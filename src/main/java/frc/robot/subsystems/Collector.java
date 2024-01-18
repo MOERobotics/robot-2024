@@ -9,6 +9,10 @@ public class Collector {
     double speed;
 
 
+    double speed2;
+
+
+
 
 
 
