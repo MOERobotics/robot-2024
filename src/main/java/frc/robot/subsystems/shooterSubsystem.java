@@ -7,10 +7,10 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class shooter extends SubsystemBase {
+public class shooterSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  public shooter() {
-
+  public shooterSubsystem() {
+    //instantiate shooter motors, encoders, sensors, PID
   }
 
   /**
@@ -37,24 +37,59 @@ public class shooter extends SubsystemBase {
     return false;
   }
 
+  //Has a note
+  public boolean hasNote(){
+    return false;
+  }
+
+  //Within reasonable range to shoot?
+  public boolean inRange() {
+    // Query some boolean state, such as a digital sensor.
+    return false;
+  }
+
+  //Shooter april tag seen
   public boolean seeSpeaker() {
     // Query some boolean state, such as a digital sensor.
     return false;
   }
 
+  //Aimed at the speaker
   public boolean aimed() {
     // Query some boolean state, such as a digital sensor.
     return false;
   }
 
+  //Is in process of aiming?
   public boolean aiming() {
     // Query some boolean state, such as a digital sensor.
     return false;
   }
 
+
+  //Good to shoot
   public boolean readyShoot() {
+    //if motors up to speed
+    //if aimed
+    //if see speaker
+
     // Query some boolean state, such as a digital sensor.
     return false;
+  }
+
+  //Shoot the note
+  public void shoot(){
+    //Feed note into shooter
+  }
+
+  //Set the desired motor speed
+  public void setShooterSpeed(double shooterSpeed){
+
+  }
+
+  //Stop motors
+  public void stop(){
+
   }
 
   @Override
