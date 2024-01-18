@@ -14,6 +14,8 @@ public class CollectorCommand extends Command {
    // shootingPositionComannd, collcetingOffGround, depositAmp, depositTrap
     private final HeadSubsystem Collector;
 
+
+
     /**
      * Creates a new ExampleCommand.
      *
