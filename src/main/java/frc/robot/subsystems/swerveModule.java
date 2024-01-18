@@ -109,6 +109,7 @@ public class swerveModule extends SubsystemBase {
         state = SwerveModuleState.optimize(state, getState().angle);
         var driveVelocity = state.speedMetersPerSecond * velocityConversionFactor;
         SmartDashboard.putNumber("Velocity " + this.driveMotor.getDeviceId(), driveVelocity);
+        SmartDashboard.putNumber("True Velocity" + this.driveMotor.getDeviceId(), getDriveVelocity());
         driveController.setReference(driveVelocity, CANSparkMax.ControlType.kVelocity);
         pivotMotor.set(turningController.calculate(getPivotRad(), state.angle.getRadians()));
     }
