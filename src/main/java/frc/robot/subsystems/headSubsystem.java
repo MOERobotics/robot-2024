@@ -7,9 +7,9 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class shooterSubsystem extends SubsystemBase {
+public class headSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  public shooterSubsystem() {
+  public headSubsystem() {
     //instantiate shooter motors, encoders, sensors, PID
   }
 
@@ -40,6 +40,19 @@ public class shooterSubsystem extends SubsystemBase {
   //Has a note
   public boolean hasNote(){
     return false;
+  }
+
+  public void setShooterTop(){
+
+  }
+  public void setShooterBottom(){
+
+  }
+  public double getShooterSpeedTop(){
+    return 0;
+  }
+  public double getShooterSpeedBottom(){
+    return 0;
   }
 
   //Within reasonable range to shoot?

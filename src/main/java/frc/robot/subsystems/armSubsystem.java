@@ -16,7 +16,7 @@ public class armSubsystem extends SubsystemBase {
      *
      * @return a command
      */
-    public Command exampleMethodCommand() {
+    public Command armSubsystem() {
         // Inline construction of command goes here.
         // Subsystem::RunOnce implicitly requires `this` subsystem.
         return runOnce(
@@ -24,6 +24,7 @@ public class armSubsystem extends SubsystemBase {
                     /* one-time action goes here */
                 });
     }
+
 
     /**
      * An example method querying a boolean state of the subsystem (for example, a digital sensor).
@@ -34,6 +35,15 @@ public class armSubsystem extends SubsystemBase {
         // Query some boolean state, such as a digital sensor.
         return false;
     }
+    public void setArmAngle(){
+
+    }
+
+    public double getArmAngle(){
+        return 0;
+    }
+
+
 
     @Override
     public void periodic() {
