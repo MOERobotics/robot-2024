@@ -1,135 +1,144 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.*;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.Arrays;
 
-public class swerveDrive extends SubsystemBase {
-    /** Creates a new ExampleSubsystem. */
-    swerveModule FLModule;
-    swerveModule BLModule;
-    swerveModule FRModule;
-    swerveModule BRModule;
-    WPI_Pigeon2 pigeon;
-    private final SwerveDriveOdometry odometer;
-    private final double maxMetersPerSec;
-    SwerveDriveKinematics kDriveKinematics;
-    public swerveDrive(swerveModule FLModule, swerveModule BLModule, swerveModule FRModule, swerveModule BRModule,
-                       WPI_Pigeon2 pigeon, double maxMetersPerSec) {
+public class SwerveDrive extends SubsystemBase {
+    private WPI_Pigeon2 gyro;
+    private Rotation2d gyroOffset = new Rotation2d();
 
-        this.pigeon = pigeon;
-        this.maxMetersPerSec = maxMetersPerSec;
+    private final SwerveModule[] swerveModules;
 
-        this.FLModule = FLModule;
+    private SwerveDriveKinematics kinematics;
 
-        this.BLModule = BLModule;
 
-        this.FRModule = FRModule;
 
-        this.BRModule = BRModule;
+    public SwerveDrive(WPI_Pigeon2 gyro, SwerveModule... modules) {
+        this.gyro = gyro;
+        this.swerveModules = modules;
 
-        kDriveKinematics = new SwerveDriveKinematics(FRModule.moduleTranslation(), FLModule.moduleTranslation(),
-                BRModule.moduleTranslation(), BLModule.moduleTranslation());
-        odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0), getModulePositions());
+
+        Translation2d[] translation2d = new Translation2d[swerveModules.length];
+        for ( int i =0; i < swerveModules.length; i ++)    {
+
+            SwerveModule state =  swerveModules[i];
+
+            translation2d[i] = state.getLocation();
+
+
+
+
+        }
+
+        kinematics = new SwerveDriveKinematics(translation2d);
+
+
+
+
 
     }
 
-    public void zeroHeading(){
-        pigeon.setYaw(0);
+    // ========== Driving ==========
+
+    /**
+     * Drive relative to the field
+     * @param speeds Field-relative speeds to drive at
+     */
+    public void driveFieldRelative(ChassisSpeeds speeds) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
-    public double getYaw(){
-        return pigeon.getYaw();
+    /**
+     * Drive relative to the robot.
+     * @param speeds Robot-relative speeds to drive at
+     */
+    public void driveRobotRelative(ChassisSpeeds speeds) {
+
+        SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(speeds);
+
+
+        for ( int i =0; i < swerveModules.length; i ++)    {
+
+          SwerveModule state =  swerveModules[i];
+          state.setDesiredState(swerveModuleStates[i]);
+
+
+
+
+        }
+
+
+
+        //throw new UnsupportedOperationException("Not implemented");
     }
 
-    public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getYaw());
+    /**
+     * Stop all motor movement
+     */
+    public void stop() {
+        // Stop all modules
+        for (SwerveModule module : this.swerveModules)
+            module.stop();
     }
 
-    public Pose2d getPose() {
-        return odometer.getPoseMeters();
+    // ========== Gyro ==========
+
+    /**
+     * Get angle relative to the field
+     * @return Angle relative to the field
+     * @see #resetFieldAngle()
+     */
+    public Rotation2d getFieldAngle() {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
-    public void resetOdometry(Pose2d pose) {
-        odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
+    /**
+     * Reset the angle of field-to-robot to 0\deg
+     * @see #resetFieldAngle(Rotation2d)
+     */
+    public void resetFieldAngle() {
+        resetFieldAngle(new Rotation2d(0));
+    }
+
+    public void resetFieldAngle(Rotation2d currentAngle) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    // ========== Odometry ==========
+
+    /**
+     * Get the positions of each swerve module
+     * @return Positions of each swerve module
+     */
+    protected SwerveModulePosition[] getPositions() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    /**
+     * Reset odometry back to (0, 0)
+     * @see #resetOdometry(Pose2d) 
+     */
+    public void resetOdometry() {
+        resetOdometry(new Pose2d());
+    }
+
+    public void resetOdometry(Pose2d currentPose) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
-
-        odometer.update(getRotation2d(), getModulePositions());
+        super.periodic();
+        // Update each of the modules
+        for (SwerveModule module : swerveModules)
+            module.periodic();
     }
-
-    public void stopModules() {
-        FLModule.stop();
-        FRModule.stop();
-        BLModule.stop();
-        BRModule.stop();
-    }
-
-    public SwerveModulePosition[] getModulePositions(){
-        SwerveModulePosition[] modulePositions = {
-                FRModule.getPosition(), FLModule.getPosition(),
-                BRModule.getPosition(), BLModule.getPosition()};
-        return modulePositions;
-    }
-
-    public void setModuleStates(SwerveModuleState[] desiredStates) {
-
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxMetersPerSec);
-        SmartDashboard.putString("FL state", desiredStates[0].toString());
-        FRModule.setDesiredState(desiredStates[0]);
-        FLModule.setDesiredState(desiredStates[1]);
-        BRModule.setDesiredState(desiredStates[2]);
-        BLModule.setDesiredState(desiredStates[3]);
-    }
-
-    public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented){
-        ChassisSpeeds chassisSpeeds;
-        if (fieldOriented){
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xspd, yspd, turnspd, getRotation2d());
-        }
-        else{
-            chassisSpeeds = new ChassisSpeeds(xspd, yspd, turnspd);
-        }
-        SmartDashboard.putString("chassis speeds", chassisSpeeds.toString());
-        SwerveModuleState[] moduleStates = kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
-
-        SmartDashboard.putString("module states", Arrays.toString(moduleStates));
-
-        setModuleStates(moduleStates);
-    }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
