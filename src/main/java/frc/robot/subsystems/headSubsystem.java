@@ -4,34 +4,29 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkLowLevel;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkRelativeEncoder;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class headSubsystem extends SubsystemBase {
-  /** Creates a new ExampleSubsystem. */
+  private final CANSparkMax collectorMotorTop = new CANSparkMax(24, CANSparkLowLevel.MotorType.kBrushless);
+  private final CANSparkMax collectorMotorTop2 = new CANSparkMax(23, CANSparkLowLevel.MotorType.kBrushless);
+  private final CANSparkMax collectorMotorBot = new CANSparkMax(25, CANSparkLowLevel.MotorType.kBrushless);
+  private final CANSparkMax collectorMotorBot2 = new CANSparkMax(22, CANSparkLowLevel.MotorType.kBrushless);
+  private final RelativeEncoder topEncoder = collectorMotorTop.getEncoder();
+  private final RelativeEncoder bottomEncoder = collectorMotorTop.getEncoder();
+  private final DigitalInput collectorBeam = new DigitalInput(1);
+
   public headSubsystem() {
-    //instantiate shooter motors, encoders, sensors, PID
+
+
   }
 
-  /**
-   * Example command factory method.
-   *
-   * @return a command
-   */
-  public Command exampleMethodCommand() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-        });
-  }
 
-  /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
-   *
-   * @return value of some boolean subsystem state, such as a digital sensor.
-   */
   public boolean exampleCondition() {
     // Query some boolean state, such as a digital sensor.
     return false;
@@ -39,20 +34,24 @@ public class headSubsystem extends SubsystemBase {
 
   //Has a note
   public boolean hasNote(){
-    return false;
+    return collectorBeam.get();
   }
 
-  public void setShooterTop(){
+  public void setShooterTop(double speed){
+        collectorMotorTop.set(speed);
+        collectorMotorTop2.set(speed);
 
   }
-  public void setShooterBottom(){
+  public void setShooterBottom(double speed){
+      collectorMotorBot.set(speed);
+      collectorMotorBot2.set(speed);
 
   }
   public double getShooterSpeedTop(){
-    return 0;
+    return topEncoder.getVelocity();
   }
   public double getShooterSpeedBottom(){
-    return 0;
+      return bottomEncoder.getVelocity();
   }
 
   //Within reasonable range to shoot?
@@ -102,6 +101,10 @@ public class headSubsystem extends SubsystemBase {
 
   //Stop motors
   public void stop(){
+    collectorMotorTop.stopMotor();
+    collectorMotorBot.stopMotor();
+    collectorMotorBot2.stopMotor();
+    collectorMotorTop2.stopMotor();
 
   }
 
