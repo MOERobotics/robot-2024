@@ -4,13 +4,23 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkLowLevel;
+import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class headSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  public headSubsystem() {
+  private CANSparkMax shooterTop;
+  private CANSparkMax shooterBottom;
+  private CANSparkMax collectorTop;
+  private CANSparkMax collectorBottom;
+  public headSubsystem(int shooterTopID,int shooterBottomID,int collectorTopID,int collectorBottomID) {
     //instantiate shooter motors, encoders, sensors, PID
+    this.shooterTop=new CANSparkMax(shooterTopID, CANSparkLowLevel.MotorType.kBrushless);
+    this.shooterBottom=new CANSparkMax(shooterBottomID,CANSparkLowLevel.MotorType.kBrushless);
+    this.collectorTop=new CANSparkMax(collectorTopID, CANSparkLowLevel.MotorType.kBrushless);
+    this.collectorBottom=new CANSparkMax(collectorBottomID,CANSparkLowLevel.MotorType.kBrushless);
   }
 
   /**
