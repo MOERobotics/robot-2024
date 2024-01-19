@@ -29,8 +29,7 @@ public class setCollectorCommand extends Command {
 
     @Override
     public void execute() {
-     headSubsystem.setShooterTop(speed);
-     headSubsystem.setShooterBottom(speed);
+     headSubsystem.setCollectorSpeed(speed, speed);
     }
 
     @Override

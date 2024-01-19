@@ -95,6 +95,11 @@ public class headSubsystem extends SubsystemBase {
     shooterSpeedBottom=speed;
     shooterBottomController.setReference(speed,CANSparkBase.ControlType.kVelocity);
   }
+
+  public void setCollectorSpeed(double topSpeed, double bottomSpeed){
+    collectorTop.set(topSpeed);
+    collectorBottom.set(bottomSpeed);
+  }
   public double getShooterSpeedTop(){
     return shooterTopEncoder.getVelocity();
   }
@@ -140,6 +145,11 @@ public class headSubsystem extends SubsystemBase {
   public void stopShooter(){
     setShooterTop(0);
     setShooterBottom(0);
+  }
+
+  public void stopMotors(){
+    collectorBottom.set(0);
+    collectorTop.set(0);
   }
 
   @Override

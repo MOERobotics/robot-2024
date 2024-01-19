@@ -29,9 +29,7 @@ public class CollectorOnOrOffCommand extends Command {
 
     @Override
     public void execute() {
-        if(!onOff){
-            headSubsystem.stop();
-        }
+
     }
 
     @Override
