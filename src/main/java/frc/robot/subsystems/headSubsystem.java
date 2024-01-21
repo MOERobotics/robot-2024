@@ -4,7 +4,13 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.CANSparkLowLevel;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkRelativeEncoder;
+
 import com.revrobotics.*;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,7 +43,7 @@ public class headSubsystem extends SubsystemBase {
 
     this.shooterTopEncoder = shooterTop.getEncoder();
     this.shooterBottomEncoder = shooterBottom.getEncoder();
-    
+
     this.shooterTopController = shooterTop.getPIDController();
     shooterTopController.setP(shooterP);
     shooterTopController.setI(shooterI);
@@ -50,7 +56,7 @@ public class headSubsystem extends SubsystemBase {
     shooterBottomController.setIZone(0);
     shooterBottomController.setD(shooterD);
     shooterBottomController.setOutputRange(-1, 1);
-    
+
   }
 
   /**
@@ -62,9 +68,9 @@ public class headSubsystem extends SubsystemBase {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
-        () -> {
-          /* one-time action goes here */
-        });
+            () -> {
+              /* one-time action goes here */
+            });
   }
 
   /**
@@ -82,13 +88,16 @@ public class headSubsystem extends SubsystemBase {
     return collectorBeam.get();
   }
 
-  public void setShooterTop(double speed){
-    shooterSpeedTop=speed;
-    shooterTopController.setReference(speed,CANSparkBase.ControlType.kVelocity);
+  public void setShooterSpeed(double speedTop,double speedBottom){
+    shooterSpeedTop=speedTop;
+    shooterSpeedBottom = speedBottom;
+    shooterTopController.setReference(speedTop,CANSparkBase.ControlType.kVelocity);
+    shooterBottomController.setReference(speedBottom,CANSparkBase.ControlType.kVelocity);
   }
-  public void setShooterBottom(double speed){
-    shooterSpeedBottom=speed;
-    shooterBottomController.setReference(speed,CANSparkBase.ControlType.kVelocity);
+
+  public void setCollectorSpeed(double topSpeed, double bottomSpeed){
+    collectorTop.set(topSpeed);
+    collectorBottom.set(bottomSpeed);
   }
   public double getShooterSpeedTop(){
     return shooterTopEncoder.getVelocity();
@@ -124,8 +133,8 @@ public class headSubsystem extends SubsystemBase {
 
   //Good to shoot
   public boolean readyShoot() {
-      return (Math.abs(shooterTopEncoder.getVelocity() - shooterSpeedTop) <= 5 && Math.abs(shooterBottomEncoder.getVelocity() - shooterSpeedBottom) <= 5
-              && aimed() && seeSpeaker());
+    return (Math.abs(shooterTopEncoder.getVelocity() - shooterSpeedTop) <= 5 && Math.abs(shooterBottomEncoder.getVelocity() - shooterSpeedBottom) <= 5
+            && aimed() && seeSpeaker() && hasNote());
     //if motors up to speed
     //if aimed
     //if see speaker
@@ -133,8 +142,16 @@ public class headSubsystem extends SubsystemBase {
 
   //Stop motors
   public void stopShooter(){
-    setShooterTop(0);
-    setShooterBottom(0);
+    setShooterSpeed(0,0);
+  }
+
+  public void stopCollector(){
+    collectorBottom.set(0);
+    collectorTop.set(0);
+  }
+  public void stopMotors(){
+    stopShooter();
+    stopCollector();
   }
 
   @Override
