@@ -7,22 +7,22 @@ package frc.robot.commands;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.swerveDrive;
+import frc.robot.subsystems.SwerveDrive;
 
 import java.util.function.Supplier;
 
 
-public class swerveController extends Command{
+public class SwerveController extends Command{
 
-    private final swerveDrive m_subsystem;
+    private final SwerveDrive m_subsystem;
     private final Supplier<Double> xspdFunction, yspdFunction, turnspdFunction;
     private final Supplier<Boolean> half;
     private final Supplier<Boolean> relativeDrive;
     private final SlewRateLimiter xLimiter, yLimiter, turnLimiter;
     private final double maxMPS, maxRPS;
 
-    public swerveController(swerveDrive subsystem, Supplier<Double> xspeed, Supplier<Double> yspeed,
-                             Supplier<Double> turnspeed, Supplier<Boolean> slow, Supplier<Boolean> relative,
+    public SwerveController(SwerveDrive subsystem, Supplier<Double> xspeed, Supplier<Double> yspeed,
+                            Supplier<Double> turnspeed, Supplier<Boolean> slow, Supplier<Boolean> relative,
                             double maxAccel, double maxAngAccel, double maxMPS, double maxRPS) {
         m_subsystem = subsystem;
         xspdFunction = xspeed;
