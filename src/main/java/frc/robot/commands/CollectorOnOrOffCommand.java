@@ -25,7 +25,18 @@ public class CollectorOnOrOffCommand extends Command {
     }
 
     @Override
-    public void initialize() {}
+    public void initialize() {
+        if(onOff){
+
+
+         headSubsystem.stopMotors();
+
+
+        }
+
+
+
+    }
 
     @Override
     public void execute() {
