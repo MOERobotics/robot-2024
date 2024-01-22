@@ -7,16 +7,14 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkRelativeEncoder;
 
 import com.revrobotics.*;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class headSubsystem extends SubsystemBase {
+public class HeadSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   private final CANSparkMax shooterTop;
   private final CANSparkMax shooterBottom;
@@ -29,7 +27,7 @@ public class headSubsystem extends SubsystemBase {
   private final DigitalInput collectorBeam;
   private double shooterSpeedTop=0;//Store desired speeds
   private double shooterSpeedBottom=0;
-  public headSubsystem(int shooterTopID,int shooterBottomID,int collectorTopID,int collectorBottomID, double shooterP, double shooterI, double shooterD, int collectorBeamID) {
+  public HeadSubsystem(int shooterTopID, int shooterBottomID, int collectorTopID, int collectorBottomID, double shooterP, double shooterI, double shooterD, int collectorBeamID) {
     //instantiate shooter motors, encoders, sensors, PID
     this.collectorBeam = new DigitalInput(collectorBeamID);
     this.shooterTop=new CANSparkMax(shooterTopID, CANSparkLowLevel.MotorType.kBrushless);

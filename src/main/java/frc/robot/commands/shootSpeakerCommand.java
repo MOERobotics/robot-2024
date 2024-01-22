@@ -4,16 +4,15 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.headSubsystem;
+import frc.robot.subsystems.HeadSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class shootSpeakerCommand extends Command {
     private double shooterSpeedTop;
     private double shooterSpeedBottom;
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final headSubsystem m_subsystem;
+    private final HeadSubsystem m_subsystem;
     double[] shooterSpeed = new double[2];
 
 
@@ -22,7 +21,7 @@ public class shootSpeakerCommand extends Command {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public shootSpeakerCommand(headSubsystem subsystem) {
+    public shootSpeakerCommand(HeadSubsystem subsystem) {
         m_subsystem = subsystem;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);

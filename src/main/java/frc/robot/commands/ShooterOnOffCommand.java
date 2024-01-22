@@ -5,12 +5,12 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.headSubsystem;
+import frc.robot.subsystems.HeadSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class ShooterOnOffCommand extends Command {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final headSubsystem m_subsystem;
+    private final HeadSubsystem m_subsystem;
     boolean onoff;
     boolean finished = false;
     double shooterSpeedTop;
@@ -21,7 +21,7 @@ public class ShooterOnOffCommand extends Command {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public ShooterOnOffCommand(headSubsystem subsystem, double shooterSpeedTop, double shooterSpeedBottom, boolean on) {
+    public ShooterOnOffCommand(HeadSubsystem subsystem, double shooterSpeedTop, double shooterSpeedBottom, boolean on) {
         m_subsystem = subsystem;
         this.shooterSpeedTop = shooterSpeedTop;
         this.shooterSpeedBottom = shooterSpeedBottom;
