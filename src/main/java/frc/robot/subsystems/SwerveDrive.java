@@ -12,17 +12,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.Arrays;
 
-public class swerveDrive extends SubsystemBase {
+public class SwerveDrive extends SubsystemBase {
     /** Creates a new ExampleSubsystem. */
-    swerveModule FLModule;
-    swerveModule BLModule;
-    swerveModule FRModule;
-    swerveModule BRModule;
+    SwerveModule FLModule;
+    SwerveModule BLModule;
+    SwerveModule FRModule;
+    SwerveModule BRModule;
     WPI_Pigeon2 pigeon;
     private final SwerveDriveOdometry odometer;
     private final double maxMetersPerSec;
     SwerveDriveKinematics kDriveKinematics;
-    public swerveDrive(swerveModule FLModule, swerveModule BLModule, swerveModule FRModule, swerveModule BRModule,
+    public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
                        WPI_Pigeon2 pigeon, double maxMetersPerSec) {
 
         this.pigeon = pigeon;
