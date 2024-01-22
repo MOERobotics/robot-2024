@@ -23,7 +23,7 @@ import frc.robot.subsystems.SwerveModule;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class SwerveBotContainer {
+public class FortissiMOEContainer{
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
@@ -40,9 +40,9 @@ public class SwerveBotContainer {
     double maxMPS = 174/39.3701;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
-            19,
-            18,
-            34,
+            3,
+            2,
+            33,
             false,
             true,
             135,
@@ -51,9 +51,9 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveModule backRightModule = new SwerveModule(
-            1,
-            20,
-            33,
+            17,
+            16,
+            34,
             false,
             true,
             -135,
@@ -62,9 +62,9 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveModule frontLeftModule = new SwerveModule(
-            11,
-            10,
-            31,
+            1,
+            20,
+            32,
             false,
             true,
             45,
@@ -73,9 +73,9 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveModule frontRightModule = new SwerveModule(
-            9,
-            8,
-            32,
+            19,
+            18,
+            31,
             false,
             true,
             -45,
@@ -86,7 +86,10 @@ public class SwerveBotContainer {
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
             pigeon, maxMPS);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
-
+    /////////////////////////////////////////////////////////////////////////////arm susbsystem start
+    private final Arm armSubsystem = new Arm(20, 21, 35, 36,
+            4, 0, 0, 0, 4, 0, 0, 0,
+            0,0,0,0,2,2);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -108,7 +111,7 @@ public class SwerveBotContainer {
 
 
 
-    public SwerveBotContainer() {
+    public FortissiMOEContainer() {
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
@@ -120,7 +123,7 @@ public class SwerveBotContainer {
 
     public Command getAutonomousCommand() {
         return null;
-       // return Autos.exampleAuto(m_drive);
+        // return Autos.exampleAuto(m_drive);
     }
 }
 
