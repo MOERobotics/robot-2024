@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 
-public class swerveModule extends SubsystemBase {
+public class SwerveModule extends SubsystemBase {
     private final CANSparkMax driveMotor;
     private final CANSparkMax pivotMotor;
 
@@ -33,7 +33,7 @@ public class swerveModule extends SubsystemBase {
     private final SparkPIDController driveController;
     private final Translation2d moduleTran;
 
-    public swerveModule(int driveMotorID, int pivotMotorID, int pivotEncoderID,
+    public SwerveModule(int driveMotorID, int pivotMotorID, int pivotEncoderID,
                         boolean driveInvert, boolean pivotInvert, double pivotOff, Translation2d moduleTran,
                         double encoderTicksPerMeter, double velocityConversionFactor,
                         double pivotP, double pivotI, double pivotD, double driveP,
@@ -109,6 +109,7 @@ public class swerveModule extends SubsystemBase {
         state = SwerveModuleState.optimize(state, getState().angle);
         var driveVelocity = state.speedMetersPerSecond * velocityConversionFactor;
         SmartDashboard.putNumber("Velocity " + this.driveMotor.getDeviceId(), driveVelocity);
+        SmartDashboard.putNumber("True Velocity" + this.driveMotor.getDeviceId(), getDriveVelocity());
         driveController.setReference(driveVelocity, CANSparkMax.ControlType.kVelocity);
         pivotMotor.set(turningController.calculate(getPivotRad(), state.angle.getRadians()));
     }
