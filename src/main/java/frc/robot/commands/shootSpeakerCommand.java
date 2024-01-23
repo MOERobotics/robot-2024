@@ -35,7 +35,7 @@ public class shootSpeakerCommand extends Command {
     @Override
     public void initialize() {
         //Set speed in RPM
-        shooterSpeed = speedCalc();//Placeholder
+        shooterSpeed = new double[]{3000,3000};//Placeholder
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -43,11 +43,12 @@ public class shootSpeakerCommand extends Command {
     public void execute() {
         m_subsystem.setShooterSpeed(shooterSpeed[0],shooterSpeed[1]);
         if(m_subsystem.readyShoot()){
-            m_subsystem.setCollectorSpeed(1,1);
+            m_subsystem.setCollectorSpeed(200,200);
         }
         if(!m_subsystem.hasNote()){
             m_subsystem.stopCollector();
         }
+
     }
 
     // Called once the command ends or is interrupted.

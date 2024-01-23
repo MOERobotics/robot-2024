@@ -9,6 +9,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 
 import com.revrobotics.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,8 +27,11 @@ public class HeadSubsystem extends SubsystemBase {
   private final SparkPIDController shooterTopController;
   private final SparkPIDController shooterBottomController;
   private final DigitalInput collectorBeam;
+  double height = 20;
   private double shooterSpeedTop=0;//Store desired speeds
   private double shooterSpeedBottom=0;
+  private double horizontalDistance;
+  private double verticalDistance;
   public HeadSubsystem(int shooterTopID, int shooterBottomID, int collectorTopID, int collectorBottomID, double shooterP, double shooterI, double shooterD, int collectorBeamID) {
     //instantiate shooter motors, encoders, sensors, PID
     this.collectorBeam = new DigitalInput(collectorBeamID);
@@ -104,13 +109,24 @@ public class HeadSubsystem extends SubsystemBase {
     return shooterBottomEncoder.getVelocity();
   }
 
+
   //Within reasonable range to shoot?
   public boolean inRange() {
     // Vision to April Tag/Odometry.
     return false;
   }
 
+  public double calculateWristAngle(Pose2d pose, double armDistance){
+    horizontalDistance = pose.getX()+armDistance;
+    return Math.atan(height/horizontalDistance);
+  }
+
+  public Translation2d getShootingArmPose(Pose2d pose, double armDistance){
+    return new Translation2d(20,calculateWristAngle(pose,armDistance));
+  }
   //Shooter april tag seen
+
+
   public boolean seeSpeaker() {
     // Query Odometry or vision to April Tag.
     return false;
