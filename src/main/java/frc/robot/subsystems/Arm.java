@@ -5,24 +5,17 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import java.util.ArrayList;
-import java.util.function.Supplier;
-
-import static com.revrobotics.CANSparkBase.ControlType.kVelocity;
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 
 public class Arm extends SubsystemBase {
@@ -37,7 +30,6 @@ public class Arm extends SubsystemBase {
 
     private Trajectory trajectory;
     private Timer timer;
-    private Pose2d desiredPose;
 
     double shoulderLength, wristLength, shoulderInertia, wristInertia, maxShoulderSpeed,
     maxWristSpeed;
@@ -65,7 +57,6 @@ public class Arm extends SubsystemBase {
         this.maxWristSpeed = maxWristSpeed;
 
         timer = new Timer();
-        desiredPose = new Pose2d(0,0,Rotation2d.fromRadians(0));
 
     }
 
