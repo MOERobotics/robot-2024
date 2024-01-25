@@ -6,16 +6,21 @@ package frc.robot;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.CollectorCommands;
+import frc.robot.commands.CollectorOnOrOffCommand;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.setCollectorCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.headSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -91,6 +96,9 @@ public class FortissiMOEContainer{
             4, 0, 0, 0, 4, 0, 0, 0,
             0,0,0,0,2,2);
 
+    private final headSubsystem headSubsystem = new headSubsystem(0,0,0,
+            0,0,0,0,0);
+
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -106,16 +114,25 @@ public class FortissiMOEContainer{
             () -> driverJoystick.getRawButton(3), 6,6, maxMPS, maxRPS
     );
 
+    private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
+
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
 
 
     public FortissiMOEContainer() {
+
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
+        var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
+
+
+
     }
+
+
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> swerveSubsystem.zeroHeading()));
@@ -124,6 +141,7 @@ public class FortissiMOEContainer{
     public Command getAutonomousCommand() {
         return null;
         // return Autos.exampleAuto(m_drive);
+
     }
 }
 
