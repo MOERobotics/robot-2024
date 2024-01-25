@@ -4,16 +4,18 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.swerveController;
+import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.swerveDrive;
-import frc.robot.subsystems.swerveModule;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveModule;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -21,7 +23,7 @@ import frc.robot.subsystems.swerveModule;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class swerveBotContainer {
+public class SwerveBotContainer {
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
@@ -37,7 +39,7 @@ public class swerveBotContainer {
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
     double maxRPS = Math.PI*2;
-    private final swerveModule backLeftModule = new swerveModule(
+    private final SwerveModule backLeftModule = new SwerveModule(
             19,
             18,
             34,
@@ -48,7 +50,7 @@ public class swerveBotContainer {
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final swerveModule backRightModule = new swerveModule(
+    private final SwerveModule backRightModule = new SwerveModule(
             1,
             20,
             33,
@@ -59,7 +61,7 @@ public class swerveBotContainer {
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final swerveModule frontLeftModule = new swerveModule(
+    private final SwerveModule frontLeftModule = new SwerveModule(
             11,
             10,
             31,
@@ -70,7 +72,7 @@ public class swerveBotContainer {
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final swerveModule frontRightModule = new swerveModule(
+    private final SwerveModule frontRightModule = new SwerveModule(
             9,
             8,
             32,
@@ -81,7 +83,7 @@ public class swerveBotContainer {
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final swerveDrive swerveSubsystem = new swerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
+    private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
             pigeon, maxMPS);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
@@ -90,12 +92,12 @@ public class swerveBotContainer {
 
     ////////////////////////////////////////////////////////////////////////////commands
 
-    private final Command drive  = new swerveController(swerveSubsystem,
+    private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
             () -> -driverJoystick.getRawAxis(4),
             () -> driverJoystick.getRawButton(6),
-            () -> driverJoystick.getRawButton(3), 3,3, maxMPS, maxRPS
+            () -> driverJoystick.getRawButton(3), 6,6, maxMPS, maxRPS
     );
 
     ////////////////////////////////////////////////////////////////////////////commands end
@@ -103,7 +105,7 @@ public class swerveBotContainer {
 
 
 
-    public swerveBotContainer() {
+    public SwerveBotContainer() {
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
