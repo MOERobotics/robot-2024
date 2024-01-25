@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -91,10 +90,10 @@ public class FortissiMOEContainer{
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
             pigeon, maxMPS);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
-    /////////////////////////////////////////////////////////////////////////////arm susbsystem start
+    /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(20, 21, 35, 36,
-            4, 0, 0, 0, 4, 0, 0, 0,
-            0,0,0,0,2,2);
+            4, 0, 0, 4, 0, 0, 0, 0,
+            0,0,0,0);
 
     private final headSubsystem headSubsystem = new headSubsystem(0,0,0,
             0,0,0,0,0);
