@@ -8,48 +8,67 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.headSubsystem;
+import frc.robot.subsystems.HeadSubsystem;
+
+import java.util.function.BiFunction;
 
 public final class CollectorCommands {
     /** Example static factory for an autonomous command. */
-    public static Command headDownThenCollect(headSubsystem headSubsystem, Arm armSubsystem) {
-        var headDownThenCollect = Commands.sequence(
+
+
+    // commands to set shoulder and wrist at various positions
+
+
+    private static Command moveThenCollect(
+            HeadSubsystem headSubsystem,
+            Arm armSubsystem,
+            Rotation2d shoulder,
+            Rotation2d wrist,
+            double topSpeed,
+            double bottomSpeed
+    ){
+
+        var command = Commands.parallel(
+
                 armSubsystem.followPathCommand(
-                        Rotation2d.fromDegrees(90),
-                        Rotation2d.fromDegrees(45)
+                       (shoulder),
+                        (wrist)
                 ),
-                new CollectorOnOrOffCommand(headSubsystem, true),
-                new setCollectorCommand(headSubsystem, 3000)
+
+                headSubsystem.runCollectorCommands(topSpeed,bottomSpeed)
+
         );
 
-        return headDownThenCollect;
+        return command;
+
+
     }
 
-    public static Command setArmToAmpThenDeposit(headSubsystem headSubsystem, Arm armSubsystem){
-        var setArmToAmpThenDeposit = Commands.sequence(
-                armSubsystem.followPathCommand(
-                        Rotation2d.fromDegrees(135),
-                        Rotation2d.fromDegrees(135)
-                ),
-                new CollectorOnOrOffCommand(headSubsystem, true),
-                new setCollectorCommand(headSubsystem, -3000)
-        );
+    // floor pickup
+    public static Command headDownThenCollect(HeadSubsystem headSubsystem, Arm armSubsystem) {
 
-        return setArmToAmpThenDeposit;
+        return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(90),
+                Rotation2d.fromDegrees(45), 0.5, 0.5 );
     }
 
-    public static Command setArmToSourceThenCollect(headSubsystem headSubsystem, Arm armSubsystem){
-        var setArmToSourceThenCollect = Commands.sequence(
-                armSubsystem.followPathCommand(
-                        Rotation2d.fromDegrees(155),
-                        Rotation2d.fromDegrees(135)
-                ),
-                new CollectorOnOrOffCommand(headSubsystem, true),
-                new setCollectorCommand(headSubsystem, 3000)
-        );
 
-        return setArmToSourceThenCollect;
+    // Amp pickup
+    public static Command setArmToAmpThenDeposit(HeadSubsystem headSubsystem, Arm armSubsystem){
+
+        return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(135),
+                Rotation2d.fromDegrees(135), -0.5, -0.5 );
+
+    }
+
+    // TODO write new command for Shooter for AMP(not done)
+    // TODO write command so that it will wait until is collected(not done)
+    // TODO Make one big command that takes in position and speeds to a void copy pasting(done)
+    // Source Collect
+    public static Command setArmToSourceThenCollect(HeadSubsystem headSubsystem, Arm armSubsystem){
+
+        return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(155),
+                Rotation2d.fromDegrees(135), 0.5, 0.5 );
+
     }
 
 
