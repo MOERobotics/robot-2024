@@ -25,6 +25,7 @@ import frc.robot.subsystems.SwerveModule;
  */
 public class FortissiMOEContainer{
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
+
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
     double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
@@ -87,12 +88,12 @@ public class FortissiMOEContainer{
             pigeon, maxMPS);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm susbsystem start
-    private final Arm armSubsystem = new Arm(20, 21, 35, 36,
+    /*private final Arm armSubsystem = new Arm(20, 21, 35, 36,
             4, 0, 0, 0, 4, 0, 0, 0,
             0,0,0,0,2,2);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
-
+*/
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
 
 
@@ -103,7 +104,7 @@ public class FortissiMOEContainer{
             () -> -driverJoystick.getRawAxis(0),
             () -> -driverJoystick.getRawAxis(4),
             () -> driverJoystick.getRawButton(6),
-            () -> driverJoystick.getRawButton(3), 6,6, maxMPS, maxRPS
+            () -> driverJoystick.getRawButton(3), 0.15,6, maxMPS, maxRPS
     );
 
     ////////////////////////////////////////////////////////////////////////////commands end
@@ -112,6 +113,7 @@ public class FortissiMOEContainer{
 
 
     public FortissiMOEContainer() {
+        pigeon.reset();
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
