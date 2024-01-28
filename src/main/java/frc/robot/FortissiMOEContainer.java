@@ -86,12 +86,12 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS, vision);
+            ()->pigeon.getYaw(), maxMPS, 0, 0,vision);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
-    /*private final Arm armSubsystem = new Arm(20, 21, 35, 36,
-            4, 0, 0, 4, 0, 0, 0, 0,
-            0,0,0,0);*/
+//    private final Arm armSubsystem = new Arm(20, 21, 35, 36,
+//            4, 0, 0, 4, 0, 0, 0, 0,
+//            0,0,0,0);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -103,8 +103,8 @@ public class FortissiMOEContainer{
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
-            () -> -driverJoystick.getRawAxis(4),
-            () -> driverJoystick.getRawButton(6),
+            () -> -driverJoystick.getRawAxis(2),
+            () -> driverJoystick.getRawButton(5),
             () -> driverJoystick.getRawButton(3), 6,6, maxMPS, maxRPS
     );
 
@@ -120,7 +120,7 @@ public class FortissiMOEContainer{
     }
 
     private void configureBindings() {
-        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> swerveSubsystem.zeroHeading()));
+        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> pigeon.setYaw(0)));
     }
 
     public Command getAutonomousCommand() {

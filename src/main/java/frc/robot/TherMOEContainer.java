@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
-import frc.robot.vision.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -23,9 +22,8 @@ import frc.robot.vision.Vision;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class SwerveBotContainer {
-    WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
-    Vision vision;
+public class TherMOEContainer{
+    AHRS navx = new AHRS();
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
     double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
@@ -41,9 +39,9 @@ public class SwerveBotContainer {
     double maxMPS = 174/39.3701;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
-            19,
-            18,
-            34,
+            3,
+            2,
+            33,
             false,
             true,
             135,
@@ -52,9 +50,9 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveModule backRightModule = new SwerveModule(
-            1,
-            20,
-            33,
+            17,
+            16,
+            34,
             false,
             true,
             -135,
@@ -63,9 +61,9 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveModule frontLeftModule = new SwerveModule(
-            11,
-            10,
-            31,
+            1,
+            20,
+            32,
             false,
             true,
             45,
@@ -74,9 +72,9 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveModule frontRightModule = new SwerveModule(
-            9,
-            8,
-            32,
+            19,
+            18,
+            31,
             false,
             true,
             -45,
@@ -85,9 +83,12 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS,0.15,0,vision);
+            ()->(-1.0*navx.getYaw()), maxMPS, 0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
-
+    /////////////////////////////////////////////////////////////////////////////arm subsystem start
+//    private final Arm armSubsystem = new Arm(20, 21, 35, 36,
+//            4, 0, 0, 4, 0, 0, 0, 0,
+//            0,0,0,0);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -108,20 +109,19 @@ public class SwerveBotContainer {
 
 
 
-
-    public SwerveBotContainer() {
+    public TherMOEContainer() {
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
     }
 
     private void configureBindings() {
-        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> pigeon.setYaw(0)));
+        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> navx.reset()));
     }
 
     public Command getAutonomousCommand() {
         return null;
-       // return Autos.exampleAuto(m_drive);
+        // return Autos.exampleAuto(m_drive);
     }
 }
 
