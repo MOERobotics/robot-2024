@@ -27,6 +27,7 @@ import frc.robot.subsystems.HeadSubsystem;
  */
 public class FortissiMOEContainer{
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
+
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
     double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
@@ -108,7 +109,7 @@ public class FortissiMOEContainer{
             () -> -driverJoystick.getRawAxis(0),
             () -> -driverJoystick.getRawAxis(4),
             () -> driverJoystick.getRawButton(6),
-            () -> driverJoystick.getRawButton(3), 6,6, maxMPS, maxRPS
+            () -> driverJoystick.getRawButton(3), 0.15,6, maxMPS, maxRPS
     );
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
@@ -119,7 +120,7 @@ public class FortissiMOEContainer{
 
 
     public FortissiMOEContainer() {
-
+        pigeon.reset();
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
@@ -129,8 +130,6 @@ public class FortissiMOEContainer{
         button9.onTrue(headDownThenCollect);
     }
 
-
-
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> swerveSubsystem.zeroHeading()));
     }
@@ -138,7 +137,6 @@ public class FortissiMOEContainer{
     public Command getAutonomousCommand() {
         return null;
         // return Autos.exampleAuto(m_drive);
-
     }
 }
 

@@ -65,7 +65,7 @@ public class SwerveDrive extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-
+        SmartDashboard.putNumber("Yaw:",getYaw());
         odometer.update(getRotation2d(), getModulePositions());
     }
 
