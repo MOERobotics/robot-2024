@@ -18,7 +18,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 
+
+
 public class Arm extends SubsystemBase {
+
+
     private final CANSparkMax shoulderMotor;
     private final CANSparkMax wristMotor;
 
@@ -34,6 +38,7 @@ public class Arm extends SubsystemBase {
     double shoulderLength, wristLength, shoulderInertia, wristInertia, maxShoulderSpeed,
     maxWristSpeed;
 
+    // constructor
     public Arm(int shoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
                double kPShoulder, double kIShoulder, double kDShoulder,
                double kPWrist, double kIWrist, double kDWrist,
