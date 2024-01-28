@@ -88,10 +88,10 @@ public class FortissiMOEContainer{
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
             pigeon, maxMPS);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
-    /////////////////////////////////////////////////////////////////////////////arm susbsystem start
+    /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(20, 21, 35, 36,
-            4, 0, 0, 0, 4, 0, 0, 0,
-            0,0,0,0,2,2);
+            4, 0, 0, 4, 0, 0, 0, 0,
+            0,0,0,0);
 
     private final HeadSubsystem headSubsystem = new HeadSubsystem(0,0,0,
             0,0,0,0,0,0,0,0,0,0);
