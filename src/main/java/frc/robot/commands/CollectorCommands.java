@@ -53,7 +53,7 @@ public final class CollectorCommands {
 
 
     // Amp pickup
-    public static Command setArmToAmpThenDeposit(HeadSubsystem headSubsystem, Arm armSubsystem){
+    public static Command setArmToAmpThenDepositCollector(HeadSubsystem headSubsystem, Arm armSubsystem){
 
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(135),
                 Rotation2d.fromDegrees(135), -0.5, -0.5 );
@@ -68,6 +68,19 @@ public final class CollectorCommands {
 
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(155),
                 Rotation2d.fromDegrees(135), 0.5, 0.5 );
+
+    }
+
+
+
+
+
+    // angles need to be changed to fit arm
+
+    public static Command setArmToAmpThenDepositShooter(HeadSubsystem headSubsystem, Arm armSubsystem){
+
+        return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(-155),
+                Rotation2d.fromDegrees(-135), 0.5, 0.5 );
 
     }
 
