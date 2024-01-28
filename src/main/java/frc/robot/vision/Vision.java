@@ -28,10 +28,10 @@ public class Vision {
 
     public Vision() {
         var networkTable = NetworkTableInstance.getDefault();
-        pubFieldToOdometry = networkTable.getStructTopic("Moenet/field_to_odometry", Pose3d.struct).publish();
-        pubRobotToCamera = networkTable.getStructTopic("Moenet/robot_to_camera", Transform3d.struct).publish();
-        subOdomToRobot = networkTable.getStructTopic("Moenet/odom_to_robot", Transform3d.struct).subscribe(new Transform3d());
-        subObjectDetections = networkTable.getStructArrayTopic("Moenet/object_detection", ObjectDetection.struct).subscribe(new ObjectDetection[]{});
+        pubFieldToOdometry = networkTable.getStructTopic("moenet/tf_field_odom", Pose3d.struct).publish();
+        pubRobotToCamera = networkTable.getStructTopic("moenet/robot_to_camera", Transform3d.struct).publish();
+        subOdomToRobot = networkTable.getStructTopic("moenet/tf_odom_robot", Transform3d.struct).subscribe(new Transform3d());
+        subObjectDetections = networkTable.getStructArrayTopic("moenet/object_detection", ObjectDetection.struct).subscribe(new ObjectDetection[]{});
     }
 
     public void setOdometryPosition(Pose2d fieldToOdometry){ //Rohan

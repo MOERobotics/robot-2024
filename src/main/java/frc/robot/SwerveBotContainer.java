@@ -85,7 +85,7 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS,0.15,0,vision);
+            ()->pigeon.getYaw(), maxMPS,0.15,0,0,vision);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
 

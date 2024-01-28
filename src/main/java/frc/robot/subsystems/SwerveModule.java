@@ -117,6 +117,9 @@ public class SwerveModule extends SubsystemBase {
     public Translation2d moduleTranslation(){
         return moduleTran;
     }
+    public void periodic(){
+        SmartDashboard.putNumber("Orientation"+this.driveMotor.getDeviceId(), getPivotRad());
+    }
 
     public void stop(){
         driveMotor.set(0);
