@@ -87,9 +87,6 @@ public class SwerveBotContainer {
             pigeon, maxMPS);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
-
-    /////////////////////////////////////////////////////////////////////////// arm subsystem end
-
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
 
 
@@ -120,7 +117,7 @@ public class SwerveBotContainer {
 
     public Command getAutonomousCommand() {
         return null;
-       // return Autos.exampleAuto(m_drive);
+        // return Autos.exampleAuto(m_drive);
     }
 }
 

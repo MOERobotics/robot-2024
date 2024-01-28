@@ -24,7 +24,11 @@ import java.util.function.Supplier;
 import static com.revrobotics.CANSparkBase.ControlType.kVelocity;
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 
+
+
 public class Arm extends SubsystemBase {
+
+
     private final CANSparkMax shoulderMotor;
     private final CANSparkMax wristMotor;
 
@@ -35,8 +39,9 @@ public class Arm extends SubsystemBase {
     private final SparkPIDController wristController;
     public Supplier<ChassisSpeeds> desiredSpeeds;
     double shoulderLength, wristLength, shoulderInertia, wristInertia, maxShoulderSpeed,
-    maxWristSpeed;
+            maxWristSpeed;
 
+    // constructor
     public Arm(int shoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
                double kPShoulder, double kIShoulder, double kDShoulder, double kFFShoulder,
                double kPWrist, double kIWrist, double kDWrist, double kFFWrist,
@@ -102,7 +107,7 @@ public class Arm extends SubsystemBase {
                 new Rotation2d(0));
     }
 
-    public Command followPathCommand(Translation2d targetPose){
+    public Command followPathCommand(Rotation2d shoulderAngle, Rotation2d wristAngle){
         return new PathfindRamsete(
                 targetPose,
                 new PathConstraints(3,3,

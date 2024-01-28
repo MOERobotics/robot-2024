@@ -4,18 +4,20 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.CollectorCommands;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.HeadSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -107,6 +109,8 @@ public class FortissiMOEContainer{
             () -> driverJoystick.getRawButton(3), 0.15,6, maxMPS, maxRPS
     );
 
+    // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
+
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
@@ -117,6 +121,17 @@ public class FortissiMOEContainer{
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
+        var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
+
+        var button9 = new Trigger(() -> driverJoystick.getRawButton(9));
+        button9.onTrue(headDownThenCollect);
+
+        var isFinished = new Trigger(() -> driverJoystick.getRawButton(9));
+
+
+
+
+
     }
 
     private void configureBindings() {
