@@ -91,7 +91,7 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(20, 21, 35, 36,
             4, 0, 0, 4, 0, 0, 0, 0,
-            0,0,0,0);
+            0,0,0,0,0,0);
 
     private final HeadSubsystem headSubsystem = new HeadSubsystem(0,0,0,
             0,0,0,0,0,0,0,0,0,0);
