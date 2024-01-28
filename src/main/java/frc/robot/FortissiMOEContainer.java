@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
+import frc.robot.vision.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -38,6 +39,8 @@ public class FortissiMOEContainer{
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
     double maxRPS = Math.PI*2;
+
+    Vision vision = new Vision();
     private final SwerveModule backLeftModule = new SwerveModule(
             3,
             2,
@@ -83,12 +86,12 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS);
+            pigeon, maxMPS, vision);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
-    private final Arm armSubsystem = new Arm(20, 21, 35, 36,
+    /*private final Arm armSubsystem = new Arm(20, 21, 35, 36,
             4, 0, 0, 4, 0, 0, 0, 0,
-            0,0,0,0);
+            0,0,0,0);*/
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
