@@ -12,7 +12,7 @@ public class shootSpeakerCommand extends Command {
     private double shooterSpeedTop;
     private double shooterSpeedBottom;
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final HeadSubsystem m_subsystem;
+    private final HeadSubsystem headSubsystem;
     double[] shooterSpeed = new double[2];
 
 
@@ -22,46 +22,44 @@ public class shootSpeakerCommand extends Command {
      * @param subsystem The subsystem used by this command.
      */
     public shootSpeakerCommand(HeadSubsystem subsystem) {
-        m_subsystem = subsystem;
+        headSubsystem = subsystem;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
     }
     //TODO: Calculate shooter speeds based on odometry.
-    public double[] speedCalc(){
-        return new double[]{0.0,0.0};
+    public double speedCalc(){
+        return 0.0;
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
         //Set speed in RPM
-        shooterSpeed = new double[]{3000,3000};//Placeholder
+        shooterSpeedTop = 0;//Placeholder
+	    shooterSpeedBottom = 0;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        m_subsystem.setShooterSpeed(shooterSpeed[0],shooterSpeed[1]);
-        if(m_subsystem.readyShoot()){
-            m_subsystem.setCollectorSpeed(200,200);
+        headSubsystem.setShooterTopSpeed(shooterSpeedTop);
+		headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
+        if(headSubsystem.readyShoot()){
+            headSubsystem.setCollectorSpeed(1,1);
         }
-        if(!m_subsystem.hasNote()){
-            m_subsystem.stopCollector();
-        }
-
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        m_subsystem.stopCollector();
+        headSubsystem.stopCollector();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
         //TODO: Need to fix the condition for when the command is finished.
-        if(!m_subsystem.hasNote()){
+        if(!headSubsystem.isCollected()){
             return true;
         }
         return false;

@@ -4,13 +4,7 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkLowLevel;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-
 import com.revrobotics.*;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,7 +28,7 @@ public class HeadSubsystem extends SubsystemBase {
     private double shooterSpeedTop=0;//Store desired speeds
     private double shooterSpeedBottom=0;
     private boolean collectorState;
-    private int shooterRPMtolerance;
+    private int shooterRPMTolerance;
     public HeadSubsystem(int shooterTopID, int shooterBottomID, int collectorTopID,
                          int collectorBottomID, double shooterP, double shooterI, double shooterD, double shooterFF,
                          double collectorP, double collectorI, double collectorD, double collectorFF,  int collectorBeamID) {
@@ -91,7 +85,7 @@ public class HeadSubsystem extends SubsystemBase {
         collectorTopController.setOutputRange(-1, 1);
 
 		// sets up tolerance
-        setShooterRPMtolerance(5);
+        setShooterRPMTolerance(5);
     }
 
 	/**
@@ -181,24 +175,28 @@ public class HeadSubsystem extends SubsystemBase {
         return false;
     }
 
+	public boolean shooterAtSpeed(){
+		return ((Math.abs(shooterTopEncoder.getVelocity() - shooterSpeedTop) <= shooterRPMTolerance) && (Math.abs(shooterBottomEncoder.getVelocity() - shooterSpeedBottom) <= shooterRPMTolerance));
+	}
+
 
     //Good to shoot
-    public boolean readyShoot(int shooterRPMtolerance) {
-        return ((Math.abs(shooterTopEncoder.getVelocity() - shooterSpeedTop) <= shooterRPMtolerance) && (Math.abs(shooterBottomEncoder.getVelocity() - shooterSpeedBottom) <= shooterRPMtolerance)
-                && aimed() && seeSpeaker());
+    public boolean readyShoot() {
+        return (shooterAtSpeed() && aimed() && seeSpeaker() && isCollected());
         //if motors up to speed
         //if aimed
         //if see speaker
+	    //Has a note
     }
 
 
 
-    public void setShooterRPMtolerance(int shooterRPMtolerance){
-        this.shooterRPMtolerance = shooterRPMtolerance;
+    public void setShooterRPMTolerance(int shooterRPMtolerance){
+        this.shooterRPMTolerance = shooterRPMtolerance;
     }
 
-    public int getShooterRPMtolerance(){
-        return shooterRPMtolerance;
+    public int getShooterRPMTolerance(){
+        return shooterRPMTolerance;
     }
 
 
@@ -244,8 +242,13 @@ public class HeadSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("shooterBottomDesired:",shooterSpeedBottom);
         SmartDashboard.putNumber("shooterTopActualSpeed:",getShooterSpeedTop());
         SmartDashboard.putNumber("shooterBottomActualSpeed:",getShooterSpeedBottom());
-        SmartDashboard.putBoolean("Ready to shoot:", isCollected());
-        SmartDashboard.putNumber("Shooter RPM Tolerance", getShooterRPMtolerance());
+	    SmartDashboard.putNumber("Shooter RPM Tolerance", getShooterRPMTolerance());
+		SmartDashboard.putBoolean("Note Collected:",isCollected());
+		SmartDashboard.putBoolean("In Range:",inRange());
+		SmartDashboard.putBoolean("Sees speaker:",seeSpeaker());
+		SmartDashboard.putBoolean("Aimed at speaker:",aimed());
+	    SmartDashboard.putBoolean("Aiming in progress:",aiming());
+	    SmartDashboard.putBoolean("Ready to shoot:", readyShoot());
         // This method will be called once per scheduler run
     }
 

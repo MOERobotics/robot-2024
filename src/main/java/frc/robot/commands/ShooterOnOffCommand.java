@@ -10,9 +10,9 @@ import frc.robot.subsystems.HeadSubsystem;
 /** An example command that uses an example subsystem. */
 public class ShooterOnOffCommand extends Command {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final HeadSubsystem m_subsystem;
+    private final HeadSubsystem headSubsystem;
     boolean onoff;
-    boolean finished = false;
+    boolean finished;
     double shooterSpeedTop;
     double shooterSpeedBottom;
 
@@ -22,7 +22,7 @@ public class ShooterOnOffCommand extends Command {
      * @param subsystem The subsystem used by this command.
      */
     public ShooterOnOffCommand(HeadSubsystem subsystem, double shooterSpeedTop, double shooterSpeedBottom, boolean on) {
-        m_subsystem = subsystem;
+        headSubsystem = subsystem;
         this.shooterSpeedTop = shooterSpeedTop;
         this.shooterSpeedBottom = shooterSpeedBottom;
         onoff = on;
@@ -33,22 +33,26 @@ public class ShooterOnOffCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        if(onoff){
-            m_subsystem.setShooterSpeed(shooterSpeedTop,shooterSpeedBottom);
-        } else{
-            m_subsystem.stopShooter();
-        }
+		finished=false;
+	    if(onoff){
+		    headSubsystem.setShooterTopSpeed(shooterSpeedTop);
+		    headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
+	    } else{
+		    headSubsystem.stopShooter();
+	    }
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if(m_subsystem.getShooterSpeedBottom() >= shooterSpeedBottom && m_subsystem.getShooterSpeedTop() >= shooterSpeedTop){
+	    if(onoff){
+		    headSubsystem.setShooterTopSpeed(shooterSpeedTop);
+		    headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
+	    } else{
+		    headSubsystem.stopShooter();
+	    }
+        if(headSubsystem.shooterAtSpeed()){
             finished = true;
-        } else if(!onoff){
-            finished = true;
-        }else{
-            finished = false;
         }
     }
 
@@ -59,9 +63,6 @@ public class ShooterOnOffCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if(finished){
-            return true;
-        }
-        return false;
+        return finished;
     }
 }

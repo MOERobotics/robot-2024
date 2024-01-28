@@ -90,12 +90,14 @@ public class FortissiMOEContainer{
             pigeon, maxMPS);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm susbsystem start
-    /*private final Arm armSubsystem = new Arm(20, 21, 35, 36,
+    private final Arm armSubsystem = new Arm(99, 99, 99, 99,
             4, 0, 0, 0, 4, 0, 0, 0,
             0,0,0,0,2,2);
-
+	//TODO: Replace 99 with correct motor IDs.
+	private final HeadSubsystem headSubsystem = new HeadSubsystem(99,99,99,
+			99,0,0,0,0,0,0,0,0,99);
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
-*/
+
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
 
 
@@ -105,9 +107,9 @@ public class FortissiMOEContainer{
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
             () -> -driverJoystick.getRawAxis(4),
-            () -> driverJoystick.getRawButton(6),
-            () -> driverJoystick.getRawButton(3), 0.15,6, maxMPS, maxRPS
-    );
+            () -> driverJoystick.getRawButton(6),//Slow Bumper
+            () -> driverJoystick.getRawButton(3),//Robot relative
+		    0.15,6, maxMPS, maxRPS);
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
 
