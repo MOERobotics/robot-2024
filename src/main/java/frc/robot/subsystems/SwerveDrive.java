@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.vision.Vision;
+
 import java.util.Arrays;
 
 public class SwerveDrive extends SubsystemBase {
@@ -19,11 +21,12 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModule FRModule;
     SwerveModule BRModule;
     WPI_Pigeon2 pigeon;
+    Vision vision;
     private final SwerveDriveOdometry odometer;
     private final double maxMetersPerSec;
     SwerveDriveKinematics kDriveKinematics;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
-                       WPI_Pigeon2 pigeon, double maxMetersPerSec) {
+                       WPI_Pigeon2 pigeon, double maxMetersPerSec,Vision vision) {
 
         this.pigeon = pigeon;
         this.maxMetersPerSec = maxMetersPerSec;
@@ -35,6 +38,7 @@ public class SwerveDrive extends SubsystemBase {
         this.FRModule = FRModule;
 
         this.BRModule = BRModule;
+        this.vision = vision;
 
         kDriveKinematics = new SwerveDriveKinematics(FRModule.moduleTranslation(), FLModule.moduleTranslation(),
                 BRModule.moduleTranslation(), BLModule.moduleTranslation());
@@ -66,7 +70,7 @@ public class SwerveDrive extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
 
-        odometer.update(getRotation2d(), getModulePositions());
+        vision.setOdometryPosition(odometer.update(getRotation2d(), getModulePositions()));
     }
 
     public void stopModules() {

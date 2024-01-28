@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
+import frc.robot.vision.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -25,6 +26,7 @@ import frc.robot.subsystems.SwerveModule;
  */
 public class SwerveBotContainer {
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
+    Vision vision;
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
     double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
@@ -84,7 +86,7 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS);
+            pigeon, maxMPS,vision);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
 

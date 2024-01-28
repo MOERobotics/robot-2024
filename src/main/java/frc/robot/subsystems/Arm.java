@@ -9,12 +9,15 @@ import com.revrobotics.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.vision.Vision;
+
 import java.util.ArrayList;
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 
@@ -30,6 +33,7 @@ public class Arm extends SubsystemBase {
 
     private Trajectory trajectory;
     private Timer timer;
+    Vision vision;
 
     double shoulderLength, wristLength, shoulderInertia, wristInertia, maxShoulderSpeed,
     maxWristSpeed;
@@ -38,7 +42,7 @@ public class Arm extends SubsystemBase {
                double kPShoulder, double kIShoulder, double kDShoulder,
                double kPWrist, double kIWrist, double kDWrist,
                double shoulderLength, double wristLength, double shoulderInertia, double wristInertia,
-               double maxShoulderSpeed, double maxWristSpeed) {
+               double maxShoulderSpeed, double maxWristSpeed, Vision vision) {
         shoulderMotor = new CANSparkMax(shoulderMotorID, kBrushless);
         wristMotor = new CANSparkMax(wristMotorID, kBrushless);
 
@@ -50,6 +54,7 @@ public class Arm extends SubsystemBase {
         wristController = new PIDController(kPWrist, kIWrist, kDWrist);
 
         this.shoulderLength = shoulderLength;
+        this.vision = vision;
         this.shoulderInertia = shoulderInertia;
         this.wristLength = wristLength;
         this.wristInertia = wristInertia;
@@ -63,6 +68,8 @@ public class Arm extends SubsystemBase {
     public void periodic(){
         //TODO: make the mechanism 2d object in here
         pathFollow(trajectory.sample(timer.get()).poseMeters);
+        //TODO: Transform to camera and pass in a real Transform3d.
+        vision.setCameraPosition(new Transform3d());
     }
 
     void pathFollow(Pose2d desState){
@@ -86,6 +93,7 @@ public class Arm extends SubsystemBase {
         return new Pose2d(new Translation2d(shoulderState().getRadians(), wristState().getRadians()),
                 new Rotation2d(0));
     }
+
 
     public void goToPoint(Pose2d targetDest){
         var startPose = getArmState();
