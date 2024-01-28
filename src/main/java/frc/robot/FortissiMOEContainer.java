@@ -89,9 +89,13 @@ public class FortissiMOEContainer{
             pigeon, maxMPS);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
+
+
+
+    // Need to fill in proper values for constructor
     private final Arm armSubsystem = new Arm(20, 21, 35, 36,
             4, 0, 0, 4, 0, 0, 0, 0,
-            0,0,0,0);
+            0,0,0,0,0,0);
 
     private final HeadSubsystem headSubsystem = new HeadSubsystem(0,0,0,
             0,0,0,0,0,0,0,0,0,0);
@@ -127,6 +131,10 @@ public class FortissiMOEContainer{
 
         var button9 = new Trigger(() -> driverJoystick.getRawButton(9));
         button9.onTrue(headDownThenCollect);
+
+        var isFinished = new Trigger(() -> driverJoystick.getRawButton(9));
+
+
 
 
 

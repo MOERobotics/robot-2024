@@ -108,10 +108,23 @@ public class HeadSubsystem extends SubsystemBase {
 
 
     //Has a note
-    public boolean IsCollected(){
+    public boolean isCollected()
+    {
+
         return collectorBeam.get();
+
+
+
     }
 
+
+
+    public boolean isFinished(){
+
+
+        return false;
+
+    }
     // TODO rename methods(partially done?)
     public void setShooterTopSpeed(double speed){
         shooterSpeedTop=speed;
@@ -241,13 +254,31 @@ public class HeadSubsystem extends SubsystemBase {
 
     // TODO A state where we know its safe to move even if the note isn't completely in the head(not done)
 
+
+
+    public void readyToMoveShooter(){
+
+
+
+
+
+    }
+
+
+
+
     @Override
     public void periodic() {
         SmartDashboard.putNumber("shooterTopDesired:",shooterSpeedTop);
         SmartDashboard.putNumber("shooterBottomDesired:",shooterSpeedBottom);
         SmartDashboard.putNumber("shooterTopActualSpeed:",getShooterSpeedTop());
         SmartDashboard.putNumber("shooterBottomActualSpeed:",getShooterSpeedBottom());
-        SmartDashboard.putBoolean("Ready to shoot:",readyShoot());
+        SmartDashboard.putBoolean("Ready to shoot:", isCollected());
+        SmartDashboard.putNumber("Shooter RPM Tolerance", getShooterRPMtolerance());
+        SmartDashboard.putNumber("Shooter RPM Tolerance", getShooterRPMtolerance());
+
+
+
         // This method will be called once per scheduler run
     }
 

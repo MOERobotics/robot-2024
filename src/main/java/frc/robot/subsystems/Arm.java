@@ -5,17 +5,23 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindRamsete;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.*;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.ArrayList;
+
+import java.util.function.Supplier;
+
+import static com.revrobotics.CANSparkBase.ControlType.kVelocity;
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 
 
@@ -29,19 +35,16 @@ public class Arm extends SubsystemBase {
     private final CANcoder shoulderEncoder;
     private final CANcoder wristEncoder;
 
-    private final PIDController shoulderController;
-    private final PIDController wristController;
-
-    private Trajectory trajectory;
-    private Timer timer;
-
+    private final SparkPIDController shoulderController;
+    private final SparkPIDController wristController;
+    public Supplier<ChassisSpeeds> desiredSpeeds;
     double shoulderLength, wristLength, shoulderInertia, wristInertia, maxShoulderSpeed,
-    maxWristSpeed;
+            maxWristSpeed;
 
     // constructor
     public Arm(int shoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
-               double kPShoulder, double kIShoulder, double kDShoulder,
-               double kPWrist, double kIWrist, double kDWrist,
+               double kPShoulder, double kIShoulder, double kDShoulder, double kFFShoulder,
+               double kPWrist, double kIWrist, double kDWrist, double kFFWrist,
                double shoulderLength, double wristLength, double shoulderInertia, double wristInertia,
                double maxShoulderSpeed, double maxWristSpeed) {
         shoulderMotor = new CANSparkMax(shoulderMotorID, kBrushless);
@@ -50,9 +53,18 @@ public class Arm extends SubsystemBase {
         shoulderEncoder = new CANcoder(shoulderEncoderID);
         wristEncoder = new CANcoder(wristEncoderID);
 
+        shoulderController = shoulderMotor.getPIDController();
+        wristController = wristMotor.getPIDController();
 
-        shoulderController = new PIDController(kPShoulder, kIShoulder, kDShoulder);
-        wristController = new PIDController(kPWrist, kIWrist, kDWrist);
+        shoulderController.setP(kPShoulder);
+        shoulderController.setI(kIShoulder);
+        shoulderController.setD(kDShoulder);
+        shoulderController.setFF(kFFShoulder);
+
+        wristController.setP(kPWrist);
+        wristController.setI(kIWrist);
+        wristController.setD(kDWrist);
+        wristController.setFF(kFFWrist);
 
         this.shoulderLength = shoulderLength;
         this.shoulderInertia = shoulderInertia;
@@ -61,23 +73,26 @@ public class Arm extends SubsystemBase {
         this.maxShoulderSpeed = maxShoulderSpeed;
         this.maxWristSpeed = maxWristSpeed;
 
-        timer = new Timer();
 
     }
 
     public void periodic(){
+        pathFollow(desiredSpeeds.get());
         //TODO: make the mechanism 2d object in here
-        pathFollow(trajectory.sample(timer.get()).poseMeters);
     }
 
-    void pathFollow(Pose2d desState){
+    void pathFollow(ChassisSpeeds armSpeeds){
         //x is shoulder, y is wrist
-        shoulderController.setSetpoint(desState.getX());
-        shoulderMotor.set(shoulderController.calculate(shoulderState().getRadians()));
-        wristController.setSetpoint(desState.getY());
-        wristMotor.set(wristController.calculate(wristState().getRadians()));
+        shoulderController.setReference(armSpeeds.vxMetersPerSecond, kVelocity);
+        wristController.setReference(armSpeeds.vyMetersPerSecond, kVelocity);
     }
 
+    ChassisSpeeds currArmSpeeds(){
+        return new ChassisSpeeds(
+                shoulderEncoder.getVelocity().getValueAsDouble(),
+                wristEncoder.getVelocity().getValueAsDouble(), 0
+        );
+    }
 
     Rotation2d shoulderState(){
         return Rotation2d.fromDegrees(shoulderEncoder.getAbsolutePosition().getValueAsDouble());
@@ -92,25 +107,7 @@ public class Arm extends SubsystemBase {
                 new Rotation2d(0));
     }
 
-    public void goToPoint(Pose2d targetDest) {
-        var startPose = getArmState();
-
-        var interiorWaypoints = new ArrayList<Translation2d>();
-        interiorWaypoints.add(new Translation2d((targetDest.getX() + startPose.getX()) / 3,
-                (targetDest.getY() + startPose.getY()) / 3));
-        interiorWaypoints.add(new Translation2d(2 * (targetDest.getX() + startPose.getX()) / 3,
-                2 * (targetDest.getY() + startPose.getY()) / 3));
-
-        TrajectoryConfig config = new TrajectoryConfig(maxShoulderSpeed, maxWristSpeed);
-        config.setReversed(true);
-
-        trajectory = TrajectoryGenerator.generateTrajectory(
-                startPose,
-                interiorWaypoints,
-                targetDest,
-                config);
-        timer.restart();
-   /* public Command followPathCommand(Rotation2d shoulderAngle, Rotation2d wristAngle){
+    public Command followPathCommand(Rotation2d shoulderAngle, Rotation2d wristAngle){
         return new PathfindRamsete(
                 targetPose,
                 new PathConstraints(3,3,
@@ -121,9 +118,8 @@ public class Arm extends SubsystemBase {
                 new ReplanningConfig(),
                 this
         );
-    } */
-
-
     }
+
+
 
 }

@@ -31,7 +31,7 @@ public final class CollectorCommands {
         var command = Commands.parallel(
 
                 armSubsystem.followPathCommand(
-                       (shoulder),
+                        (shoulder),
                         (wrist)
                 ),
 
