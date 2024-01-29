@@ -44,6 +44,13 @@ public class SwerveDrive extends SubsystemBase {
 
     }
 
+    public double getDesiredYaw(){
+        return desiredYaw;
+    }
+
+    public void setDesiredYaw(double yaw){
+        desiredYaw = yaw;
+    }
 
     public double getYaw(){
         return pigeon.get();
@@ -65,6 +72,7 @@ public class SwerveDrive extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("yaw", pigeon.get());
+        SmartDashboard.putNumber("desired yaw", getDesiredYaw());
         odometer.update(getRotation2d(), getModulePositions());
     }
 
