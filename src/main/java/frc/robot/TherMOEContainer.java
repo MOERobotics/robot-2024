@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
 
@@ -22,7 +21,7 @@ import frc.robot.subsystems.SwerveModule;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class TherMOEContainer{
+public class TherMOEContainer extends RobotContainer {
     AHRS navx = new AHRS();
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
@@ -115,13 +114,9 @@ public class TherMOEContainer{
         configureBindings();
     }
 
-    private void configureBindings() {
+    @Override
+    void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> navx.reset()));
-    }
-
-    public Command getAutonomousCommand() {
-        return null;
-        // return Autos.exampleAuto(m_drive);
     }
 }
 

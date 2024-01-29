@@ -22,7 +22,7 @@ import frc.robot.subsystems.SwerveModule;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class SwerveBotContainer {
+public class SwerveBotContainer extends RobotContainer {
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
@@ -113,13 +113,9 @@ public class SwerveBotContainer {
         configureBindings();
     }
 
-    private void configureBindings() {
+    @Override
+    void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> pigeon.setYaw(0)));
-    }
-
-    public Command getAutonomousCommand() {
-        return null;
-       // return Autos.exampleAuto(m_drive);
     }
 }
 
