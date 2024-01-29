@@ -5,19 +5,54 @@
 package frc.robot;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import com.pathplanner.lib.pathfinding.LocalADStar;
+
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends TimedRobot {
+  /**
+   * Set this to true before a competition weekend
+   */
+  public static final boolean IS_COMPETITION = false;
   private Command m_autonomousCommand;
 
-  private SwerveBotContainer m_robotContainer;
+  private RobotContainer m_robotContainer;
+  
+  private RobotContainer selectRobot() {
+    // Competition override
+    if (IS_COMPETITION)
+      return new FortissiMOEContainer();
+    // Try to read from USB
+    try {
+      Path robotFile = Paths.get("/u/robot.txt").toRealPath();
+      var robotName = Files.readString(robotFile);
+      var rc = RobotContainer.forName(robotName);
+      if (rc.isPresent())
+        return rc.get();
+    } catch (IOException | NullPointerException ex) {
+      // ignored
+    }
+    // Try to load from RoboRIO firmware
+    var rc = RobotContainer.forName(RobotController.getComments());
+    // By default, we select Fortissimoe
+    return rc.orElseGet(FortissiMOEContainer::new);
+  }
 
   @Override
   public void robotInit() {
-    m_robotContainer = new SwerveBotContainer();
+    if (m_robotContainer == null)
+      m_robotContainer = selectRobot();
   }
 
 

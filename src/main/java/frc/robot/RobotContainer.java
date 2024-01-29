@@ -18,6 +18,22 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public abstract class RobotContainer {
+  public static Optional<RobotContainer> forName(String name) {
+    if (name == null)
+      return Optional.empty();
+    
+    name = name.strip().toLowerCase();
+    switch (name) {
+      case "fortissimoe":
+        return Optional.of(new FortissiMOEContainer());
+      case "thermoe":
+        return Optional.of(new TherMOEContainer());
+      case "swerve":
+        return Optional.of(new SwerveBotContainer());
+      default:
+        return Optional.empty();
+    }
+  }
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
