@@ -4,12 +4,14 @@
 
 package frc.robot.subsystems;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -90,6 +92,9 @@ public class SwerveDrive extends SubsystemBase {
 
     public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
         TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
+        PIDController xController = new PIDController(1,0,0);
+        PIDController yController = new PIDController(1,0,0);
+        var thetaController = new ProfiledPIDController(1,0,0,new TrapezoidProfile.Constraints(Math.PI,Math.PI));
         this.startVelocityMetersPerSecond = startVelocityMetersPerSecond;
         this.endVelocityMetersPerSecond = endVelocityMetersPerSecond;
         config.setEndVelocity(endVelocityMetersPerSecond);
@@ -100,8 +105,7 @@ public class SwerveDrive extends SubsystemBase {
                 end,
                 config
         );
-
-        return new SwerveControllerCommand(trajectory,getPose(),kDriveKinematics,0,0,0,this::setModuleStates,this);
+        return new SwerveControllerCommand(trajectory,this::getPose,kDriveKinematics,xController,yController,thetaController,this::setModuleStates,this);
     }
 
     public SwerveModulePosition[] getModulePositions(){
