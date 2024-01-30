@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,12 +20,19 @@ public final class Autos {
     return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
   }
   public static Command doubleNoteAuto(SwerveDrive subsystem) {
-    Pose2d startPose1 = new Pose2d();
-    Pose2d endPose1 = new Pose2d();
+    double bumperSize = 0;
+    Rotation2d startRotation1 = new Rotation2d(0);
+    //x = dist center of robot when robot is pushed against the wall.
+    Pose2d startPose1 = new Pose2d(0.3556 + bumperSize,1.4,startRotation1);
+    Rotation2d endRotation1 = new Rotation2d(0);
+    Pose2d endPose1 = new Pose2d(2.9,1.4, endRotation1);
+
     double startVelocity1 = 0; //Velocities are in meters/second.
     double endVelocity1 = 0;
+
     ArrayList<Translation2d> internalPoints1 = new ArrayList<Translation2d>();
     Command command1 = new DriveTrajectory(subsystem, startPose1, endPose1, internalPoints1, startVelocity1, endVelocity1);
+
     //TODO:Add some commands for shooting once before leaving, once after trajectory.
     return Commands.sequence(/*shootCommand1,*/ command1 /*,shootCommand2*/);
   }
