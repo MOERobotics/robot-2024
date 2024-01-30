@@ -83,7 +83,7 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS, 0, 0, 0);
+            ()->pigeon.getYaw(), maxMPS, 5, 0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
 //    private final Arm armSubsystem = new Arm(20, 21, 35, 36,
