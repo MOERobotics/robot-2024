@@ -117,7 +117,6 @@ public class HeadSubsystem extends SubsystemBase {
         return collectorBeam.get();
     }
 
-    // TODO rename methods(partially done?)
     public void setShooterTopSpeed(double speed){
         shooterSpeedTop=speed;
         shooterTopController.setReference(speed,CANSparkBase.ControlType.kVelocity);
@@ -143,7 +142,6 @@ public class HeadSubsystem extends SubsystemBase {
         return  Commands.runOnce(() -> this.setCollectorSpeed(topSpeed,bottomSpeed));
     }
 
-    //TODO Make collector state of on or off(done)
     public double getShooterSpeedTop(){
         return shooterTopEncoder.getVelocity();
     }
@@ -154,12 +152,6 @@ public class HeadSubsystem extends SubsystemBase {
     //Within reasonable range to shoot?
     public boolean inRange() {
         // Vision to April Tag/Odometry.
-        return false;
-    }
-
-    //Shooter april tag seen
-    public boolean seeSpeaker() {
-        // Query Odometry or vision to April Tag.
         return false;
     }
 
@@ -182,7 +174,7 @@ public class HeadSubsystem extends SubsystemBase {
 
     //Good to shoot
     public boolean readyShoot() {
-        return (shooterAtSpeed() && aimed() && seeSpeaker() && isCollected());
+        return (shooterAtSpeed() && aimed() && isCollected());
         //if motors up to speed
         //if aimed
         //if see speaker
@@ -245,7 +237,6 @@ public class HeadSubsystem extends SubsystemBase {
 	    SmartDashboard.putNumber("Shooter RPM Tolerance", getShooterRPMTolerance());
 		SmartDashboard.putBoolean("Note Collected:",isCollected());
 		SmartDashboard.putBoolean("In Range:",inRange());
-		SmartDashboard.putBoolean("Sees speaker:",seeSpeaker());
 		SmartDashboard.putBoolean("Aimed at speaker:",aimed());
 	    SmartDashboard.putBoolean("Aiming in progress:",aiming());
 	    SmartDashboard.putBoolean("Ready to shoot:", readyShoot());

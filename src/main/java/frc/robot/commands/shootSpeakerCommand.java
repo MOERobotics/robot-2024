@@ -13,7 +13,6 @@ public class shootSpeakerCommand extends Command {
     private double shooterSpeedBottom;
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final HeadSubsystem headSubsystem;
-    double[] shooterSpeed = new double[2];
 
 
     /**
@@ -35,8 +34,8 @@ public class shootSpeakerCommand extends Command {
     @Override
     public void initialize() {
         //Set speed in RPM
-        shooterSpeedTop = 0;//Placeholder
-	    shooterSpeedBottom = 0;
+        shooterSpeedTop = speedCalc();//Placeholder
+	    shooterSpeedBottom = speedCalc();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
