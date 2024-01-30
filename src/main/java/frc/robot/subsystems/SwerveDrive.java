@@ -6,9 +6,17 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
@@ -21,14 +29,19 @@ public class SwerveDrive extends SubsystemBase {
     Supplier<Double> pigeon;
     private final SwerveDriveOdometry odometer;
     private final double maxMetersPerSec;
+    private final double maxMetersPerSecSquared;
     SwerveDriveKinematics kDriveKinematics;
+    private double startVelocityMetersPerSecond;
+    private double endVelocityMetersPerSecond;
     double desiredYaw;
     private final PIDController drivePID;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
-                       Supplier<Double> pigeon, double maxMetersPerSec, double kP, double kI, double kD) {
+                       Supplier<Double> pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD) {
 
         this.pigeon = pigeon;
         this.maxMetersPerSec = maxMetersPerSec;
+
+        this.maxMetersPerSecSquared = maxMetersPerSecSquared;
 
         this.FLModule = FLModule;
 
@@ -73,6 +86,22 @@ public class SwerveDrive extends SubsystemBase {
         FRModule.stop();
         BLModule.stop();
         BRModule.stop();
+    }
+
+    public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
+        TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
+        this.startVelocityMetersPerSecond = startVelocityMetersPerSecond;
+        this.endVelocityMetersPerSecond = endVelocityMetersPerSecond;
+        config.setEndVelocity(endVelocityMetersPerSecond);
+        config.setStartVelocity(startVelocityMetersPerSecond);
+        var trajectory = TrajectoryGenerator.generateTrajectory(
+                start,
+                internalPoints,
+                end,
+                config
+        );
+
+        return new SwerveControllerCommand(trajectory,getPose(),kDriveKinematics,0,0,0,this::setModuleStates,this);
     }
 
     public SwerveModulePosition[] getModulePositions(){
