@@ -83,7 +83,7 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS,0.15,0,0);
+            ()->pigeon.getYaw(), maxMPS,0.04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
 
@@ -114,7 +114,7 @@ public class SwerveBotContainer {
     }
 
     private void configureBindings() {
-        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> pigeon.setYaw(0)));
+        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
     }
 
     public Command getAutonomousCommand() {
