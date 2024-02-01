@@ -32,9 +32,9 @@ private static Translation2d midPose;
 
     double startVelocity1 = 0; //Velocities are in meters/second.
     double endVelocity1 = 0;
-    //midPose = new Translation2d(2,1);
+    midPose = new Translation2d(2,1);
     ArrayList<Translation2d> internalPoints1 = new ArrayList<Translation2d>();
-    //internalPoints1.add(midPose);
+    internalPoints1.add(midPose);
     Command command1 = new DriveTrajectory(subsystem, startPose1, endPose1, internalPoints1, startVelocity1, endVelocity1);
 
     //TODO:Add some commands for shooting once before leaving, once after trajectory.

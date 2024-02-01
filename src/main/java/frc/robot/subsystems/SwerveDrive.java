@@ -13,6 +13,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -94,11 +95,11 @@ public class SwerveDrive extends SubsystemBase {
         BRModule.stop();
     }
 
-    public Command generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
+    public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond, Field2d field){
         TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
-        PIDController xController = new PIDController(1,0,1);
-        PIDController yController = new PIDController(1,0,1);
-        var thetaController = new ProfiledPIDController(1,0,1,new TrapezoidProfile.Constraints(Math.PI,Math.PI));
+        PIDController xController = new PIDController(1,0,0);
+        PIDController yController = new PIDController(1,0,0);
+        var thetaController = new ProfiledPIDController(0.1,0,0,new TrapezoidProfile.Constraints(Math.PI,Math.PI));
         this.startVelocityMetersPerSecond = startVelocityMetersPerSecond;
         this.endVelocityMetersPerSecond = endVelocityMetersPerSecond;
         config.setEndVelocity(endVelocityMetersPerSecond);
@@ -109,7 +110,8 @@ public class SwerveDrive extends SubsystemBase {
                 end,
                 config
         );
-        return new SwerveControllerCommand(
+        field.getRobotObject().setTrajectory(trajectory);
+        SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                         trajectory,
                         this::getPose,
                         kDriveKinematics,
@@ -126,6 +128,8 @@ public class SwerveDrive extends SubsystemBase {
                         }
                 )*/
         );
+        SmartDashboard.putBoolean("Finished?",trajCommand.isFinished());
+        return trajCommand;
     }
 
     public SwerveModulePosition[] getModulePositions(){
