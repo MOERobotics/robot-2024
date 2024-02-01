@@ -116,7 +116,7 @@ public class FortissiMOEContainer{
     }
 
     private void configureBindings() {
-        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> pigeon.setYaw(0)));
+        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
     }
 
     public Command getAutonomousCommand() {
