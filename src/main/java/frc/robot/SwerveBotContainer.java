@@ -40,7 +40,7 @@ public class SwerveBotContainer {
     double driveFF = 1.76182e-4;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
-    double maxMPS = 25/39.3701;
+    double maxMPS = 174/39.3701;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
             19,
@@ -102,7 +102,7 @@ public class SwerveBotContainer {
             () -> -driverJoystick.getRawAxis(0),
             () -> -driverJoystick.getRawAxis(2),
             () -> driverJoystick.getRawButton(6),
-            () -> driverJoystick.getRawButton(1), 0.3,6, maxMPS, maxRPS
+            () -> driverJoystick.getRawButton(1), 6,6, maxMPS, maxRPS
     );
 
     ////////////////////////////////////////////////////////////////////////////commands end
@@ -115,12 +115,12 @@ public class SwerveBotContainer {
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
-        var button11 = new Trigger(()->driverJoystick.getRawButton(11)); //turn to source
+        var button11 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
         button11.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
                 () -> -driverJoystick.getRawAxis(0),60*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?1:-1)));
 
-        var button12 = new Trigger(()->driverJoystick.getRawButton(12)); //turn to amp
+        var button12 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
         button12.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
                 () -> -driverJoystick.getRawAxis(0),90*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?1:-1)));
