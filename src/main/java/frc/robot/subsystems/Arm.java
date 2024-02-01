@@ -15,6 +15,9 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.helpers.AutoCodeLines;
+
+import org.opencv.core.Point;
 import java.util.ArrayList;
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 
@@ -30,15 +33,17 @@ public class Arm extends SubsystemBase {
 
     private Trajectory trajectory;
     private Timer timer;
+    private Point intermediaryPoint;
+    private boolean finSpot = false;
+    private boolean armInPos = false;
+    private Point desPose, startPose;
 
-    double shoulderLength, wristLength, shoulderInertia, wristInertia, maxShoulderSpeed,
-    maxWristSpeed;
+    double shoulderLength, wristLength, shoulderInertia, wristInertia, maxArmSpeed, targetDist;
 
     public Arm(int shoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
                double kPShoulder, double kIShoulder, double kDShoulder,
                double kPWrist, double kIWrist, double kDWrist,
-               double shoulderLength, double wristLength, double shoulderInertia, double wristInertia,
-               double maxShoulderSpeed, double maxWristSpeed) {
+               double maxArmSpeed, Rotation2d safeShoulderAngle, Rotation2d safeWristAngle) {
         shoulderMotor = new CANSparkMax(shoulderMotorID, kBrushless);
         wristMotor = new CANSparkMax(wristMotorID, kBrushless);
 
@@ -49,27 +54,25 @@ public class Arm extends SubsystemBase {
         shoulderController = new PIDController(kPShoulder, kIShoulder, kDShoulder);
         wristController = new PIDController(kPWrist, kIWrist, kDWrist);
 
-        this.shoulderLength = shoulderLength;
-        this.shoulderInertia = shoulderInertia;
-        this.wristLength = wristLength;
-        this.wristInertia = wristInertia;
-        this.maxShoulderSpeed = maxShoulderSpeed;
-        this.maxWristSpeed = maxWristSpeed;
+        this.maxArmSpeed = maxArmSpeed;
 
+        intermediaryPoint = new Point(safeShoulderAngle.getDegrees(), safeWristAngle.getDegrees());
+        finSpot = true;
+        desPose = getArmState();
         timer = new Timer();
-
+        armInPos = false;
     }
 
     public void periodic(){
         //TODO: make the mechanism 2d object in here
-        pathFollow(trajectory.sample(timer.get()).poseMeters);
+        wayPointFollow(timer.get());
     }
 
-    void pathFollow(Pose2d desState){
+    void pathFollow(Point desState){
         //x is shoulder, y is wrist
-        shoulderController.setSetpoint(desState.getX());
+        shoulderController.setSetpoint(desState.x);
         shoulderMotor.set(shoulderController.calculate(shoulderState().getRadians()));
-        wristController.setSetpoint(desState.getY());
+        wristController.setSetpoint(desState.y);
         wristMotor.set(wristController.calculate(wristState().getRadians()));
     }
 
@@ -82,29 +85,55 @@ public class Arm extends SubsystemBase {
         return Rotation2d.fromDegrees(wristEncoder.getAbsolutePosition().getValueAsDouble());
     }
 
-    public Pose2d getArmState(){
-        return new Pose2d(new Translation2d(shoulderState().getRadians(), wristState().getRadians()),
-                new Rotation2d(0));
+    public Point getArmState(){
+        return new Point(shoulderState().getRadians(), wristState().getRadians());
     }
 
-    public void goToPoint(Pose2d targetDest){
-        var startPose = getArmState();
+    public void goToPoint(Rotation2d shoulderPose, Rotation2d wristPose){
+        desPose = new Point(shoulderPose.getDegrees(), shoulderPose.getDegrees());
+        startPose = getArmState();
+        double xDel = startPose.x-intermediaryPoint.x;
+        double yDel = startPose.y-intermediaryPoint.y;
+        targetDist = Math.sqrt(xDel*xDel+yDel*yDel);
+        finSpot = false;
+        armInPos = false;
+    }
 
-        var interiorWaypoints = new ArrayList<Translation2d>();
-        interiorWaypoints.add(new Translation2d((targetDest.getX()+startPose.getX())/3,
-                (targetDest.getY()+startPose.getY())/3));
-        interiorWaypoints.add(new Translation2d(2*(targetDest.getX()+startPose.getX())/3,
-                2*(targetDest.getY()+startPose.getY())/3));
+    public void wayPointFollow(double time){
 
-        TrajectoryConfig config = new TrajectoryConfig(maxShoulderSpeed, maxWristSpeed);
-        config.setReversed(true);
+        double s = AutoCodeLines.getS(targetDist,.2, maxArmSpeed, time);
+        double shoulderPos, wristPos;
 
-        trajectory = TrajectoryGenerator.generateTrajectory(
-                startPose,
-                interiorWaypoints,
-                targetDest,
-                config);
-        timer.restart();
+        if (!finSpot){
+            shoulderPos = AutoCodeLines.getPositionX(startPose, intermediaryPoint, s);
+            wristPos = AutoCodeLines.getPositionY(startPose, intermediaryPoint, s);
+            double deltX = (intermediaryPoint.x-getArmState().x);
+            double deltY = (intermediaryPoint.y-getArmState().y);
+            double delt = Math.sqrt(deltY*deltY+deltX*deltX);
+            if (delt <= .1){
+                timer.restart();
+                finSpot = true;
+                double xDel = desPose.x-getArmState().x;
+                double yDel = desPose.y-getArmState().y;
+                targetDist = Math.sqrt(xDel*xDel+yDel*yDel);
+            }
+        }
+        else{
+            shoulderPos = AutoCodeLines.getPositionX(intermediaryPoint, desPose, s);
+            wristPos = AutoCodeLines.getPositionY(intermediaryPoint, desPose, s);
+            double deltX = (desPose.x-getArmState().x);
+            double deltY = (desPose.y-getArmState().y);
+            double delt = Math.sqrt(deltY*deltY+deltX*deltX);
+            if (delt <= .1){
+                shoulderPos = desPose.x; wristPos = desPose.y;
+                armInPos = true;
+            }
+        }
+        pathFollow(new Point(shoulderPos, wristPos));
+    }
+
+    public boolean armInPos(){
+        return this.armInPos;
     }
 
 
