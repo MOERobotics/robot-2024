@@ -8,11 +8,14 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.setHeading;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
@@ -25,6 +28,7 @@ import frc.robot.subsystems.SwerveModule;
  */
 public class SwerveBotContainer {
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
+
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
     double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
@@ -37,7 +41,7 @@ public class SwerveBotContainer {
     double driveFF = 1.76182e-4;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
-    double maxMPS = 174/39.3701;
+    double maxMPS = 25/39.3701;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
             19,
@@ -92,15 +96,14 @@ public class SwerveBotContainer {
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
 
-
     ////////////////////////////////////////////////////////////////////////////commands
 
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
-            () -> -driverJoystick.getRawAxis(4),
+            () -> -driverJoystick.getRawAxis(2),
             () -> driverJoystick.getRawButton(6),
-            () -> driverJoystick.getRawButton(3), 6,6, maxMPS, maxRPS
+            () -> driverJoystick.getRawButton(1), 0.3,6, maxMPS, maxRPS
     );
 
     ////////////////////////////////////////////////////////////////////////////commands end
@@ -109,9 +112,19 @@ public class SwerveBotContainer {
 
 
     public SwerveBotContainer() {
+        pigeon.reset();
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
+        var button11 = new Trigger(()->driverJoystick.getRawButton(11)); //turn to source
+        button11.whileTrue(new setHeading(swerveSubsystem,
+                () -> -driverJoystick.getRawAxis(1),
+                () -> -driverJoystick.getRawAxis(0),60*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?1:-1)));
+
+        var button12 = new Trigger(()->driverJoystick.getRawButton(12)); //turn to amp
+        button12.whileTrue(new setHeading(swerveSubsystem,
+                () -> -driverJoystick.getRawAxis(1),
+                () -> -driverJoystick.getRawAxis(0),90*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?1:-1)));
     }
 
     private void configureBindings() {
