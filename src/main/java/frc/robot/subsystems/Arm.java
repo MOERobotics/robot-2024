@@ -14,6 +14,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.helpers.AutoCodeLines;
 
@@ -31,15 +32,14 @@ public class Arm extends SubsystemBase {
     private final PIDController shoulderController;
     private final PIDController wristController;
 
-    private Trajectory trajectory;
     private Timer timer;
     private Point intermediaryPoint;
     private boolean finSpot = false;
     private boolean armInPos = false;
     private Point desPose, startPose;
 
-    double shoulderLength, wristLength, shoulderInertia, wristInertia, maxArmSpeed, targetDist;
-
+    double maxArmSpeed, targetDist;
+//TODO: do path stuff in separate command
     public Arm(int shoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
                double kPShoulder, double kIShoulder, double kDShoulder,
                double kPWrist, double kIWrist, double kDWrist,
@@ -60,7 +60,7 @@ public class Arm extends SubsystemBase {
         finSpot = true;
         desPose = getArmState();
         timer = new Timer();
-        armInPos = false;
+        armInPos = true;
     }
 
     public void periodic(){
@@ -68,12 +68,12 @@ public class Arm extends SubsystemBase {
         wayPointFollow(timer.get());
     }
 
-    void pathFollow(Point desState){
+    private void pathFollow(Rotation2d shoulder, Rotation2d wrist){
         //x is shoulder, y is wrist
-        shoulderController.setSetpoint(desState.x);
-        shoulderMotor.set(shoulderController.calculate(shoulderState().getRadians()));
-        wristController.setSetpoint(desState.y);
-        wristMotor.set(wristController.calculate(wristState().getRadians()));
+        shoulderController.setSetpoint(shoulder.getDegrees());
+        shoulderMotor.set(shoulderController.calculate(shoulderState().getDegrees()));
+        wristController.setSetpoint(wrist.getDegrees());
+        wristMotor.set(wristController.calculate(wristState().getDegrees()));
     }
 
 
@@ -85,8 +85,8 @@ public class Arm extends SubsystemBase {
         return Rotation2d.fromDegrees(wristEncoder.getAbsolutePosition().getValueAsDouble());
     }
 
-    public Point getArmState(){
-        return new Point(shoulderState().getRadians(), wristState().getRadians());
+    private Point getArmState(){
+        return new Point(shoulderState().getDegrees(), wristState().getDegrees());
     }
 
     public void goToPoint(Rotation2d shoulderPose, Rotation2d wristPose){
@@ -99,9 +99,9 @@ public class Arm extends SubsystemBase {
         armInPos = false;
     }
 
-    public void wayPointFollow(double time){
+    private void wayPointFollow(double time){
 
-        double s = AutoCodeLines.getS(targetDist,.2, maxArmSpeed, time);
+        double s = AutoCodeLines.getS(targetDist,.2, maxArmSpeed/2, time);
         double shoulderPos, wristPos;
 
         if (!finSpot){
@@ -118,18 +118,21 @@ public class Arm extends SubsystemBase {
                 targetDist = Math.sqrt(xDel*xDel+yDel*yDel);
             }
         }
-        else{
+        else if (!armInPos){
             shoulderPos = AutoCodeLines.getPositionX(intermediaryPoint, desPose, s);
             wristPos = AutoCodeLines.getPositionY(intermediaryPoint, desPose, s);
             double deltX = (desPose.x-getArmState().x);
             double deltY = (desPose.y-getArmState().y);
             double delt = Math.sqrt(deltY*deltY+deltX*deltX);
+            //TODO: log everything
             if (delt <= .1){
                 shoulderPos = desPose.x; wristPos = desPose.y;
                 armInPos = true;
             }
         }
-        pathFollow(new Point(shoulderPos, wristPos));
+        SmartDashboard.putNumber("shoulderPos", shoulderPos);
+        SmartDashboard.putNumber("wristPos", wristPos);
+        pathFollow(Rotation2d.fromDegrees(shoulderPos), Rotation2d.fromDegrees(wristPos));
     }
 
     public boolean armInPos(){
