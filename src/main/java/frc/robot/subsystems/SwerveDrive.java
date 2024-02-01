@@ -15,6 +15,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
@@ -81,6 +82,9 @@ public class SwerveDrive extends SubsystemBase {
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("yaw", pigeon.get());
         odometer.update(getRotation2d(), getModulePositions());
+        SmartDashboard.putNumber("Posex",getPose().getX());
+        SmartDashboard.putNumber("Posey",getPose().getY());
+        SmartDashboard.putNumber("Rotation",getPose().getRotation().getDegrees());
     }
 
     public void stopModules() {
@@ -90,11 +94,11 @@ public class SwerveDrive extends SubsystemBase {
         BRModule.stop();
     }
 
-    public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
+    public Command generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
         TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
-        PIDController xController = new PIDController(1,0,0);
-        PIDController yController = new PIDController(1,0,0);
-        var thetaController = new ProfiledPIDController(1,0,0,new TrapezoidProfile.Constraints(Math.PI,Math.PI));
+        PIDController xController = new PIDController(1,0,1);
+        PIDController yController = new PIDController(1,0,1);
+        var thetaController = new ProfiledPIDController(1,0,1,new TrapezoidProfile.Constraints(Math.PI,Math.PI));
         this.startVelocityMetersPerSecond = startVelocityMetersPerSecond;
         this.endVelocityMetersPerSecond = endVelocityMetersPerSecond;
         config.setEndVelocity(endVelocityMetersPerSecond);
@@ -105,7 +109,23 @@ public class SwerveDrive extends SubsystemBase {
                 end,
                 config
         );
-        return new SwerveControllerCommand(trajectory,this::getPose,kDriveKinematics,xController,yController,thetaController,this::setModuleStates,this);
+        return new SwerveControllerCommand(
+                        trajectory,
+                        this::getPose,
+                        kDriveKinematics,
+                        xController,
+                        yController,
+                        thetaController,
+                        this::setModuleStates,
+                        this
+                /*Commands.run(
+                        () -> {
+                            SmartDashboard.putString("xcontroller", xController.toString());
+                            SmartDashboard.putString("ycontroller", yController.toString());
+                            SmartDashboard.putString("tcontroller", thetaController.toString());
+                        }
+                )*/
+        );
     }
 
     public SwerveModulePosition[] getModulePositions(){
@@ -118,7 +138,10 @@ public class SwerveDrive extends SubsystemBase {
     public void setModuleStates(SwerveModuleState[] desiredStates) {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxMetersPerSec);
-        SmartDashboard.putString("FL state", desiredStates[0].toString());
+        SmartDashboard.putString("FL state", desiredStates[1].toString());
+        SmartDashboard.putString("FR state", desiredStates[0].toString());
+        SmartDashboard.putString("BR state", desiredStates[2].toString());
+        SmartDashboard.putString("BL state", desiredStates[3].toString());
         FRModule.setDesiredState(desiredStates[0]);
         FLModule.setDesiredState(desiredStates[1]);
         BRModule.setDesiredState(desiredStates[2]);

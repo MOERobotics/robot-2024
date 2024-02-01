@@ -83,7 +83,7 @@ public class TherMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->(-1.0*navx.getYaw()), maxMPS, 0, 0, 0);
+            ()->(-1.0*navx.getYaw()), maxMPS, .15,0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
 //    private final Arm armSubsystem = new Arm(20, 21, 35, 36,

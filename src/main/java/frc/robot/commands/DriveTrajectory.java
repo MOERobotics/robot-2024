@@ -6,7 +6,9 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.subsystems.SwerveDrive;
 
 import java.util.ArrayList;
@@ -45,12 +47,14 @@ public class DriveTrajectory extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        SmartDashboard.putString("Initialized","initialized");
         trajectoryCommand = m_subsystem.generateTrajectory(startPose, endPose, internalPoints, startVelocity, endVelocity);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        SmartDashboard.putString("Executing", Boolean.toString(trajectoryCommand.isFinished()));
         trajectoryCommand.execute();
     }
 
@@ -63,7 +67,7 @@ public class DriveTrajectory extends Command {
     @Override
     public boolean isFinished() {
         if(trajectoryCommand == null){
-            return false;
+            return true;
         } else {
             return trajectoryCommand.isFinished();
         }
