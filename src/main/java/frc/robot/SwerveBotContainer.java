@@ -98,7 +98,7 @@ public class SwerveBotContainer {
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
             () -> -driverJoystick.getRawAxis(2),
-            () -> driverJoystick.getRawButton(5),
+            () -> driverJoystick.getRawButton(6),
             () -> driverJoystick.getRawButton(3), 6,6, maxMPS, maxRPS
     );
 
