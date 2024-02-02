@@ -28,14 +28,14 @@ private static Translation2d midPose;
     //x = dist center of robot when robot is pushed against the wall.
     Pose2d startPose1 = new Pose2d(0/*0.3556 + bumperSize*/,0/*1.4*/,startRotation1);
     Rotation2d endRotation1 = new Rotation2d(0);
-    Pose2d endPose1 = new Pose2d(2.9,1.4, endRotation1);
+    Pose2d endPose1 = new Pose2d(3,2, endRotation1);
 
     double startVelocity1 = 0; //Velocities are in meters/second.
     double endVelocity1 = 0;
     midPose = new Translation2d(2,1);
     ArrayList<Translation2d> internalPoints1 = new ArrayList<Translation2d>();
     internalPoints1.add(midPose);
-    Command command1 = new DriveTrajectory(subsystem, startPose1, endPose1, internalPoints1, startVelocity1, endVelocity1);
+    Command command1 = subsystem.generateTrajectory(startPose1, endPose1, internalPoints1, startVelocity1, endVelocity1, null);
 
     //TODO:Add some commands for shooting once before leaving, once after trajectory.
     return Commands.sequence(/*shootCommand1,*/ command1 /*,shootCommand2*/);

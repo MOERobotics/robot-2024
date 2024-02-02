@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -70,9 +71,7 @@ public class SwerveDrive extends SubsystemBase {
         return Rotation2d.fromDegrees(getYaw());
     }
 
-    public Pose2d getPose() {
-        return odometer.getPoseMeters();
-    }
+    public Pose2d getPose() {return odometer.getPoseMeters();}
 
     public void resetOdometry(Pose2d pose) {
         odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
@@ -97,8 +96,8 @@ public class SwerveDrive extends SubsystemBase {
 
     public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond, Field2d field){
         TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
-        PIDController xController = new PIDController(1,0,0);
-        PIDController yController = new PIDController(1,0,0);
+        PIDController xController = new PIDController(0.04,0,0);
+        PIDController yController = new PIDController(0.04,0,0);
         var thetaController = new ProfiledPIDController(0.1,0,0,new TrapezoidProfile.Constraints(Math.PI,Math.PI));
         this.startVelocityMetersPerSecond = startVelocityMetersPerSecond;
         this.endVelocityMetersPerSecond = endVelocityMetersPerSecond;
@@ -110,7 +109,9 @@ public class SwerveDrive extends SubsystemBase {
                 end,
                 config
         );
+        if (field != null)
         field.getRobotObject().setTrajectory(trajectory);
+        SmartDashboard.putNumber("Time",trajectory.getTotalTimeSeconds());
         SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                         trajectory,
                         this::getPose,

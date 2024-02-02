@@ -39,8 +39,8 @@ public class SwerveBotContainer {
     double driveFF = 1.76182e-4;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
-    double maxMPS = 15/39.3701;
-    double maxMPSSquared = .15;
+    double maxMPS = 30/39.3701;
+    double maxMPSSquared = 6;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
             19,
@@ -87,7 +87,7 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS,maxMPSSquared,0.15,0,0);
+            ()->pigeon.getYaw(), maxMPS,maxMPSSquared,0.04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
 
