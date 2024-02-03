@@ -8,6 +8,8 @@ import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.SwerveController;
@@ -23,6 +25,12 @@ import frc.robot.subsystems.SwerveModule;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class FortissiMOEContainer{
+
+
+    Solenoid shooter;
+
+   //  PneumaticHub m_ph = new PneumaticHub(PH_CAN_ID);
+
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
@@ -100,7 +108,7 @@ public class FortissiMOEContainer{
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
-            () -> -driverJoystick.getRawAxis(4),
+            () -> -driverJoystick.getRawAxis(2),
             () -> driverJoystick.getRawButton(6),
             () -> driverJoystick.getRawButton(3), 6,6, maxMPS, maxRPS
     );
@@ -113,11 +121,25 @@ public class FortissiMOEContainer{
     public FortissiMOEContainer() {
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
+
+
+        shooter = new Solenoid(PneumaticsModuleType.REVPH,7);
+
         configureBindings();
+
+
+
     }
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> swerveSubsystem.zeroHeading()));
+        new JoystickButton(driverJoystick, 2).whileTrue(Commands.runOnce(() -> shooterOn(shooter)));
+
+    }
+
+    private void shooterOn(Solenoid shooter) {
+
+        shooter.set(true);
     }
 
     public Command getAutonomousCommand() {

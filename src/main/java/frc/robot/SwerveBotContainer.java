@@ -8,7 +8,11 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.SwerveController;
@@ -24,6 +28,12 @@ import frc.robot.subsystems.SwerveModule;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class SwerveBotContainer {
+
+    // public Solenoid shooter;
+
+
+    public DigitalOutput shooter;
+
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
@@ -98,7 +108,7 @@ public class SwerveBotContainer {
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
-            () -> -driverJoystick.getRawAxis(4),
+            () -> -driverJoystick.getRawAxis(2),
             () -> driverJoystick.getRawButton(6),
             () -> driverJoystick.getRawButton(3), 6,6, maxMPS, maxRPS
     );
@@ -109,13 +119,30 @@ public class SwerveBotContainer {
 
 
     public SwerveBotContainer() {
+
+        shooter = new DigitalOutput(4);
+
+
         swerveSubsystem.setDefaultCommand(drive);
+       //  shooter = new Solenoid(PneumaticsModuleType.REVPH,4);
+
+
         // Configure the trigger bindings
         configureBindings();
     }
 
     private void configureBindings() {
+
+
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> swerveSubsystem.zeroHeading()));
+        new JoystickButton(driverJoystick, 2)
+                .whileTrue(Commands.runOnce(() -> {shooter.set(true);SmartDashboard.putBoolean("shooteron",true);}))
+                .whileFalse(Commands.runOnce(()-> {shooter.set(false); SmartDashboard.putBoolean("shooteron",false);}));
+    }
+
+    private void shooterOn(Solenoid shooter) {
+
+        shooter.set(true);
     }
 
     public Command getAutonomousCommand() {
