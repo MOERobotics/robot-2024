@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.*;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -152,6 +153,10 @@ public class HeadSubsystem extends SubsystemBase {
         return false;
     }
 
+    public boolean seeSpeaker(){
+        return false;
+    }
+
     public boolean shooterAtSpeed(){
         return ((Math.abs(shooterTopEncoder.getVelocity() - shooterSpeedTop) <= shooterRPMTolerance) && (Math.abs(shooterBottomEncoder.getVelocity() - shooterSpeedBottom) <= shooterRPMTolerance));
     }
@@ -164,6 +169,14 @@ public class HeadSubsystem extends SubsystemBase {
         //if aimed
         //if see speaker
         //Has a note
+    }
+
+
+    public double getAngleBetweenSpeaker(Pose2d pose) {
+        if (readyShoot() && seeSpeaker()) {
+            return Math.atan(pose.getY() / pose.getX());
+        }
+        return 0;
     }
 
 
@@ -233,8 +246,3 @@ public class HeadSubsystem extends SubsystemBase {
     }
 }
 
-    public double getAngleBetweenSpeaker(Pose2d pose){
-        if(readyShoot() && seeSpeaker()){
-            return Math.atan(pose.getY()/pose.getX());
-        }
-        return 0;

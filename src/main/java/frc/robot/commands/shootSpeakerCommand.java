@@ -44,7 +44,7 @@ public class shootSpeakerCommand extends Command {
         headSubsystem.setShooterTopSpeed(shooterSpeedTop);
 		headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
         if(headSubsystem.readyShoot()){
-            headSubsystem.setCollectorSpeed(1,1);
+            headSubsystem.setCollectorSpeed(1);
         }
     }
 

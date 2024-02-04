@@ -95,7 +95,7 @@ public class FortissiMOEContainer{
             0,0,0,0,2,2);
 	//TODO: Replace 99 with correct motor IDs.
 	private final HeadSubsystem headSubsystem = new HeadSubsystem(99,99,99,
-			99,0,0,0,0,0,0,0,0,99);
+			99,0,0,0,0,0,0,0,0);
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
