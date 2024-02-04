@@ -13,8 +13,10 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
@@ -101,6 +103,7 @@ public class SwerveBotContainer {
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
+    private final Joystick funcOpJoystick = new Joystick(0);
 
 
     ////////////////////////////////////////////////////////////////////////////commands
@@ -132,12 +135,10 @@ public class SwerveBotContainer {
     }
 
     private void configureBindings() {
-
-
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> swerveSubsystem.zeroHeading()));
-        new JoystickButton(driverJoystick, 2)
-                .whileTrue(Commands.runOnce(() -> {shooter.set(true);SmartDashboard.putBoolean("shooteron",true);}))
-                .whileFalse(Commands.runOnce(()-> {shooter.set(false); SmartDashboard.putBoolean("shooteron",false);}));
+        var loop = CommandScheduler.getInstance().getDefaultButtonLoop();
+            new Trigger(funcOpJoystick.axisGreaterThan(3, 0.8, loop))
+                    .whileTrue(Commands.runOnce(() -> shooter.set(true))).whileFalse(Commands.runOnce(()->shooter.set(false)));
     }
 
     private void shooterOn(Solenoid shooter) {
