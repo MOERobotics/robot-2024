@@ -24,6 +24,7 @@ import frc.robot.subsystems.SwerveModule;
  */
 public class TherMOEContainer{
     AHRS navx = new AHRS();
+
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
     double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
