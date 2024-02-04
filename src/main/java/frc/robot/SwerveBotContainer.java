@@ -115,15 +115,15 @@ public class SwerveBotContainer {
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
-        var button11 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
-        button11.whileTrue(new setHeading(swerveSubsystem,
+        var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
+        button8.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
                 () -> -driverJoystick.getRawAxis(0),60*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?1:-1)));
 
-        var button12 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
-        button12.whileTrue(new setHeading(swerveSubsystem,
+        var button7 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
+        button7.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),90*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?1:-1)));
+                () -> -driverJoystick.getRawAxis(0),90*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?-1:1)));
     }
 
     private void configureBindings() {
