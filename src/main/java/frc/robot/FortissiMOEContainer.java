@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
@@ -30,7 +31,6 @@ import java.awt.*;
  */
 public class FortissiMOEContainer{
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
-
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
     double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
@@ -90,12 +90,12 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS);
+            ()->pigeon.getYaw(), maxMPS, 0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm susbsystem start
-    private final Arm armSubsystem = new Arm(99, 99, 99, 99,
-            4, 0, 0, 0, 4, 0, 0, 0,
-            0,0,0,0,2,2);
+    private final Arm armSubsystem = new Arm(4, 15,21, 35, 36,
+            0, 0, 0, 0, 0, 0, new Rotation2d(0), new Rotation2d(0),
+            0,0);
 	//TODO: Replace 99 with correct motor IDs.
 	private final HeadSubsystem headSubsystem = new HeadSubsystem(99,99,99,
 			99,0,0,0,0,0,0,0,0);
@@ -152,17 +152,13 @@ public class FortissiMOEContainer{
 
     }
 
-
-
-
     private void configureBindings() {
-        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> swerveSubsystem.zeroHeading()));
+        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
     }
 
     public Command getAutonomousCommand() {
         return null;
         // return Autos.exampleAuto(m_drive);
-
     }
 }
 

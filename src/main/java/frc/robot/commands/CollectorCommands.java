@@ -15,39 +15,27 @@ import java.util.function.BiFunction;
 public final class CollectorCommands {
     /** Example static factory for an autonomous command. */
     // commands to set shoulder and wrist at various positions
-    private static Command moveThenCollect(
-            HeadSubsystem headSubsystem,
-            Arm armSubsystem,
-            Rotation2d shoulder,
-            Rotation2d wrist,
-            double speed
-    ){
+    private static Command moveThenCollect(HeadSubsystem headSubsystem, Arm armSubsystem,
+            Rotation2d shoulder, Rotation2d wrist, double speed, double accel){
 
         var command = Commands.parallel(
-
-                armSubsystem.followPathCommand(
-                        (shoulder),
-                        (wrist)
-                ),
+                new ArmPathFollow(armSubsystem, shoulder, wrist, speed, accel),
                 headSubsystem.runCollectorCommands(speed)
         );
-
         return command;
-
-
     }
 
     // floor pickup
     public static Command headDownThenCollect(HeadSubsystem headSubsystem, Arm armSubsystem) {
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(90),
-                Rotation2d.fromDegrees(45), 0.5);
+                Rotation2d.fromDegrees(45), 0.5, .3);
     }
 
 
     // Amp pickup
     public static Command setArmToAmpThenDeposit(HeadSubsystem headSubsystem, Arm armSubsystem){
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(135),
-                Rotation2d.fromDegrees(135), -0.5);
+                Rotation2d.fromDegrees(135), -0.5,.3);
     }
     // TODO write new command for Shooter for AMP(not done)
     // TODO write command so that it will wait until is collected(not done)
@@ -55,7 +43,7 @@ public final class CollectorCommands {
     // Source Collect
     public static Command setArmToSourceThenCollect(HeadSubsystem headSubsystem, Arm armSubsystem){
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(155),
-                Rotation2d.fromDegrees(135), 0.5);
+                Rotation2d.fromDegrees(135), 0.5,.3);
     }
 
 

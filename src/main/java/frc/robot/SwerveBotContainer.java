@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -84,7 +83,7 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS);
+            ()->pigeon.getYaw(), maxMPS,0.04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -95,8 +94,8 @@ public class SwerveBotContainer {
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
-            () -> -driverJoystick.getRawAxis(4),
-            () -> driverJoystick.getRawButton(6),
+            () -> -driverJoystick.getRawAxis(2),
+            () -> driverJoystick.getRawButton(5),
             () -> driverJoystick.getRawButton(3), 6,6, maxMPS, maxRPS
     );
 
@@ -112,7 +111,7 @@ public class SwerveBotContainer {
     }
 
     private void configureBindings() {
-        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> swerveSubsystem.zeroHeading()));
+        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
     }
 
     public Command getAutonomousCommand() {

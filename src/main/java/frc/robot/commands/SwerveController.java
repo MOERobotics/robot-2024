@@ -42,7 +42,8 @@ public class SwerveController extends Command{
     }
 
     @Override
-    public void initialize() {}
+    public void initialize() {
+    }
 
     @Override
     public void execute() {
@@ -65,12 +66,16 @@ public class SwerveController extends Command{
         yspd = yLimiter.calculate(yspd)*maxMPS;
         turnspd = turnLimiter.calculate(turnspd)*maxRPS * 2.0;
 
+
         SmartDashboard.putNumber("xspd", xspd);
         SmartDashboard.putNumber("yspd", yspd);
         SmartDashboard.putNumber("turnspd", turnspd);
-
-        m_subsystem.driveAtSpeed(xspd, yspd, turnspd, !relativeDrive.get());
-
+        if (xspd == 0 && yspd == 0 && turnspd == 0){
+            m_subsystem.stopModules();
+        }
+        else {
+            m_subsystem.driveAtSpeed(xspd, yspd, turnspd, !relativeDrive.get());
+        }
     }
 
     @Override
