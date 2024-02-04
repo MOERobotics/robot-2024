@@ -20,8 +20,7 @@ public final class CollectorCommands {
             Arm armSubsystem,
             Rotation2d shoulder,
             Rotation2d wrist,
-            double topSpeed,
-            double bottomSpeed
+            double speed
     ){
 
         var command = Commands.parallel(
@@ -30,7 +29,7 @@ public final class CollectorCommands {
                         (shoulder),
                         (wrist)
                 ),
-                headSubsystem.runCollectorCommands(topSpeed,bottomSpeed)
+                headSubsystem.runCollectorCommands(speed)
         );
 
         return command;
@@ -41,14 +40,14 @@ public final class CollectorCommands {
     // floor pickup
     public static Command headDownThenCollect(HeadSubsystem headSubsystem, Arm armSubsystem) {
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(90),
-                Rotation2d.fromDegrees(45), 0.5, 0.5 );
+                Rotation2d.fromDegrees(45), 0.5);
     }
 
 
     // Amp pickup
     public static Command setArmToAmpThenDeposit(HeadSubsystem headSubsystem, Arm armSubsystem){
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(135),
-                Rotation2d.fromDegrees(135), -0.5, -0.5 );
+                Rotation2d.fromDegrees(135), -0.5);
     }
     // TODO write new command for Shooter for AMP(not done)
     // TODO write command so that it will wait until is collected(not done)
@@ -56,7 +55,7 @@ public final class CollectorCommands {
     // Source Collect
     public static Command setArmToSourceThenCollect(HeadSubsystem headSubsystem, Arm armSubsystem){
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(155),
-                Rotation2d.fromDegrees(135), 0.5, 0.5 );
+                Rotation2d.fromDegrees(135), 0.5);
     }
 
 

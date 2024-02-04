@@ -95,7 +95,7 @@ public class FortissiMOEContainer{
             0,0,0,0,0,0);
 
     private final HeadSubsystem headSubsystem = new HeadSubsystem(0,0,0,
-            0,0,0,0,0,0,0,0,0,0);
+            0,0,0,0,0,1e-1,0,0,0);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -126,9 +126,24 @@ public class FortissiMOEContainer{
         // Configure the trigger bindings
         configureBindings();
         var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
+        var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
 
-        var button9 = new Trigger(() -> driverJoystick.getRawButton(9));
-        button9.onTrue(headDownThenCollect);
+        var button1 = new Trigger(() -> driverJoystick.getRawButton(1));
+        button1.onTrue(headSubsystem.runCollectorCommands(-.5));
+
+        var button2 = new Trigger(() -> driverJoystick.getRawButton(2));
+        button2.onTrue(headSubsystem.runCollectorCommands(.5));
+
+        var button8 = new Trigger (() -> driverJoystick.getRawButton(8));
+        button8.onTrue(headSubsystem.runCollectorCommands(0));
+
+        if(!button1.getAsBoolean()&&!button2.getAsBoolean()){
+            headSubsystem.stopCollector();
+        }
+
+
+
+
     }
 
     private void configureBindings() {
