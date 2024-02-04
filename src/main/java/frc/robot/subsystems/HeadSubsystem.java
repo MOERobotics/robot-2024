@@ -4,13 +4,7 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkLowLevel;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-
 import com.revrobotics.*;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,42 +12,32 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class HeadSubsystem extends SubsystemBase {
-//<<<<<<<< HEAD:src/main/java/frc/robot/subsystems/HeadSubsystem.java
     /** Creates a new ExampleSubsystem. */
     private final CANSparkMax shooterTop;
     private final CANSparkMax shooterBottom;
-    private final CANSparkMax collectorID;
+    private final CANSparkMax collector;
     private final RelativeEncoder shooterTopEncoder;
     private final RelativeEncoder shooterBottomEncoder;
     private final SparkPIDController shooterTopController;
     private final SparkPIDController shooterBottomController;
-
     private final SparkPIDController collectorController;
     private final DigitalInput collectorBeam;
+
     private double shooterSpeedTop=0;//Store desired speeds
     private double shooterSpeedBottom=0;
-
     private boolean collectorState;
-    double height = 20;
-
-    private double horizontalDistance;
-    private double verticalDistance;
-
-    private int shooterRPMtolerance;
-    // TODO rename tolerance to explain what it is (shooterRPMtolerance)(done)
+    private int shooterRPMTolerance;
     public HeadSubsystem(int shooterTopID, int shooterBottomID, int collectorID, double shooterP, double shooterI, double shooterD, double shooterFF,
                          double collectorP, double collectorI, double collectorD, double collectorFF,  int collectorBeamID) {
-        // TODO create PID for bottom controller(done)
-        // TODO make collector PID controlled(done)
         //instantiate shooter motors, encoders, sensors, PID
         this.collectorBeam = new DigitalInput(collectorBeamID);
         this.shooterTop=new CANSparkMax(shooterTopID, CANSparkLowLevel.MotorType.kBrushless);
         this.shooterBottom=new CANSparkMax(shooterBottomID,CANSparkLowLevel.MotorType.kBrushless);
-        this.collectorID=new CANSparkMax(collectorID, CANSparkLowLevel.MotorType.kBrushless);
+        this.collector=new CANSparkMax(collectorID, CANSparkLowLevel.MotorType.kBrushless);
         shooterTop.setIdleMode(CANSparkBase.IdleMode.kCoast);
         shooterBottom.setIdleMode(CANSparkBase.IdleMode.kCoast);
-        collectorController.setIdleMode(CANSparkBase.IdleMode.kBrake);
-
+        collector.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        //TODO: Reverse motors if needed
         this.shooterTopEncoder = shooterTop.getEncoder();
         this.shooterBottomEncoder = shooterBottom.getEncoder();
 
@@ -77,8 +61,8 @@ public class HeadSubsystem extends SubsystemBase {
         shooterBottomController.setFF(shooterFF);
         shooterBottomController.setOutputRange(-1, 1);
 
-        // set Collecter PID
-        this.collectorController = collectorID.getPIDController();
+        // set  Collecter PID
+        this.collectorController = collector.getPIDController();
         collectorController.setP(collectorP);
         collectorController.setI(collectorI);
         collectorController.setIZone(0);
@@ -86,19 +70,39 @@ public class HeadSubsystem extends SubsystemBase {
         collectorController.setFF(collectorFF);
         collectorController.setOutputRange(-1, 1);
 
-
         // sets up tolerance
-        setShooterRPMtolerance(5);
-
+        setShooterRPMTolerance(5);
     }
 
-    public boolean hasNote(){
-        return collectorBeam.get();
+    /**
+     * Example command factory method.
+     *
+     * @return a command
+     */
+    public Command exampleMethodCommand() {
+        // Inline construction of command goes here.
+        // Subsystem::RunOnce implicitly requires `this` subsystem.
+        return runOnce(
+                () -> {
+                    /* one-time action goes here */
+                });
+    }
+
+    /**
+     * An example method querying a boolean state of the subsystem (for example, a digital sensor).
+     *
+     * @return value of some boolean subsystem state, such as a digital sensor.
+     */
+    public boolean exampleCondition() {
+        // Query some boolean state, such as a digital sensor.
+        return false;
     }
 
     //Has a note
+    public boolean isCollected(){
+        return collectorBeam.get();
+    }
 
-    // TODO rename methods(partially done?)
     public void setShooterTopSpeed(double speed){
         shooterSpeedTop=speed;
         shooterTopController.setReference(speed,CANSparkBase.ControlType.kVelocity);
@@ -109,19 +113,20 @@ public class HeadSubsystem extends SubsystemBase {
     }
     // TODO check collector speeds before turning on(check)
     public void setCollectorSpeed(double speed){
-        collectorID.set(speed);
-        if(speed == 0){
+        collector.set(speed);
+
+        if(speed==0){
             collectorState = false;
-        } else{
+        } else {
             collectorState = true;
         }
-    }
 
+
+    }
     public Command runCollectorCommands (double speed){
         return  Commands.runOnce(() -> this.setCollectorSpeed(speed));
     }
 
-    //TODO Make collector state of on or off(done)
     public double getShooterSpeedTop(){
         return shooterTopEncoder.getVelocity();
     }
@@ -132,12 +137,6 @@ public class HeadSubsystem extends SubsystemBase {
     //Within reasonable range to shoot?
     public boolean inRange() {
         // Vision to April Tag/Odometry.
-        return false;
-    }
-
-    //Shooter april tag seen
-    public boolean seeSpeaker() {
-        // Query Odometry or vision to April Tag.
         return false;
     }
 
@@ -153,36 +152,28 @@ public class HeadSubsystem extends SubsystemBase {
         return false;
     }
 
+    public boolean shooterAtSpeed(){
+        return ((Math.abs(shooterTopEncoder.getVelocity() - shooterSpeedTop) <= shooterRPMTolerance) && (Math.abs(shooterBottomEncoder.getVelocity() - shooterSpeedBottom) <= shooterRPMTolerance));
+    }
+
 
     //Good to shoot
     public boolean readyShoot() {
-        return (Math.abs(shooterTopEncoder.getVelocity() - shooterSpeedTop) <= 5 && Math.abs(shooterBottomEncoder.getVelocity() - shooterSpeedBottom) <= 5
-                && aimed() && seeSpeaker());
-
-        // TODO feed in variable for shooter tolerance and overload method(done)
+        return (shooterAtSpeed() && aimed() && isCollected());
         //if motors up to speed
         //if aimed
         //if see speaker
-    }
-
-    public double getAngleBetweenSpeaker(Pose2d pose){
-        if(readyShoot() && seeSpeaker()){
-            return Math.atan(pose.getY()/pose.getX());
-        }
-        return 0;
+        //Has a note
     }
 
 
 
-
-    public void setShooterRPMtolerance(int shooterRPMtolerance){
-
-        this.shooterRPMtolerance = shooterRPMtolerance;
-
+    public void setShooterRPMTolerance(int shooterRPMtolerance){
+        this.shooterRPMTolerance = shooterRPMtolerance;
     }
 
-    public int getShooterRPMtolerance(){
-        return shooterRPMtolerance;
+    public int getShooterRPMTolerance(){
+        return shooterRPMTolerance;
     }
 
 
@@ -198,8 +189,8 @@ public class HeadSubsystem extends SubsystemBase {
     }
 
     public void stopCollector(){
-        collectorID.set(0);
-
+        collector.set(0);
+        collectorState = false;
     }
 
 
@@ -210,6 +201,16 @@ public class HeadSubsystem extends SubsystemBase {
 
 
     // TODO A state where we know its safe to move even if the note isn't completely in the head(not done)
+    public void readyToMoveShooter(){
+
+
+
+
+
+    }
+
+
+
 
     @Override
     public void periodic() {
@@ -217,7 +218,12 @@ public class HeadSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("shooterBottomDesired:",shooterSpeedBottom);
         SmartDashboard.putNumber("shooterTopActualSpeed:",getShooterSpeedTop());
         SmartDashboard.putNumber("shooterBottomActualSpeed:",getShooterSpeedBottom());
-        SmartDashboard.putBoolean("Ready to shoot:",readyShoot());
+        SmartDashboard.putNumber("Shooter RPM Tolerance", getShooterRPMTolerance());
+        SmartDashboard.putBoolean("Note Collected:",isCollected());
+        SmartDashboard.putBoolean("In Range:",inRange());
+        SmartDashboard.putBoolean("Aimed at speaker:",aimed());
+        SmartDashboard.putBoolean("Aiming in progress:",aiming());
+        SmartDashboard.putBoolean("Ready to shoot:", readyShoot());
         // This method will be called once per scheduler run
     }
 
@@ -225,30 +231,10 @@ public class HeadSubsystem extends SubsystemBase {
     public void simulationPeriodic() {
         // This method will be called once per scheduler run during simulation
     }
-
-  //Has a note
-
-  public void setShooterSpeed(double speedTop,double speedBottom){
-    shooterSpeedTop=speedTop;
-    shooterSpeedBottom = speedBottom;
-    shooterTopController.setReference(speedTop,CANSparkBase.ControlType.kVelocity);
-    shooterBottomController.setReference(speedBottom,CANSparkBase.ControlType.kVelocity);
-  }
-
-
-  public double calculateWristAngle(Pose2d pose, double armDistance){
-    horizontalDistance = pose.getX()+armDistance;
-    return Math.atan(height/horizontalDistance);
-  }
-
-  public Translation2d getShootingArmPose(Pose2d pose, double armDistance){
-    return new Translation2d(20,calculateWristAngle(pose,armDistance));
-  }
-  //Shooter april tag seen
-
-
-
-
-
-
 }
+
+    public double getAngleBetweenSpeaker(Pose2d pose){
+        if(readyShoot() && seeSpeaker()){
+            return Math.atan(pose.getY()/pose.getX());
+        }
+        return 0;
