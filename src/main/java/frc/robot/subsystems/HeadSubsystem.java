@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import com.revrobotics.*;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -125,6 +127,7 @@ public class HeadSubsystem extends SubsystemBase {
 
     }
     public Command runCollectorCommands (double speed){
+        SmartDashboard.putBoolean("started collector", collectorState);
         return  Commands.runOnce(() -> this.setCollectorSpeed(speed));
     }
 
@@ -172,12 +175,16 @@ public class HeadSubsystem extends SubsystemBase {
     }
 
 
-    public double getAngleBetweenSpeaker(Pose2d pose) {
+    public double getAngleBetweenSpeaker(Translation2d pose) {
+        Translation2d speaker = new Translation2d(0, Units.inchesToMeters(219));
+        Translation2d diff =  pose.minus(speaker);
         if (readyShoot() && seeSpeaker()) {
-            return Math.atan(pose.getY() / pose.getX());
+            return Math.atan2(diff.getY(),diff.getX());
         }
         return 0;
     }
+
+
 
 
 
