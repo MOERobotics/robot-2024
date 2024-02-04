@@ -10,11 +10,14 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.CollectorCommands;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.HeadSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -24,7 +27,6 @@ import frc.robot.subsystems.SwerveModule;
  */
 public class FortissiMOEContainer{
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
-
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
     double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
@@ -91,6 +93,16 @@ public class FortissiMOEContainer{
 //            4, 0, 0, 4, 0, 0, 0, 0,
 //            0,0,0,0);
 
+
+
+    // Need to fill in proper values for constructor
+    private final Arm armSubsystem = new Arm(20, 21, 35, 36,
+            4, 0, 0, 4, 0, 0, 0, 0,
+            0,0,0,0,0,0);
+
+    private final HeadSubsystem headSubsystem = new HeadSubsystem(0,0,0,
+            0,0,0,0,0,0,0,0,0,0);
+
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -106,16 +118,33 @@ public class FortissiMOEContainer{
             () -> driverJoystick.getRawButton(3), .15,6, maxMPS, maxRPS
     );
 
+    // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
+
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
 
+
     public FortissiMOEContainer() {
+
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
         pigeon.reset();
+        var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
+
+        var button9 = new Trigger(() -> driverJoystick.getRawButton(9));
+        button9.onTrue(headDownThenCollect);
+
+        var isFinished = new Trigger(() -> driverJoystick.getRawButton(9));
+
+
+
+
+
     }
+
+
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> pigeon.setYaw(0)));

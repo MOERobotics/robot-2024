@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -89,9 +90,6 @@ public class SwerveBotContainer {
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
             ()->pigeon.getYaw(), maxMPS,maxMPSSquared,0.04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
-
-
-    /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
 
