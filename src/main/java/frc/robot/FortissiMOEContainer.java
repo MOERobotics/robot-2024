@@ -14,10 +14,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.CollectorCommands;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.setHeading;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.HeadSubsystem;
+
+import java.awt.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -140,7 +143,15 @@ public class FortissiMOEContainer{
         }
 
 
+        var button5 = new Trigger (() -> driverJoystick.getRawButton(5));
+        button5.onTrue(new setHeading(swerveSubsystem,
+                () -> driverJoystick.getRawAxis(1),
+                () -> driverJoystick.getRawAxis(2),
+                headSubsystem.getAngleBetweenSpeaker(swerveSubsystem.getPose().getTranslation()))
+        );
+
     }
+
 
 
 

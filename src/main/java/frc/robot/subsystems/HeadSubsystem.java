@@ -156,7 +156,7 @@ public class HeadSubsystem extends SubsystemBase {
         return false;
     }
 
-    public boolean seeSpeaker(){
+    public static boolean seeSpeaker(){
         return false;
     }
 
@@ -222,11 +222,6 @@ public class HeadSubsystem extends SubsystemBase {
 
     // TODO A state where we know its safe to move even if the note isn't completely in the head(not done)
     public void readyToMoveShooter(){
-
-
-
-
-
     }
 
 
