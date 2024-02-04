@@ -15,34 +15,29 @@ public class HeadSubsystem extends SubsystemBase {
     /** Creates a new ExampleSubsystem. */
     private final CANSparkMax shooterTop;
     private final CANSparkMax shooterBottom;
-    private final CANSparkMax collectorTop;
-    private final CANSparkMax collectorBottom;
+    private final CANSparkMax collector;
     private final RelativeEncoder shooterTopEncoder;
     private final RelativeEncoder shooterBottomEncoder;
     private final SparkPIDController shooterTopController;
     private final SparkPIDController shooterBottomController;
-    private final SparkPIDController collectorBottomController;
-    private final SparkPIDController collectorTopController;
+    private final SparkPIDController collectorController;
     private final DigitalInput collectorBeam;
 
     private double shooterSpeedTop=0;//Store desired speeds
     private double shooterSpeedBottom=0;
     private boolean collectorState;
     private int shooterRPMTolerance;
-    public HeadSubsystem(int shooterTopID, int shooterBottomID, int collectorTopID,
-                         int collectorBottomID, double shooterP, double shooterI, double shooterD, double shooterFF,
+    public HeadSubsystem(int shooterTopID, int shooterBottomID, int collectorID, double shooterP, double shooterI, double shooterD, double shooterFF,
                          double collectorP, double collectorI, double collectorD, double collectorFF,  int collectorBeamID) {
         //instantiate shooter motors, encoders, sensors, PID
         this.collectorBeam = new DigitalInput(collectorBeamID);
         this.shooterTop=new CANSparkMax(shooterTopID, CANSparkLowLevel.MotorType.kBrushless);
         this.shooterBottom=new CANSparkMax(shooterBottomID,CANSparkLowLevel.MotorType.kBrushless);
-        this.collectorTop=new CANSparkMax(collectorTopID, CANSparkLowLevel.MotorType.kBrushless);
-        this.collectorBottom=new CANSparkMax(collectorBottomID,CANSparkLowLevel.MotorType.kBrushless);
+        this.collector=new CANSparkMax(collectorID, CANSparkLowLevel.MotorType.kBrushless);
         shooterTop.setIdleMode(CANSparkBase.IdleMode.kCoast);
         shooterBottom.setIdleMode(CANSparkBase.IdleMode.kCoast);
-        collectorTop.setIdleMode(CANSparkBase.IdleMode.kBrake);
-        collectorBottom.setIdleMode(CANSparkBase.IdleMode.kBrake);
-
+        collector.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        //TODO: Reverse motors if needed
         this.shooterTopEncoder = shooterTop.getEncoder();
         this.shooterBottomEncoder = shooterBottom.getEncoder();
 
@@ -66,23 +61,14 @@ public class HeadSubsystem extends SubsystemBase {
         shooterBottomController.setFF(shooterFF);
         shooterBottomController.setOutputRange(-1, 1);
 
-        // set bottom collecter PID
-        this.collectorBottomController = collectorBottom.getPIDController();
-        collectorBottomController.setP(collectorP);
-        collectorBottomController.setI(collectorI);
-        collectorBottomController.setIZone(0);
-        collectorBottomController.setD(collectorD);
-        collectorBottomController.setFF(collectorFF);
-        collectorBottomController.setOutputRange(-1, 1);
-
-        // set top Collecter PID
-        this.collectorTopController = collectorTop.getPIDController();
-        collectorTopController.setP(collectorP);
-        collectorTopController.setI(collectorI);
-        collectorTopController.setIZone(0);
-        collectorTopController.setD(collectorD);
-        collectorTopController.setFF(collectorFF);
-        collectorTopController.setOutputRange(-1, 1);
+        // set  Collecter PID
+        this.collectorController = collector.getPIDController();
+        collectorController.setP(collectorP);
+        collectorController.setI(collectorI);
+        collectorController.setIZone(0);
+        collectorController.setD(collectorD);
+        collectorController.setFF(collectorFF);
+        collectorController.setOutputRange(-1, 1);
 
 		// sets up tolerance
         setShooterRPMTolerance(5);
@@ -126,11 +112,10 @@ public class HeadSubsystem extends SubsystemBase {
         shooterBottomController.setReference(speed,CANSparkBase.ControlType.kVelocity);
     }
     // TODO check collector speeds before turning on(check)
-    public void setCollectorSpeed(double topSpeed, double bottomSpeed){
-        collectorTop.set(topSpeed);
-        collectorBottom.set(bottomSpeed);
+    public void setCollectorSpeed(double speed){
+        collector.set(speed);
 
-        if(topSpeed == 0 || bottomSpeed == 0){
+        if(speed==0){
             collectorState = false;
         } else {
             collectorState = true;
@@ -138,8 +123,8 @@ public class HeadSubsystem extends SubsystemBase {
 
 
     }
-    public Command runCollectorCommands (double topSpeed, double bottomSpeed){
-        return  Commands.runOnce(() -> this.setCollectorSpeed(topSpeed,bottomSpeed));
+    public Command runCollectorCommands (double speed){
+        return  Commands.runOnce(() -> this.setCollectorSpeed(speed));
     }
 
     public double getShooterSpeedTop(){
@@ -204,8 +189,7 @@ public class HeadSubsystem extends SubsystemBase {
     }
 
     public void stopCollector(){
-        collectorBottom.set(0);
-        collectorTop.set(0);
+        collector.set(0);
         collectorState = false;
     }
 

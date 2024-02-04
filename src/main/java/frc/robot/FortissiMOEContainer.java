@@ -12,8 +12,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.CollectorCommands;
+import frc.robot.commands.ShooterOnOffCommand;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.shootSpeakerCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
@@ -42,6 +44,7 @@ public class FortissiMOEContainer{
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
     double maxRPS = Math.PI*2;
+
     private final SwerveModule backLeftModule = new SwerveModule(
             3,
             2,
@@ -90,12 +93,21 @@ public class FortissiMOEContainer{
             pigeon, maxMPS);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm susbsystem start
-    private final Arm armSubsystem = new Arm(99, 99, 99, 99,
+    private final Arm armSubsystem = new Arm(15,  14, 53, 54,
             4, 0, 0, 0, 4, 0, 0, 0,
             0,0,0,0,2,2);
-	//TODO: Replace 99 with correct motor IDs.
-	private final HeadSubsystem headSubsystem = new HeadSubsystem(99,99,99,
-			99,0,0,0,0,0,0,0,0,99);
+
+    //Shoulder 4 and 15
+    //Wrist 14
+    //Shooter top 6
+    //Shooter bottom 13
+    //Collector 5
+
+
+
+	//TODO: Replace 99 with correct motor IDs.(Partially complete)
+	private final HeadSubsystem headSubsystem = new HeadSubsystem(6,13,5,
+			0.01,0,0,0,0.01,0,0,0,99);
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -123,16 +135,24 @@ public class FortissiMOEContainer{
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
-        var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
+       // var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
 
         var button9 = new Trigger(() -> driverJoystick.getRawButton(9));
-        button9.onTrue(headDownThenCollect);
+       // button9.onTrue(headDownThenCollect);
 
         var isFinished = new Trigger(() -> driverJoystick.getRawButton(9));
 
+        var button4 = new Trigger(() -> driverJoystick.getRawButton(4));
+        var shooterOn = new ShooterOnOffCommand(headSubsystem,3000, 3000, true);
+        button4.onTrue(shooterOn);
 
+        var button3 = new Trigger(() -> driverJoystick.getRawButton(3));
+        var shooterOff = new ShooterOnOffCommand(headSubsystem,3000,3000,false);
+        button3.onTrue(shooterOff);
 
-
+        var shootTrigger = new Trigger(() -> driverJoystick.getRawAxis(3)>=0.5);
+        var shoot = new shootSpeakerCommand(headSubsystem);
+        shootTrigger.whileTrue(shoot);
 
     }
 
@@ -145,16 +165,3 @@ public class FortissiMOEContainer{
         // return Autos.exampleAuto(m_drive);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

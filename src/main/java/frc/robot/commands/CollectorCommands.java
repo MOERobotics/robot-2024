@@ -24,8 +24,7 @@ public final class CollectorCommands {
             Arm armSubsystem,
             Rotation2d shoulder,
             Rotation2d wrist,
-            double topSpeed,
-            double bottomSpeed
+            double speed
     ){
 
         var command = Commands.parallel(
@@ -35,7 +34,7 @@ public final class CollectorCommands {
                         (wrist)
                 ),
 
-                headSubsystem.runCollectorCommands(topSpeed,bottomSpeed)
+                headSubsystem.runCollectorCommands(speed)
 
         );
 
@@ -48,7 +47,7 @@ public final class CollectorCommands {
     public static Command headDownThenCollect(HeadSubsystem headSubsystem, Arm armSubsystem) {
 
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(90),
-                Rotation2d.fromDegrees(45), 0.5, 0.5 );
+                Rotation2d.fromDegrees(45), 0.5);
     }
 
 
@@ -56,7 +55,7 @@ public final class CollectorCommands {
     public static Command setArmToAmpThenDepositCollector(HeadSubsystem headSubsystem, Arm armSubsystem){
 
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(135),
-                Rotation2d.fromDegrees(135), -0.5, -0.5 );
+                Rotation2d.fromDegrees(135), -0.5);
 
     }
 
@@ -67,7 +66,7 @@ public final class CollectorCommands {
     public static Command setArmToSourceThenCollect(HeadSubsystem headSubsystem, Arm armSubsystem){
 
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(155),
-                Rotation2d.fromDegrees(135), 0.5, 0.5 );
+                Rotation2d.fromDegrees(135), 0.5);
 
     }
 
@@ -80,7 +79,7 @@ public final class CollectorCommands {
     public static Command setArmToAmpThenDepositShooter(HeadSubsystem headSubsystem, Arm armSubsystem){
 
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(-155),
-                Rotation2d.fromDegrees(-135), 0.5, 0.5 );
+                Rotation2d.fromDegrees(-135), 0.5);
 
     }
 
