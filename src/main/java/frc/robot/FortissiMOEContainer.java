@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
@@ -86,9 +87,9 @@ public class FortissiMOEContainer{
             ()->pigeon.getYaw(), maxMPS, 0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
-//    private final Arm armSubsystem = new Arm(20, 21, 35, 36,
-//            4, 0, 0, 4, 0, 0, 0, 0,
-//            0,0,0,0);
+    private final Arm armSubsystem = new Arm(4, 15,21, 35, 36,
+            0, 0, 0, 0, 0, 0, new Rotation2d(0), new Rotation2d(0),
+            0,0);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -117,6 +118,10 @@ public class FortissiMOEContainer{
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
+        new JoystickButton(driverJoystick, 2).onTrue(Commands.run(()->armSubsystem.shoulderPower(.1)));
+        new JoystickButton(driverJoystick, 4).onTrue(Commands.run(()->armSubsystem.wristPower(.1)));
+        new JoystickButton(driverJoystick, 6).onTrue(Commands.run(()->armSubsystem.shoulderPower(-.1)));
+        new JoystickButton(driverJoystick, 7).onTrue(Commands.run(()->armSubsystem.wristPower(-.1)));
     }
 
     public Command getAutonomousCommand() {
