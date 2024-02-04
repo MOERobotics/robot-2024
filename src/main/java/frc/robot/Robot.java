@@ -6,6 +6,10 @@ package frc.robot;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.pathfinding.LocalADStar;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -17,6 +21,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+		DataLogManager.start();
+		DriverStation.startDataLog(DataLogManager.getLog());
 		m_robotContainer = new FortissiMOEContainer();
 	}
 

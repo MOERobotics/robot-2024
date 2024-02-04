@@ -5,6 +5,8 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.*;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,6 +24,13 @@ public class HeadSubsystem extends SubsystemBase {
     private final SparkPIDController shooterBottomController;
     private final SparkPIDController collectorController;
     private final DigitalInput collectorBeam;
+    private final DoubleLogEntry logCollectorSpeed;
+    private final DoubleLogEntry logCollectorPower;
+    private final DoubleLogEntry logShooterTopSpeed;
+    private final DoubleLogEntry logShooterBottomSpeed;
+    private final DoubleLogEntry logShooterTopDesired;
+    private final DoubleLogEntry logShooterBottomDesired;
+    private final DoubleLogEntry logShooterTolerance;
 
     private double shooterSpeedTop=0;//Store desired speeds
     private double shooterSpeedBottom=0;
@@ -38,8 +47,21 @@ public class HeadSubsystem extends SubsystemBase {
         shooterBottom.setIdleMode(CANSparkBase.IdleMode.kCoast);
         collector.setIdleMode(CANSparkBase.IdleMode.kBrake);
         //TODO: Reverse motors if needed
+        shooterTop.setInverted(false);
+        shooterBottom.setInverted(false);
+        collector.setInverted(false);
+
         this.shooterTopEncoder = shooterTop.getEncoder();
         this.shooterBottomEncoder = shooterBottom.getEncoder();
+
+        var log = DataLogManager.getLog();
+        logCollectorSpeed = new DoubleLogEntry(log, "Head/collectorSpeed");
+        logCollectorPower = new DoubleLogEntry(log, "Head/colelctorPower");
+        logShooterTopSpeed = new DoubleLogEntry(log, "Head/TopShooterSpeed");
+        logShooterBottomSpeed = new DoubleLogEntry(log, "Head/BottomShooterSpeed");
+        logShooterTopDesired = new DoubleLogEntry(log, "Head/TopShooterDesired");
+        logShooterBottomDesired = new DoubleLogEntry(log, "Head/BottomShooterDesired");
+        logShooterTolerance = new DoubleLogEntry(log, "Head/ShooterRPMTolerance");
 
         // configure collector motor top and bottom
 
@@ -202,15 +224,7 @@ public class HeadSubsystem extends SubsystemBase {
 
     // TODO A state where we know its safe to move even if the note isn't completely in the head(not done)
     public void readyToMoveShooter(){
-
-
-
-
-
     }
-
-
-
 
     @Override
     public void periodic() {
@@ -225,6 +239,14 @@ public class HeadSubsystem extends SubsystemBase {
 	    SmartDashboard.putBoolean("Aiming in progress:",aiming());
 	    SmartDashboard.putBoolean("Ready to shoot:", readyShoot());
         // This method will be called once per scheduler run
+        logCollectorSpeed.append(collector.getEncoder().getVelocity());
+        logCollectorPower.append(collector.get());
+        logShooterTopSpeed.append(getShooterSpeedTop());
+        logShooterBottomSpeed.append(getShooterSpeedBottom());
+        logShooterTopDesired.append(shooterSpeedTop);
+        logShooterBottomDesired.append(shooterSpeedBottom);
+        logShooterTolerance.append(getShooterRPMTolerance());
+
     }
 
     @Override
