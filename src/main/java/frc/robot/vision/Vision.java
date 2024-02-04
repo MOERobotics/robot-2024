@@ -1,9 +1,6 @@
 package frc.robot.vision;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArraySubscriber;
 import edu.wpi.first.networktables.StructPublisher;
@@ -25,6 +22,7 @@ public class Vision {
     StructArraySubscriber<ObjectDetection> subObjectDetections;
 
     Pose3d fieldToOdometry3d = new Pose3d();
+    Transform2d offSet;
 
     public Vision() {
         var networkTable = NetworkTableInstance.getDefault();
@@ -41,8 +39,13 @@ public class Vision {
     }
 
     public Pose2d getRobotPosition(){// Tanmaybe
+        if (subOdomToRobot == null) return fieldToOdometry3d.transformBy(new Transform3d(offSet.getX(), offSet.getY(), 0,
+                new Rotation3d(0,0,offSet.getRotation().getRadians()))).toPose2d();
         return fieldToOdometry3d.transformBy(subOdomToRobot.get()).toPose2d();
+    }
 
+    public void setRobotPosition(Pose2d odometry, Pose2d pose){
+        offSet = pose.minus(odometry);
     }
 
     public void setCameraPosition(Transform3d robotToCamera){ //Rohan

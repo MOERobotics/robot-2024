@@ -62,8 +62,8 @@ public class SwerveDrive extends SubsystemBase {
         return odometer.getPoseMeters();
     }
 
-    public void resetOdometry(Pose2d pose) {
-        odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
+    public void setRobotPose(Pose2d pose) {
+        this.vision.setRobotPosition(getPose(), pose);
     }
 
     @Override
