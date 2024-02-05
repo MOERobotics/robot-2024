@@ -80,7 +80,7 @@ public class Arm extends SubsystemBase {
 
         Rotation2d safeShoulder, safeWrist;
         if (wristState().getDegrees() < extremeWrist.getDegrees() && wristPos.getDegrees() < extremeWrist.getDegrees() ||
-                wristState().getDegrees() > extremeWrist.getDegrees() && wristPos.getDegrees() < extremeWrist.getDegrees()){
+        wristState().getDegrees() > extremeWrist.getDegrees() && wristPos.getDegrees() < extremeWrist.getDegrees()){
             return new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel);
         }
         safeShoulder = Rotation2d.fromDegrees((wristPos.getDegrees()-wristState().getDegrees())/

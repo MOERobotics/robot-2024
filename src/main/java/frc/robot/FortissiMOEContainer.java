@@ -92,10 +92,13 @@ public class FortissiMOEContainer{
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
             ()->pigeon.getYaw(), maxMPS, 0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
-    /////////////////////////////////////////////////////////////////////////////arm susbsystem start
+    /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,21, 35, 36,
             0, 0, 0, 0, 0, 0, new Rotation2d(0), new Rotation2d(0),
             0,0);
+
+    /////////////////////////////////////////////////////////////////////////////arm susbsystem start
+
 	//TODO: Replace 99 with correct motor IDs.
 	private final HeadSubsystem headSubsystem = new HeadSubsystem(99,99,99,
 			99,0,0,0,0,0,0,0,0);
@@ -117,7 +120,6 @@ public class FortissiMOEContainer{
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
 
     ////////////////////////////////////////////////////////////////////////////commands end
-
 
 
 
@@ -154,6 +156,10 @@ public class FortissiMOEContainer{
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
+        new JoystickButton(driverJoystick, 2).onTrue(Commands.run(()->armSubsystem.shoulderPower(.1)));
+        new JoystickButton(driverJoystick, 4).onTrue(Commands.run(()->armSubsystem.wristPower(.1)));
+        new JoystickButton(driverJoystick, 6).onTrue(Commands.run(()->armSubsystem.shoulderPower(-.1)));
+        new JoystickButton(driverJoystick, 7).onTrue(Commands.run(()->armSubsystem.wristPower(-.1)));
     }
 
     public Command getAutonomousCommand() {
