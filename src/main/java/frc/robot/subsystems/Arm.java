@@ -39,11 +39,15 @@ public class Arm extends SubsystemBase {
         shoulderMotorRight = new CANSparkMax(rightShoulderMotorID, kBrushless);
         wristMotor = new CANSparkMax(wristMotorID, kBrushless);
 
+        shoulderMotorRight.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        shoulderMotorLeft.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        wristMotor.setIdleMode(CANSparkBase.IdleMode.kBrake);
+
         shoulderMotorLeft.setInverted(false);
         shoulderMotorRight.setInverted(true);
         wristMotor.setInverted(false);
 
-        shoulderMotorRight.follow(shoulderMotorLeft);
+        shoulderMotorRight.follow(shoulderMotorLeft, true);
 
         shoulderEncoder = new CANcoder(shoulderEncoderID);
         wristEncoder = new CANcoder(wristEncoderID);
@@ -94,6 +98,10 @@ public class Arm extends SubsystemBase {
                 new ArmPathFollow(this, safeShoulder, safeWrist, maxSpeed, maxAccel),
                 new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel)
         );
+    }
+
+    public void stopMotors(){
+        wristPower(0); shoulderPower(0);
     }
 
 
