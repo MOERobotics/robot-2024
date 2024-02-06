@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
@@ -92,16 +93,10 @@ public class FortissiMOEContainer{
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
             pigeon, maxMPS);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
-    /////////////////////////////////////////////////////////////////////////////arm susbsystem start
-    private final Arm armSubsystem = new Arm(15,  14, 53, 54,
-            4, 0, 0, 0, 4, 0, 0, 0,
-            0,0,0,0,2,2);
-
-    //Shoulder 4 and 15
-    //Wrist 14
-    //Shooter top 6
-    //Shooter bottom 13
-    //Collector 5
+    /////////////////////////////////////////////////////////////////////////////arm subsystem start
+    private final Arm armSubsystem = new Arm(4, 15,21, 35, 36,
+            0, 0, 0, 0, 0, 0, new Rotation2d(0), new Rotation2d(0),
+            0,0);
 
 
 
@@ -118,12 +113,10 @@ public class FortissiMOEContainer{
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
-            () -> -driverJoystick.getRawAxis(4),
-            () -> driverJoystick.getRawButton(6),//Slow Bumper
-            () -> driverJoystick.getRawButton(3),//Robot relative
-		    0.15,6, maxMPS, maxRPS);
-
-    // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
+            () -> -driverJoystick.getRawAxis(2),
+            () -> driverJoystick.getRawButton(5),
+            () -> driverJoystick.getRawButton(3), 6,6, maxMPS, maxRPS
+    );
 
     ////////////////////////////////////////////////////////////////////////////commands end
 
