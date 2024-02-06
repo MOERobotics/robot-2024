@@ -133,6 +133,11 @@ public class HeadSubsystem extends SubsystemBase {
         shooterSpeedBottom=speed;
         shooterBottomController.setReference(speed,CANSparkBase.ControlType.kVelocity);
     }
+
+	public void setShooterPower(double power){
+		shooterTop.set(power);
+		shooterBottom.set(power);
+	}
     // TODO check collector speeds before turning on(check)
     public void setCollectorSpeed(double speed){
         collector.set(speed);

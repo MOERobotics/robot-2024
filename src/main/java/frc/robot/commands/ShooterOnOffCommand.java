@@ -35,10 +35,12 @@ public class ShooterOnOffCommand extends Command {
     public void initialize() {
 		finished=false;
 	    if(onoff){
-		    headSubsystem.setShooterTopSpeed(shooterSpeedTop);
-		    headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
+//		    headSubsystem.setShooterTopSpeed(shooterSpeedTop);
+//		    headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
+			headSubsystem.setShooterPower(0.2);
 	    } else{
-		    headSubsystem.stopShooter();
+//		    headSubsystem.stopShooter();
+			headSubsystem.setShooterPower(0.0);
 	    }
     }
 
@@ -46,14 +48,16 @@ public class ShooterOnOffCommand extends Command {
     @Override
     public void execute() {
 	    if(onoff){
-		    headSubsystem.setShooterTopSpeed(shooterSpeedTop);
-		    headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
+//		    headSubsystem.setShooterTopSpeed(shooterSpeedTop);
+//		    headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
+		    headSubsystem.setShooterPower(0.2);
 	    } else{
-		    headSubsystem.stopShooter();
+//		    headSubsystem.stopShooter();
+		    headSubsystem.setShooterPower(0.0);
 	    }
-        if(headSubsystem.shooterAtSpeed()){
-            finished = true;
-        }
+//        if(headSubsystem.shooterAtSpeed()){
+//            finished = true;
+//        }
     }
 
     // Called once the command ends or is interrupted.
@@ -63,6 +67,7 @@ public class ShooterOnOffCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return finished;
+//        return finished;
+	    return false;
     }
 }

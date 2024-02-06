@@ -41,17 +41,20 @@ public class shootSpeakerCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        headSubsystem.setShooterTopSpeed(shooterSpeedTop);
-		headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
+//        headSubsystem.setShooterTopSpeed(shooterSpeedTop);
+//		headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
+	    headSubsystem.setShooterPower(0.2);
         if(/*headSubsystem.readyShoot()*/true){
-            headSubsystem.setCollectorSpeed(1);
+//            headSubsystem.setCollectorSpeed(1);
+	        headSubsystem.setCollectorSpeed(0.2);
         }
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        headSubsystem.stopCollector();
+//        headSubsystem.stopCollector();
+	    headSubsystem.setCollectorSpeed(0.0);
     }
 
     // Returns true when the command should end.

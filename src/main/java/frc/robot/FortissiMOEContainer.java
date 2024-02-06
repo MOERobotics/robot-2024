@@ -101,11 +101,12 @@ public class FortissiMOEContainer{
 
 
 	//TODO: Replace 99 with correct motor IDs.(Partially complete)
-	private final HeadSubsystem headSubsystem = new HeadSubsystem(6,13,5,
-			0.01,0,0,0,0.01,0,0,0,99);
+	private final HeadSubsystem headSubsystem = new HeadSubsystem(5,13,6,
+			0.01,0,0,0,0.01,0,0,0,1);
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
+	private final Joystick functionJoystick = new Joystick(0);
 
 
     ////////////////////////////////////////////////////////////////////////////commands
@@ -135,15 +136,15 @@ public class FortissiMOEContainer{
 
         var isFinished = new Trigger(() -> driverJoystick.getRawButton(9));
 
-        var button4 = new Trigger(() -> driverJoystick.getRawButton(4));
+        var button4 = new Trigger(() -> functionJoystick.getRawButton(4));
         var shooterOn = new ShooterOnOffCommand(headSubsystem,3000, 3000, true);
         button4.onTrue(shooterOn);
 
-        var button3 = new Trigger(() -> driverJoystick.getRawButton(3));
+        var button3 = new Trigger(() -> functionJoystick.getRawButton(3));
         var shooterOff = new ShooterOnOffCommand(headSubsystem,3000,3000,false);
         button3.onTrue(shooterOff);
 
-        var shootTrigger = new Trigger(() -> driverJoystick.getRawAxis(3)>=0.5);
+        var shootTrigger = new Trigger(() -> functionJoystick.getRawAxis(3)>=0.5);
         var shoot = new shootSpeakerCommand(headSubsystem);
         shootTrigger.whileTrue(shoot);
 

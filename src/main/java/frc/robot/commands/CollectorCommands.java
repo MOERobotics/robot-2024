@@ -29,7 +29,7 @@ public final class CollectorCommands {
 
         var command = Commands.parallel(
 
-                armSubsystem.followPathCommand(
+                armSubsystem.goToPoint(
                         (shoulder),
                         (wrist)
                 ),
