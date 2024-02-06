@@ -126,7 +126,6 @@ public class SwerveBotContainer {
 
         shooter = new DigitalOutput(4);
 
-
         pigeon.reset();
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings

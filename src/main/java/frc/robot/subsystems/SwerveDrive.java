@@ -23,6 +23,8 @@ public class SwerveDrive extends SubsystemBase {
     private final double maxMetersPerSec;
     SwerveDriveKinematics kDriveKinematics;
     double desiredYaw;
+    boolean align = false;
+
     private final PIDController drivePID;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
                        Supplier<Double> pigeon, double maxMetersPerSec, double kP, double kI, double kD) {
@@ -41,7 +43,7 @@ public class SwerveDrive extends SubsystemBase {
         kDriveKinematics = new SwerveDriveKinematics(FRModule.moduleTranslation(), FLModule.moduleTranslation(),
                 BRModule.moduleTranslation(), BLModule.moduleTranslation());
         odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0), getModulePositions());
-
+        align = false;
     }
 
     public double getDesiredYaw(){
@@ -50,6 +52,10 @@ public class SwerveDrive extends SubsystemBase {
 
     public void setDesiredYaw(double yaw){
         desiredYaw = yaw;
+        headingCorrect(true);
+    }
+    public void headingCorrect(boolean correct){
+        align = correct;
     }
 
     public double getYaw(){
@@ -101,10 +107,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented){
-        if (turnspd != 0){
-            desiredYaw = pigeon.get();
-        }
-        else{
+        if (align){
             turnspd = drivePID.calculate(pigeon.get(), desiredYaw);
         }
         ChassisSpeeds chassisSpeeds;
