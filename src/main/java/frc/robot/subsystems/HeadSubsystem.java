@@ -31,7 +31,7 @@ public class HeadSubsystem extends SubsystemBase {
     private boolean collectorState;
     private int shooterRPMTolerance;
     public HeadSubsystem(int shooterTopID, int shooterBottomID, int collectorID, double shooterP, double shooterI, double shooterD, double shooterFF,
-                         double collectorP, double collectorI, double collectorD, double collectorFF,  int collectorBeamID) {
+                         double collectorP, double collectorI, double collectorD, double collectorFF,  int collectorBeamID, boolean setInverted) {
         //instantiate shooter motors, encoders, sensors, PID
         this.collectorBeam = new DigitalInput(collectorBeamID);
         this.shooterTop=new CANSparkMax(shooterTopID, CANSparkLowLevel.MotorType.kBrushless);
@@ -43,6 +43,7 @@ public class HeadSubsystem extends SubsystemBase {
         //TODO: Reverse motors if needed
         this.shooterTopEncoder = shooterTop.getEncoder();
         this.shooterBottomEncoder = shooterBottom.getEncoder();
+        collector.setInverted(true);
 
         // configure collector motor top and bottom
 
@@ -123,8 +124,6 @@ public class HeadSubsystem extends SubsystemBase {
         } else {
             collectorState = true;
         }
-
-
     }
     public Command runCollectorCommands (double speed){
         SmartDashboard.putBoolean("started collector", collectorState);

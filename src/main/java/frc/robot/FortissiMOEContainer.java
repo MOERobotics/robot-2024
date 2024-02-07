@@ -90,21 +90,22 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS, 0, 0, 0);
+            ()->pigeon.getYaw(), maxMPS, 3, 0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
-    private final Arm armSubsystem = new Arm(4, 15,21, 35, 36,
+    private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
             0, 0, 0, 0, 0, 0, new Rotation2d(0), new Rotation2d(0),
             0,0);
 
     /////////////////////////////////////////////////////////////////////////////arm susbsystem start
 
 	//TODO: Replace 99 with correct motor IDs.
-	private final HeadSubsystem headSubsystem = new HeadSubsystem(99,99,99,
-			99,0,0,0,0,0,0,0,0);
+	private final HeadSubsystem headSubsystem = new HeadSubsystem(5,13,6,
+			0,0,0,0,0,0,0,0,0, false);
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
+    private final Joystick functionJoystick = new Joystick(0);
 
 
     ////////////////////////////////////////////////////////////////////////////commands
@@ -112,8 +113,8 @@ public class FortissiMOEContainer{
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
-            () -> -driverJoystick.getRawAxis(4),
-            () -> driverJoystick.getRawButton(6),//Slow Bumper
+            () -> -driverJoystick.getRawAxis(2),
+            () -> driverJoystick.getRawButton(5),//Slow Bumper
             () -> driverJoystick.getRawButton(3),//Robot relative
 		    0.15,6, maxMPS, maxRPS);
 
@@ -131,13 +132,13 @@ public class FortissiMOEContainer{
         var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
         var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
 
-        var button1 = new Trigger(() -> driverJoystick.getRawButton(1));
-        button1.onTrue(headSubsystem.runCollectorCommands(-.5));
+        var button1 = new Trigger(() -> functionJoystick.getRawButton(1));
+        button1.onTrue(headSubsystem.runCollectorCommands(-.3));
 
-        var button2 = new Trigger(() -> driverJoystick.getRawButton(2));
-        button2.onTrue(headSubsystem.runCollectorCommands(.5));
+        var button2 = new Trigger(() -> functionJoystick.getRawButton(2));
+        button2.onTrue(headSubsystem.runCollectorCommands(.3));
 
-        var button8 = new Trigger (() -> driverJoystick.getRawButton(8));
+        var button8 = new Trigger (() -> functionJoystick.getRawButton(8));
         button8.onTrue(headSubsystem.runCollectorCommands(0));
 
         if(!button1.getAsBoolean()&&!button2.getAsBoolean()){
@@ -145,14 +146,16 @@ public class FortissiMOEContainer{
         }
 
 
-        var button5 = new Trigger (() -> driverJoystick.getRawButton(5));
+        /*var button5 = new Trigger (() -> driverJoystick.getRawButton(5));
         button5.onTrue(new setHeading(swerveSubsystem,
                 () -> driverJoystick.getRawAxis(1),
                 () -> driverJoystick.getRawAxis(2),
-                headSubsystem.getAngleBetweenSpeaker(swerveSubsystem.getPose().getTranslation()))
-        );
+                swerveSubsystem.getAngleBetweenSpeaker(swerveSubsystem.getPose().getTranslation()))
+        ); */
 
     }
+
+
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
@@ -165,6 +168,7 @@ public class FortissiMOEContainer{
     public Command getAutonomousCommand() {
         return null;
         // return Autos.exampleAuto(m_drive);
+
     }
 }
 
