@@ -47,9 +47,9 @@ public class HeadSubsystem extends SubsystemBase {
         shooterBottom.setIdleMode(CANSparkBase.IdleMode.kCoast);
         collector.setIdleMode(CANSparkBase.IdleMode.kBrake);
         //TODO: Reverse motors if needed
-        shooterTop.setInverted(false);
-        shooterBottom.setInverted(false);
-        collector.setInverted(false);
+        shooterTop.setInverted(true);
+        shooterBottom.setInverted(true);
+        collector.setInverted(true);
 
         this.shooterTopEncoder = shooterTop.getEncoder();
         this.shooterBottomEncoder = shooterBottom.getEncoder();
