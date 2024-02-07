@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -14,11 +13,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.Autos;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
-
-import static frc.robot.commands.Autos.doubleNoteAuto;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -122,7 +118,7 @@ public class SwerveBotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return Autos.doubleNoteAuto(swerveSubsystem);
+        return Autos.doubleNoteAuto1(swerveSubsystem);
        // return Autos.exampleAuto(m_drive);
     }
 }
