@@ -45,6 +45,7 @@ public class HeadSubsystem extends SubsystemBase {
         this.shooterBottomEncoder = shooterBottom.getEncoder();
         collector.setInverted(true);
 
+
         // configure collector motor top and bottom
 
         // set top shooter PID
