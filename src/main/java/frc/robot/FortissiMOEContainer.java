@@ -8,6 +8,8 @@ import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -26,6 +28,12 @@ import frc.robot.subsystems.HeadSubsystem;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class FortissiMOEContainer{
+
+
+    Solenoid shooter;
+
+   //  PneumaticHub m_ph = new PneumaticHub(PH_CAN_ID);
+
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
@@ -86,7 +94,7 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS, 5, 0, 0, 0);
+            ()->pigeon.getYaw(), maxMPS, 0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
 //    private final Arm armSubsystem = new Arm(20, 21, 35, 36,
@@ -124,11 +132,13 @@ public class FortissiMOEContainer{
 
 
 
-
     public FortissiMOEContainer() {
-
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
+
+
+        shooter = new Solenoid(PneumaticsModuleType.REVPH,7);
+
         configureBindings();
         pigeon.reset();
         var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
@@ -144,10 +154,15 @@ public class FortissiMOEContainer{
 
     }
 
-
-
     private void configureBindings() {
-        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> pigeon.setYaw(0)));
+        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
+        new JoystickButton(driverJoystick, 2).whileTrue(Commands.runOnce(() -> shooterOn(shooter)));
+
+    }
+
+    private void shooterOn(Solenoid shooter) {
+
+        shooter.set(true);
     }
 
     public Command getAutonomousCommand() {

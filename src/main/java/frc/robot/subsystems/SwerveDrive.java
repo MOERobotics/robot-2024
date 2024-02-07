@@ -39,6 +39,8 @@ public class SwerveDrive extends SubsystemBase {
     private final double maxMetersPerSecSquared;
     SwerveDriveKinematics kDriveKinematics;
     double desiredYaw;
+    boolean align = false;
+
     private final PIDController drivePID;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
                        Supplier<Double> pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD) {
@@ -59,12 +61,23 @@ public class SwerveDrive extends SubsystemBase {
         kDriveKinematics = new SwerveDriveKinematics(FRModule.moduleTranslation(), FLModule.moduleTranslation(),
                 BRModule.moduleTranslation(), BLModule.moduleTranslation());
         odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0), getModulePositions());
+        align = false;
+    }
 
+    public double getDesiredYaw(){
+        return desiredYaw;
     }
 
 	public Command setInitPosition(Pose2d initPose){
 		return Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose)));
 	}
+    public void setDesiredYaw(double yaw){
+        desiredYaw = yaw;
+        headingCorrect(true);
+    }
+    public void headingCorrect(boolean correct){
+        align = correct;
+    }
 
     public double getYaw(){
         return pigeon.get();
@@ -90,6 +103,7 @@ public class SwerveDrive extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("yaw", pigeon.get());
+        SmartDashboard.putNumber("desired yaw", getDesiredYaw());
         odometer.update(getRotation2d(), getModulePositions());
         SmartDashboard.putNumber("Posex",getPose().getX());
         SmartDashboard.putNumber("Posey",getPose().getY());
@@ -156,10 +170,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented){
-        if (turnspd != 0){
-            desiredYaw = pigeon.get();
-        }
-        else{
+        if (align){
             turnspd = drivePID.calculate(pigeon.get(), desiredYaw);
         }
         ChassisSpeeds chassisSpeeds;
