@@ -53,10 +53,10 @@ private static Translation2d midPose;
     Rotation2d startRotation1 = new Rotation2d(0);
     //x = dist center of robot when robot is pushed against the wall.
 
-    Pose2d startPose1 = new Pose2d(UsefulPoints.Points.StartingPoint1.getX(), UsefulPoints.Points.StartingPoint1.getY(),startRotation1);
+    Pose2d startPose1 = new Pose2d(UsefulPoints.Points.StartingPoint2.getX(), UsefulPoints.Points.StartingPoint2.getY(),startRotation1);
     swerveDrive.resetOdometry(startPose1);
 
-    Translation2d endPos = UsefulPoints.Points.WingedNoteLeft;
+    Translation2d endPos = UsefulPoints.Points.WingedNoteMid;
     Rotation2d endRotation1 = new Rotation2d(swerveDrive.getAngleBetweenSpeaker(endPos));
     Pose2d endPose1 = new Pose2d(endPos.getX(),endPos.getY(),endRotation1);
 
@@ -71,6 +71,30 @@ private static Translation2d midPose;
     return Commands.sequence(/*shootCommand1,*/ command1 /*,shootCommand2*/);
   }
 
+  public static Command doubleNoteAuto3(SwerveDrive swerveDrive/*, HeadSubsystem head, Arm arm*/) {
+    SmartDashboard.putString("Started", "started");
+    double bumperSize = 0;
+
+    Rotation2d startRotation1 = new Rotation2d(0);
+    //x = dist center of robot when robot is pushed against the wall.
+
+    Pose2d startPose1 = new Pose2d(UsefulPoints.Points.StartingPoint3.getX(), UsefulPoints.Points.StartingPoint3.getY(),startRotation1);
+    swerveDrive.resetOdometry(startPose1);
+
+    Translation2d endPos = UsefulPoints.Points.WingedNoteRight;
+    Rotation2d endRotation1 = new Rotation2d(swerveDrive.getAngleBetweenSpeaker(endPos));
+    Pose2d endPose1 = new Pose2d(endPos.getX(),endPos.getY(),endRotation1);
+
+    double startVelocity1 = 0; //Velocities are in meters/second.
+    double endVelocity1 = 0;
+    //midPose = new Translation2d(2,1);
+    ArrayList<Translation2d> internalPoints1 = new ArrayList<Translation2d>();
+    //internalPoints1.add(midPose);
+    Command command1 = swerveDrive.generateTrajectory(startPose1, endPose1, internalPoints1, startVelocity1, endVelocity1);
+
+    //TODO:Add some commands for shooting once before leaving, once after trajectory.
+    return Commands.sequence(/*shootCommand1,*/ command1 /*,shootCommand2*/);
+  }
   private Autos() {
     throw new UnsupportedOperationException("This is a utility class!");
   }

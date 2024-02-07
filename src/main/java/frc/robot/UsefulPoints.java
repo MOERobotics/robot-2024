@@ -16,6 +16,9 @@ public final class UsefulPoints {
         public static Translation2d WingedNoteMid = new Translation2d(Units.inchesToMeters(27*12 - 211.6), Units.inchesToMeters(27*6 + 57));
         public static Translation2d WingedNoteRight = new Translation2d(Units.inchesToMeters(27*12 - 211.6),Units.inchesToMeters(27*6));
         public static Translation2d StartingPoint1 = new Translation2d(Units.inchesToMeters(26), Units.inchesToMeters(27*6 + 124));
+        public static Translation2d StartingPoint2 = new Translation2d(Units.inchesToMeters(26), Units.inchesToMeters(27*6 + 72));
+        public static Translation2d StartingPoint3 = new Translation2d(Units.inchesToMeters(26), Units.inchesToMeters(27*6 + 0));
+
 
         public static Translation2d CenterLineMid = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6));
         public static Translation2d CenterLineFarLeft = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6 + 132));
