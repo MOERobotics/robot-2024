@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import frc.robot.AllianceFlip;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,8 +38,6 @@ public class SwerveDrive extends SubsystemBase {
     private final double maxMetersPerSec;
     private final double maxMetersPerSecSquared;
     SwerveDriveKinematics kDriveKinematics;
-    private double startVelocityMetersPerSecond;
-    private double endVelocityMetersPerSecond;
     double desiredYaw;
     private final PIDController drivePID;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
@@ -63,6 +62,9 @@ public class SwerveDrive extends SubsystemBase {
 
     }
 
+	public Command setInitPosition(Pose2d initPose){
+		return Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose)));
+	}
 
     public double getYaw(){
         return pigeon.get();
@@ -78,11 +80,11 @@ public class SwerveDrive extends SubsystemBase {
         odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
     }
 
-    public double getAngleBetweenSpeaker(Translation2d pose){
-        Translation2d speaker = new Translation2d(0, Units.inchesToMeters(219));
-        Translation2d diff = pose.minus(speaker);
-        return MathUtil.angleModulus(Math.atan2(diff.getY(), diff.getX())+ Math.PI);
-    }
+	public double getAngleBetweenSpeaker(Translation2d pos) {
+		Translation2d speaker = AllianceFlip.apply(new Translation2d(0, Units.inchesToMeters(219)));
+		Translation2d diff = pos.minus(speaker);
+		return (MathUtil.angleModulus(Math.atan2(diff.getY(),diff.getX())+Math.PI));
+	}
 
     @Override
     public void periodic() {
@@ -101,23 +103,24 @@ public class SwerveDrive extends SubsystemBase {
         BRModule.stop();
     }
 
-    public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond, Field2d field){
+
+	public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints) {
+		return generateTrajectory(start, end, internalPoints, 0,0);
+	}
+
+    public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
         TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
         PIDController xController = new PIDController(0.04,0,0);
         PIDController yController = new PIDController(0.04,0,0);
         var thetaController = new ProfiledPIDController(0.1,0,0,new TrapezoidProfile.Constraints(Math.PI,Math.PI));
-        this.startVelocityMetersPerSecond = startVelocityMetersPerSecond;
-        this.endVelocityMetersPerSecond = endVelocityMetersPerSecond;
         config.setEndVelocity(endVelocityMetersPerSecond);
         config.setStartVelocity(startVelocityMetersPerSecond);
         var trajectory = TrajectoryGenerator.generateTrajectory(
-                start,
-                internalPoints,
-                end,
+                AllianceFlip.apply(start),
+                AllianceFlip.apply(internalPoints),
+		        AllianceFlip.apply(end),
                 config
         );
-        if (field != null)
-        field.getRobotObject().setTrajectory(trajectory);
         SmartDashboard.putNumber("Time",trajectory.getTotalTimeSeconds());
         SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                         trajectory,
@@ -128,15 +131,7 @@ public class SwerveDrive extends SubsystemBase {
                         thetaController,
                         this::setModuleStates,
                         this
-                /*Commands.run(
-                        () -> {
-                            SmartDashboard.putString("xcontroller", xController.toString());
-                            SmartDashboard.putString("ycontroller", yController.toString());
-                            SmartDashboard.putString("tcontroller", thetaController.toString());
-                        }
-                )*/
         );
-        SmartDashboard.putBoolean("Finished?",trajCommand.isFinished());
         return trajCommand;
     }
 
