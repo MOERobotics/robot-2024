@@ -107,7 +107,7 @@ public class Arm extends SubsystemBase {
                 new Rotation2d(0));
     }
 
-    public Command followPathCommand(Rotation2d shoulderAngle, Rotation2d wristAngle){
+    /*public Command followPathCommand(Rotation2d shoulderAngle, Rotation2d wristAngle){
         return new PathfindRamsete(
                 targetPose,
                 new PathConstraints(3,3,
@@ -118,7 +118,7 @@ public class Arm extends SubsystemBase {
                 new ReplanningConfig(),
                 this
         );
-    }
+    }*/
 
 
 

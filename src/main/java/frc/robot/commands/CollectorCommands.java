@@ -30,10 +30,10 @@ public final class CollectorCommands {
 
         var command = Commands.parallel(
 
-                armSubsystem.followPathCommand(
+                /*armSubsystem.followPathCommand(
                         (shoulder),
                         (wrist)
-                ),
+                ),*/
 
                 headSubsystem.runCollectorCommands(topSpeed,bottomSpeed)
 

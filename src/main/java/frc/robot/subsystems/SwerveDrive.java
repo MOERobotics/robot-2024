@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -75,6 +76,12 @@ public class SwerveDrive extends SubsystemBase {
 
     public void resetOdometry(Pose2d pose) {
         odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
+    }
+
+    public double getAngleBetweenSpeaker(Translation2d pose){
+        Translation2d speaker = new Translation2d(0, Units.inchesToMeters(219));
+        Translation2d diff = pose.minus(speaker);
+        return MathUtil.angleModulus(Math.atan2(diff.getY(), diff.getX())+ Math.PI);
     }
 
     @Override
