@@ -82,6 +82,7 @@ public class SwerveModule extends SubsystemBase {
 
     public double getPivotPosition(){
         double reading = pivotEncoder.getAbsolutePosition()+pivotOffset;
+        SmartDashboard.putNumber("Power pivot Motor"+pivotMotor.getDeviceId(), pivotMotor.get());
         SmartDashboard.putNumber("pivot Motor"+pivotMotor.getDeviceId(), reading);
         if (reading < 0){
             return (reading - 180)%360 + 180;

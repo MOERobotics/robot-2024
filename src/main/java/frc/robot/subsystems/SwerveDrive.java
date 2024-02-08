@@ -100,6 +100,9 @@ public class SwerveDrive extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxMetersPerSec);
         SmartDashboard.putString("FL state", desiredStates[0].toString());
+        SmartDashboard.putString("FR state", desiredStates[1].toString());
+        SmartDashboard.putString("BL state", desiredStates[2].toString());
+        SmartDashboard.putString("BR state", desiredStates[3].toString());
         FRModule.setDesiredState(desiredStates[0]);
         FLModule.setDesiredState(desiredStates[1]);
         BRModule.setDesiredState(desiredStates[2]);
@@ -121,6 +124,7 @@ public class SwerveDrive extends SubsystemBase {
         SwerveModuleState[] moduleStates = kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
 
         SmartDashboard.putString("module states", Arrays.toString(moduleStates));
+        
 
         setModuleStates(moduleStates);
     }
