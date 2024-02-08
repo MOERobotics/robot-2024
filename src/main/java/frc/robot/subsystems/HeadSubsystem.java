@@ -105,6 +105,7 @@ public class HeadSubsystem extends SubsystemBase {
 
     //Has a note
     public boolean isCollected(){
+        SmartDashboard.putBoolean("Beambreak",collectorBeam.get());
         return collectorBeam.get();
     }
 

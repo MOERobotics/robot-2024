@@ -90,7 +90,7 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS, 3, 0, 0, 0);
+            ()->pigeon.getYaw(), maxMPS, 10, 0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
@@ -101,7 +101,7 @@ public class FortissiMOEContainer{
 
 	//TODO: Replace 99 with correct motor IDs.
 	private final HeadSubsystem headSubsystem = new HeadSubsystem(5,13,6,
-			0,0,0,0,0,0,0,0,0, false);
+			0,0,0,0,0,0,0,0,7, false);
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -126,6 +126,7 @@ public class FortissiMOEContainer{
 
 
 
+
     public FortissiMOEContainer() {
         pigeon.reset();
         swerveSubsystem.setDefaultCommand(drive);
@@ -135,10 +136,13 @@ public class FortissiMOEContainer{
         var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
 
         var button1 = new Trigger(() -> functionJoystick.getRawButton(1));
-        button1.onTrue(headSubsystem.runCollectorCommands(-.3));
-
+        button1.onTrue(headSubsystem.runCollectorCommands(-.75));
         var button2 = new Trigger(() -> functionJoystick.getRawButton(2));
-        button2.onTrue(headSubsystem.runCollectorCommands(.3));
+        if(!headSubsystem.isCollected()){
+            button2.whileTrue(headSubsystem.runCollectorCommands(.75));
+        } else{
+            headSubsystem.runCollectorCommands(0);
+        }
 
         var button8 = new Trigger (() -> functionJoystick.getRawButton(8));
         button8.onTrue(headSubsystem.runCollectorCommands(0));
@@ -170,7 +174,6 @@ public class FortissiMOEContainer{
     public Command getAutonomousCommand() {
         return null;
         // return Autos.exampleAuto(m_drive);
-
     }
 }
 
