@@ -19,7 +19,7 @@ public class boundChecker {
     }
 
     public static boolean inPointyPart2O(Rotation2d shoulderPos, Rotation2d wristPos){
-        if (wristPos.getDegrees() <= -30 && shoulderPos.getDegrees() >= 113){
+        if (wristPos.getDegrees() <= -30 && wristPos.getDegrees() >= -113){
             if (shoulderPos.getDegrees() <= 109){
                 return true;
             }
