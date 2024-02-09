@@ -127,9 +127,19 @@ public class HeadSubsystem extends SubsystemBase {
             collectorState = true;
         }
     }
-    public Command runCollectorCommands (double speed){
+    public Command runCollectorCommands (final double speed){
         SmartDashboard.putBoolean("started collector", collectorState);
-        return  Commands.runOnce(() -> this.setCollectorSpeed(speed));
+        System.err.println("Setting speed to " + speed);
+        return Commands.run(() -> {
+            double dumbSpeed = speed;
+
+            if(this.isCollected()&&(dumbSpeed>=0)){
+                dumbSpeed = 0;
+            }
+
+            this.setCollectorSpeed(dumbSpeed);
+            System.err.println("Set speed to " + dumbSpeed);
+        });
     }
 
     public double getShooterSpeedTop(){

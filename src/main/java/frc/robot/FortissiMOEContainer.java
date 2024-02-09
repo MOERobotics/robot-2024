@@ -135,21 +135,16 @@ public class FortissiMOEContainer{
         var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
         var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
 
-        var button1 = new Trigger(() -> functionJoystick.getRawButton(1));
-        button1.onTrue(headSubsystem.runCollectorCommands(-.75));
+        //var button1 = new Trigger(() -> functionJoystick.getRawButton(1));
         var button2 = new Trigger(() -> functionJoystick.getRawButton(2));
-        if(!headSubsystem.isCollected()){
-            button2.whileTrue(headSubsystem.runCollectorCommands(.75));
-        } else{
-            headSubsystem.runCollectorCommands(0);
-        }
-
+        //button1.whileTrue(headSubsystem.runCollectorCommands(-.75));
+        button2.whileTrue(headSubsystem.runCollectorCommands(.75)).whileFalse(headSubsystem.runCollectorCommands(0));
         var button8 = new Trigger (() -> functionJoystick.getRawButton(8));
         button8.onTrue(headSubsystem.runCollectorCommands(0));
 
-        if(!button1.getAsBoolean()&&!button2.getAsBoolean()){
+        /*f(/*!button1.getAsBoolean()&&!button2.getAsBoolean()){
             headSubsystem.stopCollector();
-        }
+        }*/
 
 
         /*var button5 = new Trigger (() -> driverJoystick.getRawButton(5));

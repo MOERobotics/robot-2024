@@ -19,8 +19,8 @@ public final class CollectorCommands {
             Rotation2d shoulder, Rotation2d wrist, double speed, double accel){
 
         var command = Commands.parallel(
-                new ArmPathFollow(armSubsystem, shoulder, wrist, speed, accel),
-                headSubsystem.runCollectorCommands(speed)
+                new ArmPathFollow(armSubsystem, shoulder, wrist, speed, accel)
+                //headSubsystem.runCollectorCommands(speed)
         );
         return command;
     }
