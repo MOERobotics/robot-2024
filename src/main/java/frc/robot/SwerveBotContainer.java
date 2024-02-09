@@ -10,11 +10,14 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.Autos;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
+
+import static frc.robot.commands.Autos.doubleNoteAuto;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,7 +39,8 @@ public class SwerveBotContainer {
     double driveFF = 1.76182e-4;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
-    double maxMPS = 174/39.3701;
+    double maxMPS = 30/39.3701;
+    double maxMPSSquared = 6;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
             19,
@@ -83,7 +87,7 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS);
+            ()->pigeon.getYaw(), maxMPS,maxMPSSquared,0.04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -111,7 +115,7 @@ public class SwerveBotContainer {
     }
 
     private void configureBindings() {
-        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> swerveSubsystem.zeroHeading()));
+        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> pigeon.setYaw(0)));
     }
 
     public Command getAutonomousCommand() {

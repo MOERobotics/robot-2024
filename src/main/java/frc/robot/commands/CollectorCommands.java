@@ -14,76 +14,38 @@ import java.util.function.BiFunction;
 
 public final class CollectorCommands {
     /** Example static factory for an autonomous command. */
-
-
     // commands to set shoulder and wrist at various positions
-
-
-    private static Command moveThenCollect(
-            HeadSubsystem headSubsystem,
-            Arm armSubsystem,
-            Rotation2d shoulder,
-            Rotation2d wrist,
-            double speed
-    ){
+    private static Command moveThenCollect(HeadSubsystem headSubsystem, Arm armSubsystem,
+            Rotation2d shoulder, Rotation2d wrist, double speed, double accel){
 
         var command = Commands.parallel(
-
-                armSubsystem.goToPoint(
-                        (shoulder),
-                        (wrist)
-                ),
-
-                headSubsystem.runCollectorCommands(speed)
-
+                new ArmPathFollow(armSubsystem, shoulder, wrist, speed, accel)
+                //headSubsystem.runCollectorCommands(speed)
         );
-
         return command;
-
-
     }
 
     // floor pickup
     public static Command headDownThenCollect(HeadSubsystem headSubsystem, Arm armSubsystem) {
-
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(90),
-                Rotation2d.fromDegrees(45), 0.5);
+                Rotation2d.fromDegrees(45), 0.5, .3);
     }
 
 
     // Amp pickup
-    public static Command setArmToAmpThenDepositCollector(HeadSubsystem headSubsystem, Arm armSubsystem){
-
+    public static Command setArmToAmpThenDeposit(HeadSubsystem headSubsystem, Arm armSubsystem){
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(135),
-                Rotation2d.fromDegrees(135), -0.5);
-
+                Rotation2d.fromDegrees(135), -0.5,.3);
     }
-
     // TODO write new command for Shooter for AMP(not done)
     // TODO write command so that it will wait until is collected(not done)
     // TODO Make one big command that takes in position and speeds to a void copy pasting(done)
     // Source Collect
     public static Command setArmToSourceThenCollect(HeadSubsystem headSubsystem, Arm armSubsystem){
-
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(155),
-                Rotation2d.fromDegrees(135), 0.5);
-
+                Rotation2d.fromDegrees(135), 0.5,.3);
     }
 
 
-
-
-
-    // angles need to be changed to fit arm
-
-    public static Command setArmToAmpThenDepositShooter(HeadSubsystem headSubsystem, Arm armSubsystem){
-
-        return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(-155),
-                Rotation2d.fromDegrees(-135), 0.5);
-
     }
-
-
-
-
 }

@@ -7,6 +7,9 @@ package frc.robot.subsystems;
 import com.revrobotics.*;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -92,36 +95,37 @@ public class HeadSubsystem extends SubsystemBase {
         collectorController.setFF(collectorFF);
         collectorController.setOutputRange(-1, 1);
 
-		// sets up tolerance
+        // sets up tolerance
         setShooterRPMTolerance(5);
     }
 
-	/**
-	 * Example command factory method.
-	 *
-	 * @return a command
-	 */
-	public Command exampleMethodCommand() {
-		// Inline construction of command goes here.
-		// Subsystem::RunOnce implicitly requires `this` subsystem.
-		return runOnce(
-				() -> {
-					/* one-time action goes here */
-				});
-	}
+    /**
+     * Example command factory method.
+     *
+     * @return a command
+     */
+    public Command exampleMethodCommand() {
+        // Inline construction of command goes here.
+        // Subsystem::RunOnce implicitly requires `this` subsystem.
+        return runOnce(
+                () -> {
+                    /* one-time action goes here */
+                });
+    }
 
-	/**
-	 * An example method querying a boolean state of the subsystem (for example, a digital sensor).
-	 *
-	 * @return value of some boolean subsystem state, such as a digital sensor.
-	 */
-	public boolean exampleCondition() {
-		// Query some boolean state, such as a digital sensor.
-		return false;
-	}
+    /**
+     * An example method querying a boolean state of the subsystem (for example, a digital sensor).
+     *
+     * @return value of some boolean subsystem state, such as a digital sensor.
+     */
+    public boolean exampleCondition() {
+        // Query some boolean state, such as a digital sensor.
+        return false;
+    }
 
     //Has a note
     public boolean isCollected(){
+        SmartDashboard.putBoolean("Beambreak",collectorBeam.get());
         return collectorBeam.get();
     }
 
@@ -147,11 +151,20 @@ public class HeadSubsystem extends SubsystemBase {
         } else {
             collectorState = true;
         }
-
-
     }
-    public Command runCollectorCommands (double speed){
-        return  Commands.runOnce(() -> this.setCollectorSpeed(speed));
+    public Command runCollectorCommands (final double speed){
+        SmartDashboard.putBoolean("started collector", collectorState);
+        System.err.println("Setting speed to " + speed);
+        return Commands.run(() -> {
+            double dumbSpeed = speed;
+
+            if(this.isCollected()&&(dumbSpeed>=0)){
+                dumbSpeed = 0;
+            }
+
+            this.setCollectorSpeed(dumbSpeed);
+            System.err.println("Set speed to " + dumbSpeed);
+        });
     }
 
     public double getShooterSpeedTop(){
@@ -179,9 +192,9 @@ public class HeadSubsystem extends SubsystemBase {
         return false;
     }
 
-	public boolean shooterAtSpeed(){
-		return ((Math.abs(shooterTopEncoder.getVelocity() - shooterSpeedTop) <= shooterRPMTolerance) && (Math.abs(shooterBottomEncoder.getVelocity() - shooterSpeedBottom) <= shooterRPMTolerance));
-	}
+    public boolean shooterAtSpeed(){
+        return ((Math.abs(shooterTopEncoder.getVelocity() - shooterSpeedTop) <= shooterRPMTolerance) && (Math.abs(shooterBottomEncoder.getVelocity() - shooterSpeedBottom) <= shooterRPMTolerance));
+    }
 
 
     //Good to shoot
@@ -190,8 +203,20 @@ public class HeadSubsystem extends SubsystemBase {
         //if motors up to speed
         //if aimed
         //if see speaker
-	    //Has a note
+        //Has a note
     }
+
+
+    public double getAngleBetweenSpeaker(Translation2d pose) {
+        Translation2d speaker = new Translation2d(0, Units.inchesToMeters(219));
+        Translation2d diff =  pose.minus(speaker);
+        if (readyShoot()) {
+            return Math.atan2(diff.getY(),diff.getX());
+        }
+        return 0;
+    }
+
+
 
 
 
@@ -237,12 +262,12 @@ public class HeadSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("shooterBottomDesired:",shooterSpeedBottom);
         SmartDashboard.putNumber("shooterTopActualSpeed:",getShooterSpeedTop());
         SmartDashboard.putNumber("shooterBottomActualSpeed:",getShooterSpeedBottom());
-	    SmartDashboard.putNumber("Shooter RPM Tolerance", getShooterRPMTolerance());
-		SmartDashboard.putBoolean("Note Collected:",isCollected());
-		SmartDashboard.putBoolean("In Range:",inRange());
-		SmartDashboard.putBoolean("Aimed at speaker:",aimed());
-	    SmartDashboard.putBoolean("Aiming in progress:",aiming());
-	    SmartDashboard.putBoolean("Ready to shoot:", readyShoot());
+        SmartDashboard.putNumber("Shooter RPM Tolerance", getShooterRPMTolerance());
+        SmartDashboard.putBoolean("Note Collected:",isCollected());
+        SmartDashboard.putBoolean("In Range:",inRange());
+        SmartDashboard.putBoolean("Aimed at speaker:",aimed());
+        SmartDashboard.putBoolean("Aiming in progress:",aiming());
+        SmartDashboard.putBoolean("Ready to shoot:", readyShoot());
         // This method will be called once per scheduler run
         logCollectorSpeed.append(collector.getEncoder().getVelocity());
         logCollectorPower.append(collector.get());

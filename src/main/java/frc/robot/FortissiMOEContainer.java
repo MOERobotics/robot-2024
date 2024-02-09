@@ -17,10 +17,13 @@ import frc.robot.commands.ShooterOnOffCommand;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.shootSpeakerCommand;
+import frc.robot.commands.setHeading;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.HeadSubsystem;
+
+import java.awt.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -30,7 +33,6 @@ import frc.robot.subsystems.HeadSubsystem;
  */
 public class FortissiMOEContainer{
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
-
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
     double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
@@ -91,10 +93,10 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS);
+            ()->pigeon.getYaw(), maxMPS, 10, 0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
-    private final Arm armSubsystem = new Arm(4, 15,21, 35, 36,
+    private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
             0, 0, 0, 0, 0, 0, new Rotation2d(0), new Rotation2d(0),
             0,0);
 
@@ -123,16 +125,20 @@ public class FortissiMOEContainer{
 
 
 
-
     public FortissiMOEContainer() {
         pigeon.reset();
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
-       // var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
+        var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
+        var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
 
-        var button9 = new Trigger(() -> driverJoystick.getRawButton(9));
-       // button9.onTrue(headDownThenCollect);
+        //var button1 = new Trigger(() -> functionJoystick.getRawButton(1));
+        var button2 = new Trigger(() -> functionJoystick.getRawButton(2));
+        //button1.whileTrue(headSubsystem.runCollectorCommands(-.75));
+        button2.whileTrue(headSubsystem.runCollectorCommands(.75)).whileFalse(headSubsystem.runCollectorCommands(0));
+        var button8 = new Trigger (() -> functionJoystick.getRawButton(8));
+        button8.onTrue(headSubsystem.runCollectorCommands(0));
 
         var isFinished = new Trigger(() -> driverJoystick.getRawButton(9));
 
@@ -148,10 +154,13 @@ public class FortissiMOEContainer{
         var shoot = new shootSpeakerCommand(headSubsystem);
         shootTrigger.onTrue(shoot);
 
-    }
 
     private void configureBindings() {
-        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> swerveSubsystem.zeroHeading()));
+        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
+        new JoystickButton(driverJoystick, 2).onTrue(Commands.run(()->armSubsystem.shoulderPower(.1)));
+        new JoystickButton(driverJoystick, 4).onTrue(Commands.run(()->armSubsystem.wristPower(.1)));
+        new JoystickButton(driverJoystick, 6).onTrue(Commands.run(()->armSubsystem.shoulderPower(-.1)));
+        new JoystickButton(driverJoystick, 7).onTrue(Commands.run(()->armSubsystem.wristPower(-.1)));
     }
 
     public Command getAutonomousCommand() {
