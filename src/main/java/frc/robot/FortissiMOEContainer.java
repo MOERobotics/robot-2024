@@ -126,34 +126,34 @@ public class FortissiMOEContainer{
 
 
     public FortissiMOEContainer() {
-        pigeon.reset();
-        swerveSubsystem.setDefaultCommand(drive);
-        // Configure the trigger bindings
-        configureBindings();
-        var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
-        var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
+	    pigeon.reset();
+	    swerveSubsystem.setDefaultCommand(drive);
+	    // Configure the trigger bindings
+	    configureBindings();
+	    var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
+	    var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
 
-        //var button1 = new Trigger(() -> functionJoystick.getRawButton(1));
-        var button2 = new Trigger(() -> functionJoystick.getRawButton(2));
-        //button1.whileTrue(headSubsystem.runCollectorCommands(-.75));
-        button2.whileTrue(headSubsystem.runCollectorCommands(.75)).whileFalse(headSubsystem.runCollectorCommands(0));
-        var button8 = new Trigger (() -> functionJoystick.getRawButton(8));
-        button8.onTrue(headSubsystem.runCollectorCommands(0));
+	    //var button1 = new Trigger(() -> functionJoystick.getRawButton(1));
+	    var button2 = new Trigger(() -> functionJoystick.getRawButton(2));
+	    //button1.whileTrue(headSubsystem.runCollectorCommands(-.75));
+	    button2.whileTrue(headSubsystem.runCollectorCommands(.75)).whileFalse(headSubsystem.runCollectorCommands(0));
+	    var button8 = new Trigger(() -> functionJoystick.getRawButton(8));
+	    button8.onTrue(headSubsystem.runCollectorCommands(0));
 
-        var isFinished = new Trigger(() -> driverJoystick.getRawButton(9));
+	    var isFinished = new Trigger(() -> driverJoystick.getRawButton(9));
 
-        var button4 = new Trigger(() -> functionJoystick.getRawButton(4));
-        var shooterOn = new ShooterOnOffCommand(headSubsystem,3000, 3000, true);
-        button4.onTrue(shooterOn);
+	    var button4 = new Trigger(() -> functionJoystick.getRawButton(4));
+	    var shooterOn = new ShooterOnOffCommand(headSubsystem, 3000, 3000, true);
+	    button4.onTrue(shooterOn);
 
-        var button3 = new Trigger(() -> functionJoystick.getRawButton(3));
-        var shooterOff = new ShooterOnOffCommand(headSubsystem,3000,3000,false);
-        button3.onTrue(shooterOff);
+	    var button3 = new Trigger(() -> functionJoystick.getRawButton(3));
+	    var shooterOff = new ShooterOnOffCommand(headSubsystem, 3000, 3000, false);
+	    button3.onTrue(shooterOff);
 
-        var shootTrigger = new Trigger(() -> functionJoystick.getRawAxis(3)>=0.5);
-        var shoot = new shootSpeakerCommand(headSubsystem);
-        shootTrigger.onTrue(shoot);
-
+//	    var shootTrigger = new Trigger(() -> functionJoystick.getRawAxis(3) >= 0.5);
+//	    var shoot = new shootSpeakerCommand(headSubsystem);
+//	    shootTrigger.onTrue(shoot);
+    }
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));

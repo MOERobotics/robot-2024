@@ -61,9 +61,9 @@ public class shootSpeakerCommand extends Command {
     @Override
     public boolean isFinished() {
         //TODO: Need to fix the condition for when the command is finished.
-        if(!headSubsystem.isCollected()){
-            return true;
-        }
+//        if(!headSubsystem.isCollected()){
+//            return true;
+//        }
         return false;
     }
 }

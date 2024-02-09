@@ -126,16 +126,20 @@ public class HeadSubsystem extends SubsystemBase {
     //Has a note
     public boolean isCollected(){
         SmartDashboard.putBoolean("Beambreak",collectorBeam.get());
-        return collectorBeam.get();
+        //return collectorBeam.get();
+	    return false;
     }
 
     public void setShooterTopSpeed(double speed){
         shooterSpeedTop=speed;
         shooterTopController.setReference(speed,CANSparkBase.ControlType.kVelocity);
+		shooterBottomController.setReference(speed, CANSparkBase.ControlType.kVelocity);
     }
     public void setShooterBottomSpeed(double speed){
         shooterSpeedBottom=speed;
-        shooterBottomController.setReference(speed,CANSparkBase.ControlType.kVelocity);
+       // shooterBottomController.setReference(3000,CANSparkBase.ControlType.kVelocity);
+//	    if (speed != 0)shooterBottom.set(.3);
+//		else shooterBottom.set(0);
     }
 
 	public void setShooterPower(double power){

@@ -35,8 +35,8 @@ public class ShooterOnOffCommand extends Command {
     public void initialize() {
 		finished=false;
 	    if(onoff){
-		    headSubsystem.setShooterTopSpeed(shooterSpeedTop);
 		    headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
+		    headSubsystem.setShooterTopSpeed(shooterSpeedTop);
 //			headSubsystem.setShooterPower(0.2);
 	    } else{
 		    headSubsystem.stopShooter();
@@ -47,14 +47,14 @@ public class ShooterOnOffCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-	    if(onoff){
-		    headSubsystem.setShooterTopSpeed(shooterSpeedTop);
-		    headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
-//		    headSubsystem.setShooterPower(0.2);
-	    } else{
-		    headSubsystem.stopShooter();
-//		    headSubsystem.setShooterPower(0.0);
-	    }
+//	    if(onoff){
+//		    headSubsystem.setShooterTopSpeed(shooterSpeedTop);
+//		    headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
+////		    headSubsystem.setShooterPower(0.2);
+//	    } else{
+//		    headSubsystem.stopShooter();
+////		    headSubsystem.setShooterPower(0.0);
+//	    }
     }
 
     // Called once the command ends or is interrupted.
