@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.*;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -13,6 +12,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 public class HeadSubsystem extends SubsystemBase {
     /** Creates a new ExampleSubsystem. */
@@ -127,21 +130,31 @@ public class HeadSubsystem extends SubsystemBase {
             collectorState = true;
         }
     }
-    public Command runCollectorCommands (final double speed){
+    public Command runCollectorCommandsForTeleop (final double speed, BooleanSupplier button1, BooleanSupplier button2){
         SmartDashboard.putBoolean("started collector", collectorState);
-        System.err.println("Setting speed to " + speed);
         return Commands.run(() -> {
             double dumbSpeed = speed;
-
-            if(this.isCollected()&&(dumbSpeed>=0)){
-                dumbSpeed = 0;
+            if(button1.getAsBoolean() && !button2.getAsBoolean()){
+                dumbSpeed = -dumbSpeed;
             }
-
-            this.setCollectorSpeed(dumbSpeed);
-            System.err.println("Set speed to " + dumbSpeed);
+            updateCollectorSpeed(dumbSpeed);
         });
     }
 
+    public Command runCollectorForAuto(final double speed) {
+        Command cmd = Commands.run(() -> updateCollectorSpeed(speed));
+        if (speed > 0) {
+            cmd = cmd.until(this::isCollected);
+        }
+        return cmd;
+    }
+
+    private void updateCollectorSpeed(double speed){
+        if(this.isCollected()&&(speed>=0)){
+            speed = 0;
+        }
+        this.setCollectorSpeed(speed);
+    }
     public double getShooterSpeedTop(){
         return shooterTopEncoder.getVelocity();
     }

@@ -22,6 +22,7 @@ import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.HeadSubsystem;
 
 import java.awt.*;
+import java.util.function.Supplier;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -121,7 +122,11 @@ public class FortissiMOEContainer{
 		    0.15,6, maxMPS, maxRPS);
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
-
+    Command collectorCommand = headSubsystem.runCollectorCommandsForTeleop(
+            0.75,
+            ()->functionJoystick.getRawButton(1),
+            ()->functionJoystick.getRawButton(2)
+    );
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
@@ -129,18 +134,23 @@ public class FortissiMOEContainer{
 
     public FortissiMOEContainer() {
         pigeon.reset();
-        swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
         var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
         var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
 
-        //var button1 = new Trigger(() -> functionJoystick.getRawButton(1));
-        var button2 = new Trigger(() -> functionJoystick.getRawButton(2));
-        //button1.whileTrue(headSubsystem.runCollectorCommands(-.75));
+
+
+
+        swerveSubsystem.setDefaultCommand(
+                Commands.parallel(drive,collectorCommand)
+        );
+
+        /*button1.whileTrue(headSubsystem.runCollectorCommands(-.75));
         button2.whileTrue(headSubsystem.runCollectorCommands(.75)).whileFalse(headSubsystem.runCollectorCommands(0));
-        var button8 = new Trigger (() -> functionJoystick.getRawButton(8));
-        button8.onTrue(headSubsystem.runCollectorCommands(0));
+        */
+        /*var button8 = new Trigger (() -> functionJoystick.getRawButton(8));
+        button8.onTrue();*/
 
         /*f(/*!button1.getAsBoolean()&&!button2.getAsBoolean()){
             headSubsystem.stopCollector();
