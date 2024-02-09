@@ -102,7 +102,7 @@ public class FortissiMOEContainer{
 
 	//TODO: Replace 99 with correct motor IDs.(Partially complete)
 	private final HeadSubsystem headSubsystem = new HeadSubsystem(5,13,6,
-			0.01,0,0,0,0.01,0,0,0,1);
+			0.01,0,0,0,0.01,0,0,0,7);
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -146,7 +146,7 @@ public class FortissiMOEContainer{
 
         var shootTrigger = new Trigger(() -> functionJoystick.getRawAxis(3)>=0.5);
         var shoot = new shootSpeakerCommand(headSubsystem);
-        shootTrigger.whileTrue(shoot);
+        shootTrigger.onTrue(shoot);
 
     }
 
