@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.CollectorCommands;
-import frc.robot.commands.ShooterOnOffCommand;
+import frc.robot.commands.ShooterControllerCommand;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
@@ -92,14 +92,15 @@ public class FortissiMOEContainer{
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
             0, 0, 0, 0, 0, 0, new Rotation2d(0), new Rotation2d(0),
             0,0);
+    /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
-
-
-	private final HeadSubsystem headSubsystem = new HeadSubsystem(5,13,6,
-			0,0,0,driveFF,0.01,0,0,0,7);
+    ///////////////////////////////////////////////////////////////////////////////////////head subsystem
+	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(5,
+            13,0, 0,0,driveFF);
     private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem(6,
             0.01,0,0,0,7);
-    /////////////////////////////////////////////////////////////////////////// arm subsystem end
+    ///////////////////////////////////////////////////////////////////////////////////////head subsystem
+
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
 	private final Joystick functionJoystick = new Joystick(0);
@@ -121,29 +122,27 @@ public class FortissiMOEContainer{
     Command collectorCommand = collectorSubsystem.runCollectorCommandsForTeleop(
             0.75,
             ()->functionJoystick.getRawButton(1),
-            ()->functionJoystick.getRawButton(2)
+            ()->functionJoystick.getRawButton(2),
+            ()->functionJoystick.getRawButton(3)
     );
     ////////////////////////////////////////////////////////////////////////////commands end
 
-
-    Command shooterOn = new ShooterOnOffCommand(headSubsystem, 1000, 1000,
-            ()-> functionJoystick.getRawButtonPressed(4));
+    Command shooterControl = new ShooterControllerCommand(shooterSubsystem, 6000,6000,
+            ()->functionJoystick.getRawButtonPressed(4));
 
     public FortissiMOEContainer() {
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
-        var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
-        var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
-
-
+//        var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
+//        var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
 
 
         swerveSubsystem.setDefaultCommand(
                 Commands.parallel(drive,collectorCommand)
         );
 
-        headSubsystem.setDefaultCommand(shooterOn);
+        shooterSubsystem.setDefaultCommand(shooterControl);
 	    // Configure the trigger bindings
 	    configureBindings();
 //

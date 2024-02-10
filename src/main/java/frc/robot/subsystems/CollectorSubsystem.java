@@ -44,17 +44,20 @@ public class CollectorSubsystem extends SubsystemBase {
             collectorState = true;
         }
     }
-    public Command runCollectorCommandsForTeleop (final double speed, Supplier<Boolean> button1, Supplier<Boolean> button2){
+    public Command runCollectorCommandsForTeleop (final double speed, Supplier<Boolean> button1, Supplier<Boolean> button2,
+                                                  Supplier<Boolean> index){
         SmartDashboard.putBoolean("started collector", collectorState);
         return Commands.run(() -> {
             double finalSpeed = speed;
-            if(button1.get() && !button2.get()){
+            if (index.get()){
+                finalSpeed = speed;
+            } else if(button1.get() && !button2.get()){ //spit out
                 finalSpeed = -finalSpeed;
-            } else if(!button1.get()&&!button2.get()){
+            } else if(!button1.get()&&!button2.get()){ //nothing
                 finalSpeed = 0;
-            } else if(button2.get()&&isCollected()/*&&!readyShoot()*/){
+            } else if(button2.get()&&isCollected()){ //beam break
                 finalSpeed = 0;
-            } else if(button1.get()&&button2.get()){
+            } else if(button1.get()&&button2.get()){ //both pressed?
                 finalSpeed = 0;
             }
             updateCollectorSpeed(finalSpeed);
@@ -70,9 +73,6 @@ public class CollectorSubsystem extends SubsystemBase {
     }
 
     private void updateCollectorSpeed(double speed){
-        if(this.isCollected()&&(speed>=0)){
-            speed = 0;
-        }
         this.setCollectorSpeed(speed);
     }
     public void stopCollector(){

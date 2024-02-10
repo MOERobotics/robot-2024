@@ -6,13 +6,14 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.HeadSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 
 import java.util.function.Supplier;
 
 /** An example command that uses an example subsystem. */
-public class ShooterOnOffCommand extends Command {
+public class ShooterControllerCommand extends Command {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final HeadSubsystem headSubsystem;
+    private final ShooterSubsystem subsystem;
     Supplier<Boolean> onoff;
     boolean finished;
     double shooterSpeedTop;
@@ -24,8 +25,8 @@ public class ShooterOnOffCommand extends Command {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public ShooterOnOffCommand(HeadSubsystem subsystem, double shooterSpeedTop, double shooterSpeedBottom, Supplier<Boolean> on) {
-        headSubsystem = subsystem;
+    public ShooterControllerCommand(ShooterSubsystem subsystem, double shooterSpeedTop, double shooterSpeedBottom, Supplier<Boolean> on) {
+        this.subsystem = subsystem;
         this.shooterSpeedTop = shooterSpeedTop;
         this.shooterSpeedBottom = shooterSpeedBottom;
         onoff = on;
@@ -46,11 +47,9 @@ public class ShooterOnOffCommand extends Command {
             onState %= 2;
         }
         if (onState%2 == 1){
-            headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
-            headSubsystem.setShooterTopSpeed(shooterSpeedTop);
+            subsystem.setShooterSpeeds(shooterSpeedTop, shooterSpeedBottom);
         } else{
-            headSubsystem.setShooterBottomSpeed(0);
-            headSubsystem.setShooterTopSpeed(0);
+            subsystem.stopShooter();
         }
     }
 

@@ -4,6 +4,8 @@ import com.revrobotics.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import java.util.function.Supplier;
+
 public class ShooterSubsystem extends SubsystemBase {
 
     private final CANSparkMax shooterTop;
@@ -18,6 +20,10 @@ public class ShooterSubsystem extends SubsystemBase {
                             double shooterI, double shooterD, double shooterFF) {
         shooterTop = new CANSparkMax(shooterTopID, CANSparkLowLevel.MotorType.kBrushless);
         shooterBottom = new CANSparkMax(shooterBottomID, CANSparkLowLevel.MotorType.kBrushless);
+        shooterTop.setInverted(true);
+        shooterBottom.setInverted(true);
+        shooterTop.setIdleMode(CANSparkBase.IdleMode.kCoast);
+        shooterBottom.setIdleMode(CANSparkBase.IdleMode.kCoast);
 
         shooterTopEncoder = shooterTop.getEncoder();
         shooterTopController = shooterTop.getPIDController();
@@ -42,6 +48,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setShooterSpeeds(double topSpeed, double bottomSpeed){
         setShooterTopSpeed(topSpeed); setShooterBottomSpeed(bottomSpeed);
     }
+
     public void stopShooter(){
         setShooterSpeeds(0,0);
     }

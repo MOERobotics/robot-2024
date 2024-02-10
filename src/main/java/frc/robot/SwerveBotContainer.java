@@ -25,7 +25,6 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
 
-import static frc.robot.commands.Autos.doubleNoteAuto;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
