@@ -133,17 +133,17 @@ public class HeadSubsystem extends SubsystemBase {
     public Command runCollectorCommandsForTeleop (final double speed, BooleanSupplier button1, BooleanSupplier button2){
         SmartDashboard.putBoolean("started collector", collectorState);
         return Commands.run(() -> {
-            double dumbSpeed = speed;
+            double finalSpeed = speed;
             if(button1.getAsBoolean() && !button2.getAsBoolean()){
-                dumbSpeed = -dumbSpeed;
+                finalSpeed = -finalSpeed;
             } else if(!button1.getAsBoolean()&&!button2.getAsBoolean()){
-                dumbSpeed = 0;
-            } else if(button2.getAsBoolean()&&isCollected()){
-                dumbSpeed = 0;
+                finalSpeed = 0;
+            } else if(button2.getAsBoolean()&&isCollected()/*&&!readyShoot()*/){
+                finalSpeed = 0;
             } else if(button1.getAsBoolean()&&button2.getAsBoolean()){
-                dumbSpeed = 0;
+                finalSpeed = 0;
             }
-            updateCollectorSpeed(dumbSpeed);
+            updateCollectorSpeed(finalSpeed);
         });
     }
 
