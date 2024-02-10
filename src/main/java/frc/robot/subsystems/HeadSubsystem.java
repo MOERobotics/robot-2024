@@ -136,6 +136,12 @@ public class HeadSubsystem extends SubsystemBase {
             double dumbSpeed = speed;
             if(button1.getAsBoolean() && !button2.getAsBoolean()){
                 dumbSpeed = -dumbSpeed;
+            } else if(!button1.getAsBoolean()&&!button2.getAsBoolean()){
+                dumbSpeed = 0;
+            } else if(button2.getAsBoolean()&&isCollected()){
+                dumbSpeed = 0;
+            } else if(button1.getAsBoolean()&&button2.getAsBoolean()){
+                dumbSpeed = 0;
             }
             updateCollectorSpeed(dumbSpeed);
         });
