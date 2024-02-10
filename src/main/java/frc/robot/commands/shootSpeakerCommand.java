@@ -27,8 +27,8 @@ public class shootSpeakerCommand extends Command {
     }
     //TODO: Calculate shooter speeds based on odometry.
     public double speedCalc(){
-        return 0.0;
-    }
+        return 3000.0;
+    }//placeholder value
 
     // Called when the command is initially scheduled.
     @Override
@@ -43,8 +43,10 @@ public class shootSpeakerCommand extends Command {
     public void execute() {
         headSubsystem.setShooterTopSpeed(shooterSpeedTop);
 		headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
-        if(headSubsystem.readyShoot()){
+//	    headSubsystem.setShooterPower(0.2);
+        if(/*headSubsystem.readyShoot()*/true){
             headSubsystem.setCollectorSpeed(1);
+//	        headSubsystem.setCollectorSpeed(0.2);
         }
     }
 
@@ -52,15 +54,16 @@ public class shootSpeakerCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         headSubsystem.stopCollector();
+//	    headSubsystem.setCollectorSpeed(0.0);
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
         //TODO: Need to fix the condition for when the command is finished.
-        if(!headSubsystem.isCollected()){
-            return true;
-        }
+//        if(!headSubsystem.isCollected()){
+//            return true;
+//        }
         return false;
     }
 }

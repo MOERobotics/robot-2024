@@ -66,7 +66,9 @@ public class SwerveDrive extends SubsystemBase {
         return Rotation2d.fromDegrees(getYaw());
     }
 
-    public Pose2d getPose() {return odometer.getPoseMeters();}
+    public Pose2d getPose() {
+        return odometer.getPoseMeters();
+    }
 
     public void resetOdometry(Pose2d pose) {
         odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
@@ -129,7 +131,6 @@ public class SwerveDrive extends SubsystemBase {
 
         setModuleStates(moduleStates);
     }
-
 
 }
 

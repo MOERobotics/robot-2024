@@ -12,10 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 public class HeadSubsystem extends SubsystemBase {
     /** Creates a new ExampleSubsystem. */
@@ -34,7 +30,7 @@ public class HeadSubsystem extends SubsystemBase {
     private boolean collectorState;
     private int shooterRPMTolerance;
     public HeadSubsystem(int shooterTopID, int shooterBottomID, int collectorID, double shooterP, double shooterI, double shooterD, double shooterFF,
-                         double collectorP, double collectorI, double collectorD, double collectorFF,  int collectorBeamID, boolean setInverted) {
+                         double collectorP, double collectorI, double collectorD, double collectorFF,  int collectorBeamID) {
         //instantiate shooter motors, encoders, sensors, PID
         this.collectorBeam = new DigitalInput(collectorBeamID);
         this.shooterTop=new CANSparkMax(shooterTopID, CANSparkLowLevel.MotorType.kBrushless);
@@ -44,9 +40,12 @@ public class HeadSubsystem extends SubsystemBase {
         shooterBottom.setIdleMode(CANSparkBase.IdleMode.kCoast);
         collector.setIdleMode(CANSparkBase.IdleMode.kBrake);
         //TODO: Reverse motors if needed
+        shooterTop.setInverted(true);
+        shooterBottom.setInverted(true);
+        collector.setInverted(true);
+
         this.shooterTopEncoder = shooterTop.getEncoder();
         this.shooterBottomEncoder = shooterBottom.getEncoder();
-        collector.setInverted(true);
 
 
         // configure collector motor top and bottom
@@ -115,11 +114,19 @@ public class HeadSubsystem extends SubsystemBase {
     public void setShooterTopSpeed(double speed){
         shooterSpeedTop=speed;
         shooterTopController.setReference(speed,CANSparkBase.ControlType.kVelocity);
+		shooterBottomController.setReference(speed, CANSparkBase.ControlType.kVelocity);
     }
     public void setShooterBottomSpeed(double speed){
         shooterSpeedBottom=speed;
-        shooterBottomController.setReference(speed,CANSparkBase.ControlType.kVelocity);
+       // shooterBottomController.setReference(3000,CANSparkBase.ControlType.kVelocity);
+//	    if (speed != 0)shooterBottom.set(.3);
+//		else shooterBottom.set(0);
     }
+
+	public void setShooterPower(double power){
+		shooterTop.set(power);
+		shooterBottom.set(power);
+	}
     // TODO check collector speeds before turning on(check)
     public void setCollectorSpeed(double speed){
         collector.set(speed);
@@ -180,10 +187,6 @@ public class HeadSubsystem extends SubsystemBase {
         return false;
     }
 
-    public static boolean seeSpeaker(){
-        return false;
-    }
-
     public boolean shooterAtSpeed(){
         return ((Math.abs(shooterTopEncoder.getVelocity() - shooterSpeedTop) <= shooterRPMTolerance) && (Math.abs(shooterBottomEncoder.getVelocity() - shooterSpeedBottom) <= shooterRPMTolerance));
     }
@@ -202,7 +205,7 @@ public class HeadSubsystem extends SubsystemBase {
     public double getAngleBetweenSpeaker(Translation2d pose) {
         Translation2d speaker = new Translation2d(0, Units.inchesToMeters(219));
         Translation2d diff =  pose.minus(speaker);
-        if (readyShoot() && seeSpeaker()) {
+        if (readyShoot()) {
             return Math.atan2(diff.getY(),diff.getX());
         }
         return 0;
@@ -248,9 +251,6 @@ public class HeadSubsystem extends SubsystemBase {
     public void readyToMoveShooter(){
     }
 
-
-
-
     @Override
     public void periodic() {
         SmartDashboard.putNumber("shooterTopDesired:",shooterSpeedTop);
@@ -271,4 +271,3 @@ public class HeadSubsystem extends SubsystemBase {
         // This method will be called once per scheduler run during simulation
     }
 }
-

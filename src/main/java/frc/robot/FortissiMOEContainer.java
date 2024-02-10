@@ -9,12 +9,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.CollectorCommands;
+import frc.robot.commands.ShooterOnOffCommand;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.setHeading;
@@ -24,7 +23,6 @@ import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.HeadSubsystem;
 
 import java.awt.*;
-import java.util.function.Supplier;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -48,6 +46,7 @@ public class FortissiMOEContainer{
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
     double maxRPS = Math.PI*2;
+
     private final SwerveModule backLeftModule = new SwerveModule(
             3,
             2,
@@ -100,20 +99,17 @@ public class FortissiMOEContainer{
             0, 0, 0, 0, 0, 0, new Rotation2d(0), new Rotation2d(0),
             0,0);
 
-    /////////////////////////////////////////////////////////////////////////////arm susbsystem start
 
-	//TODO: Replace 99 with correct motor IDs.
+
 	private final HeadSubsystem headSubsystem = new HeadSubsystem(5,13,6,
-			0,0,0,0,0,0,0,0,7, false);
+			0,0,0,driveFF,0.01,0,0,0,7);
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
-    private final Joystick functionJoystick = new Joystick(0);
+	private final Joystick functionJoystick = new Joystick(0);
 
 
     ////////////////////////////////////////////////////////////////////////////commands
-
-
 
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
@@ -132,7 +128,8 @@ public class FortissiMOEContainer{
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
-
+    Command shooterOn = new ShooterOnOffCommand(headSubsystem, 1000, 1000,
+            ()-> functionJoystick.getRawButtonPressed(4));
 
     public FortissiMOEContainer() {
         swerveSubsystem.setDefaultCommand(drive);
@@ -148,28 +145,14 @@ public class FortissiMOEContainer{
                 Commands.parallel(drive,collectorCommand)
         );
 
-        /*button1.whileTrue(headSubsystem.runCollectorCommands(-.75));
-        button2.whileTrue(headSubsystem.runCollectorCommands(.75)).whileFalse(headSubsystem.runCollectorCommands(0));
-        */
-        /*var button8 = new Trigger (() -> functionJoystick.getRawButton(8));
-        button8.onTrue();*/
-
-        /*f(/*!button1.getAsBoolean()&&!button2.getAsBoolean()){
-            headSubsystem.stopCollector();
-        }*/
-
-
-        /*var button5 = new Trigger (() -> driverJoystick.getRawButton(5));
-        button5.onTrue(new setHeading(swerveSubsystem,
-                () -> driverJoystick.getRawAxis(1),
-                () -> driverJoystick.getRawAxis(2),
-                swerveSubsystem.getAngleBetweenSpeaker(swerveSubsystem.getPose().getTranslation()))
-        ); */
-
-
-
+        headSubsystem.setDefaultCommand(shooterOn);
+	    // Configure the trigger bindings
+	    configureBindings();
+//
 
     }
+
+
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
@@ -184,16 +167,3 @@ public class FortissiMOEContainer{
         // return Autos.exampleAuto(m_drive);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

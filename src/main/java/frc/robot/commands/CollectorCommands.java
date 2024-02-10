@@ -45,6 +45,4 @@ public final class CollectorCommands {
         return moveThenCollect(headSubsystem,armSubsystem,  Rotation2d.fromDegrees(155),
                 Rotation2d.fromDegrees(135), 0.5,.3);
     }
-
-
 }
