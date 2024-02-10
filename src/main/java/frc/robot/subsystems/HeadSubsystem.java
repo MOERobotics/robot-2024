@@ -27,13 +27,13 @@ public class HeadSubsystem extends SubsystemBase {
     private final SparkPIDController shooterBottomController;
     private final SparkPIDController collectorController;
     private final DigitalInput collectorBeam;
-    private final DoubleLogEntry logCollectorSpeed;
-    private final DoubleLogEntry logCollectorPower;
-    private final DoubleLogEntry logShooterTopSpeed;
-    private final DoubleLogEntry logShooterBottomSpeed;
-    private final DoubleLogEntry logShooterTopDesired;
-    private final DoubleLogEntry logShooterBottomDesired;
-    private final DoubleLogEntry logShooterTolerance;
+//    private final DoubleLogEntry logCollectorSpeed;
+//    private final DoubleLogEntry logCollectorPower;
+//    private final DoubleLogEntry logShooterTopSpeed;
+//    private final DoubleLogEntry logShooterBottomSpeed;
+//    private final DoubleLogEntry logShooterTopDesired;
+//    private final DoubleLogEntry logShooterBottomDesired;
+//    private final DoubleLogEntry logShooterTolerance;
 
     private double shooterSpeedTop=0;//Store desired speeds
     private double shooterSpeedBottom=0;
@@ -57,14 +57,14 @@ public class HeadSubsystem extends SubsystemBase {
         this.shooterTopEncoder = shooterTop.getEncoder();
         this.shooterBottomEncoder = shooterBottom.getEncoder();
 
-        var log = DataLogManager.getLog();
-        logCollectorSpeed = new DoubleLogEntry(log, "Head/collectorSpeed");
-        logCollectorPower = new DoubleLogEntry(log, "Head/colelctorPower");
-        logShooterTopSpeed = new DoubleLogEntry(log, "Head/TopShooterSpeed");
-        logShooterBottomSpeed = new DoubleLogEntry(log, "Head/BottomShooterSpeed");
-        logShooterTopDesired = new DoubleLogEntry(log, "Head/TopShooterDesired");
-        logShooterBottomDesired = new DoubleLogEntry(log, "Head/BottomShooterDesired");
-        logShooterTolerance = new DoubleLogEntry(log, "Head/ShooterRPMTolerance");
+//        var log = DataLogManager.getLog();
+//        logCollectorSpeed = new DoubleLogEntry(log, "Head/collectorSpeed");
+//        logCollectorPower = new DoubleLogEntry(log, "Head/colelctorPower");
+//        logShooterTopSpeed = new DoubleLogEntry(log, "Head/TopShooterSpeed");
+//        logShooterBottomSpeed = new DoubleLogEntry(log, "Head/BottomShooterSpeed");
+//        logShooterTopDesired = new DoubleLogEntry(log, "Head/TopShooterDesired");
+//        logShooterBottomDesired = new DoubleLogEntry(log, "Head/BottomShooterDesired");
+//        logShooterTolerance = new DoubleLogEntry(log, "Head/ShooterRPMTolerance");
 
         // configure collector motor top and bottom
 
@@ -272,14 +272,14 @@ public class HeadSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Aimed at speaker:",aimed());
         SmartDashboard.putBoolean("Aiming in progress:",aiming());
         SmartDashboard.putBoolean("Ready to shoot:", readyShoot());
-        // This method will be called once per scheduler run
-        logCollectorSpeed.append(collector.getEncoder().getVelocity());
-        logCollectorPower.append(collector.get());
-        logShooterTopSpeed.append(getShooterSpeedTop());
-        logShooterBottomSpeed.append(getShooterSpeedBottom());
-        logShooterTopDesired.append(shooterSpeedTop);
-        logShooterBottomDesired.append(shooterSpeedBottom);
-        logShooterTolerance.append(getShooterRPMTolerance());
+//        // This method will be called once per scheduler run
+//        logCollectorSpeed.append(collector.getEncoder().getVelocity());
+//        logCollectorPower.append(collector.get());
+//        logShooterTopSpeed.append(getShooterSpeedTop());
+//        logShooterBottomSpeed.append(getShooterSpeedBottom());
+//        logShooterTopDesired.append(shooterSpeedTop);
+//        logShooterBottomDesired.append(shooterSpeedBottom);
+//        logShooterTolerance.append(getShooterRPMTolerance());
 
     }
 

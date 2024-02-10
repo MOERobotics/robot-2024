@@ -7,63 +7,55 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.HeadSubsystem;
 
+import java.util.function.Supplier;
+
 /** An example command that uses an example subsystem. */
 public class ShooterOnOffCommand extends Command {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final HeadSubsystem headSubsystem;
-    boolean onoff;
+    Supplier<Boolean> onoff;
     boolean finished;
     double shooterSpeedTop;
     double shooterSpeedBottom;
+    int onState = 0;
 
     /**
      * Creates a new ExampleCommand.
      *
      * @param subsystem The subsystem used by this command.
      */
-    public ShooterOnOffCommand(HeadSubsystem subsystem, double shooterSpeedTop, double shooterSpeedBottom, boolean on) {
+    public ShooterOnOffCommand(HeadSubsystem subsystem, double shooterSpeedTop, double shooterSpeedBottom, Supplier<Boolean> on) {
         headSubsystem = subsystem;
         this.shooterSpeedTop = shooterSpeedTop;
         this.shooterSpeedBottom = shooterSpeedBottom;
         onoff = on;
-        // Use addRequirements() here to declare subsystem dependencies.
+        onState = 0;
         addRequirements(subsystem);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-		finished=false;
-	    if(onoff){
-		    headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
-		    headSubsystem.setShooterTopSpeed(shooterSpeedTop);
-//			headSubsystem.setShooterPower(0.2);
-	    } else{
-		    headSubsystem.stopShooter();
-//			headSubsystem.setShooterPower(0.0);
-	    }
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-//	    if(onoff){
-//		    headSubsystem.setShooterTopSpeed(shooterSpeedTop);
-//		    headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
-////		    headSubsystem.setShooterPower(0.2);
-//	    } else{
-//		    headSubsystem.stopShooter();
-////		    headSubsystem.setShooterPower(0.0);
-//	    }
+        if(onoff.get()){
+            onState += 1;
+            onState %= 2;
+        }
+        if (onState%2 == 1){
+            headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
+            headSubsystem.setShooterTopSpeed(shooterSpeedTop);
+        } else{
+            headSubsystem.setShooterBottomSpeed(0);
+            headSubsystem.setShooterTopSpeed(0);
+        }
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {}
 
-    // Returns true when the command should end.
-    @Override
-    public boolean isFinished() {
-        return headSubsystem.shooterAtSpeed();
-    }
 }
