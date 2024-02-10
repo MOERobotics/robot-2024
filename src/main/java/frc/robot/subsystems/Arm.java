@@ -7,19 +7,17 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.*;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.ArrayList;
+import frc.robot.commands.ArmPathFollow;
+
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 
 public class Arm extends SubsystemBase {
-    private final CANSparkMax shoulderMotor;
+    private final CANSparkMax shoulderMotorLeft, shoulderMotorRight;
     private final CANSparkMax wristMotor;
 
     private final CANcoder shoulderEncoder;
@@ -28,87 +26,84 @@ public class Arm extends SubsystemBase {
     private final PIDController shoulderController;
     private final PIDController wristController;
 
-    private Trajectory trajectory;
-    private Timer timer;
+    private Rotation2d extremeShoulder, extremeWrist;
+    private double maxSpeed, maxAccel;
 
-    double shoulderLength, wristLength, shoulderInertia, wristInertia, maxShoulderSpeed,
-    maxWristSpeed;
-
-    public Arm(int shoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
+    public Arm(int rightShoulderMotorID, int leftShoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
                double kPShoulder, double kIShoulder, double kDShoulder,
                double kPWrist, double kIWrist, double kDWrist,
-               double shoulderLength, double wristLength, double shoulderInertia, double wristInertia,
-               double maxShoulderSpeed, double maxWristSpeed) {
-        shoulderMotor = new CANSparkMax(shoulderMotorID, kBrushless);
+               Rotation2d extremeShoulderAngle, Rotation2d extremeWristAngle,
+               double maxSpeed, double maxAccel) {
+
+        shoulderMotorLeft = new CANSparkMax(leftShoulderMotorID, kBrushless);
+        shoulderMotorRight = new CANSparkMax(rightShoulderMotorID, kBrushless);
         wristMotor = new CANSparkMax(wristMotorID, kBrushless);
+
+        shoulderMotorLeft.setInverted(false);
+        shoulderMotorRight.setInverted(true);
+        wristMotor.setInverted(false);
+
+        shoulderMotorRight.follow(shoulderMotorLeft);
 
         shoulderEncoder = new CANcoder(shoulderEncoderID);
         wristEncoder = new CANcoder(wristEncoderID);
 
+        this.maxAccel = maxAccel; this.maxSpeed = maxSpeed;
 
         shoulderController = new PIDController(kPShoulder, kIShoulder, kDShoulder);
         wristController = new PIDController(kPWrist, kIWrist, kDWrist);
-
-        this.shoulderLength = shoulderLength;
-        this.shoulderInertia = shoulderInertia;
-        this.wristLength = wristLength;
-        this.wristInertia = wristInertia;
-        this.maxShoulderSpeed = maxShoulderSpeed;
-        this.maxWristSpeed = maxWristSpeed;
-
-        timer = new Timer();
-
+        extremeShoulder = extremeShoulderAngle; extremeWrist = extremeWristAngle;
     }
 
     public void periodic(){
         //TODO: make the mechanism 2d object in here
-        pathFollow(trajectory.sample(timer.get()).poseMeters);
+        SmartDashboard.putNumber("shoulderValue", shoulderState().getDegrees());
+        SmartDashboard.putNumber("wristValue", wristState().getDegrees());
     }
 
-    void pathFollow(Pose2d desState){
+    public void pathFollow(Rotation2d shoulder, Rotation2d wrist){
         //x is shoulder, y is wrist
-        shoulderController.setSetpoint(desState.getX());
-        shoulderMotor.set(shoulderController.calculate(shoulderState().getRadians()));
-        wristController.setSetpoint(desState.getY());
-        wristMotor.set(wristController.calculate(wristState().getRadians()));
+        shoulderController.setSetpoint(shoulder.getDegrees());
+        shoulderPower(shoulderController.calculate(shoulderState().getDegrees()));
+        wristController.setSetpoint(wrist.getDegrees());
+        wristPower(wristController.calculate(wristState().getDegrees()));
+    }
+
+    public void shoulderPower(double power){
+        shoulderMotorLeft.set(power);
+    }
+    public void wristPower(double power){
+        wristMotor.set(power);
+    }
+
+    public Command goToPoint(Rotation2d shoulderPos, Rotation2d wristPos) {
+
+        Rotation2d safeShoulder, safeWrist;
+        if (wristState().getDegrees() < extremeWrist.getDegrees() && wristPos.getDegrees() < extremeWrist.getDegrees() ||
+        wristState().getDegrees() > extremeWrist.getDegrees() && wristPos.getDegrees() < extremeWrist.getDegrees()){
+            return new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel);
+        }
+        safeShoulder = Rotation2d.fromDegrees((wristPos.getDegrees()-wristState().getDegrees())/
+                (extremeWrist.getDegrees()-wristPos.getDegrees())
+                *(extremeShoulder.getDegrees()-shoulderPos.getDegrees()));
+        if (safeShoulder.getDegrees() >= extremeShoulder.getDegrees()){
+            return new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel);
+        }
+        safeShoulder = extremeShoulder; safeWrist = extremeWrist;
+        return new SequentialCommandGroup(
+                new ArmPathFollow(this, safeShoulder, safeWrist, maxSpeed, maxAccel),
+                new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel)
+        );
     }
 
 
-    Rotation2d shoulderState(){
+    public Rotation2d shoulderState(){
         return Rotation2d.fromDegrees(shoulderEncoder.getAbsolutePosition().getValueAsDouble());
     }
 
-    Rotation2d wristState(){
+    public Rotation2d wristState(){
         return Rotation2d.fromDegrees(wristEncoder.getAbsolutePosition().getValueAsDouble());
     }
-
-    public Pose2d getArmState(){
-        return new Pose2d(new Translation2d(shoulderState().getRadians(), wristState().getRadians()),
-                new Rotation2d(0));
-    }
-
-    public void goToPoint(Pose2d targetDest){
-        var startPose = getArmState();
-
-        var interiorWaypoints = new ArrayList<Translation2d>();
-        interiorWaypoints.add(new Translation2d((targetDest.getX()+startPose.getX())/3,
-                (targetDest.getY()+startPose.getY())/3));
-        interiorWaypoints.add(new Translation2d(2*(targetDest.getX()+startPose.getX())/3,
-                2*(targetDest.getY()+startPose.getY())/3));
-
-        TrajectoryConfig config = new TrajectoryConfig(maxShoulderSpeed, maxWristSpeed);
-        config.setReversed(true);
-
-        trajectory = TrajectoryGenerator.generateTrajectory(
-                startPose,
-                interiorWaypoints,
-                targetDest,
-                config);
-        timer.restart();
-    }
-
-
-
 
 
 }

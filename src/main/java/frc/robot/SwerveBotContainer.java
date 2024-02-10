@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -17,12 +18,15 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.Autos;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.setHeading;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
+
+import static frc.robot.commands.Autos.doubleNoteAuto;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -101,9 +105,6 @@ public class SwerveBotContainer {
             ()->pigeon.getYaw(), maxMPS,0.04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
-
-    /////////////////////////////////////////////////////////////////////////// arm subsystem end
-
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
     private final Joystick funcOpJoystick = new Joystick(0);
 
@@ -154,7 +155,7 @@ public class SwerveBotContainer {
 
     public Command getAutonomousCommand() {
         return null;
-       // return Autos.exampleAuto(m_drive);
+        // return Autos.exampleAuto(m_drive);
     }
 }
 

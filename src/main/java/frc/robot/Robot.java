@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    CommandScheduler.getInstance().run();
+      CommandScheduler.getInstance().run();
   }
 
   @Override
@@ -64,8 +64,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-
-      CommandScheduler.getInstance().cancelAll();
+    CommandScheduler.getInstance().cancelAll();
   }
 
   @Override

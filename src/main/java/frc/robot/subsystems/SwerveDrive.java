@@ -66,9 +66,7 @@ public class SwerveDrive extends SubsystemBase {
         return Rotation2d.fromDegrees(getYaw());
     }
 
-    public Pose2d getPose() {
-        return odometer.getPoseMeters();
-    }
+    public Pose2d getPose() {return odometer.getPoseMeters();}
 
     public void resetOdometry(Pose2d pose) {
         odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
@@ -80,6 +78,9 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboard.putNumber("yaw", pigeon.get());
         SmartDashboard.putNumber("desired yaw", getDesiredYaw());
         odometer.update(getRotation2d(), getModulePositions());
+        SmartDashboard.putNumber("Posex",getPose().getX());
+        SmartDashboard.putNumber("Posey",getPose().getY());
+        SmartDashboard.putNumber("Rotation",getPose().getRotation().getDegrees());
     }
 
     public void stopModules() {
@@ -124,10 +125,11 @@ public class SwerveDrive extends SubsystemBase {
         SwerveModuleState[] moduleStates = kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
 
         SmartDashboard.putString("module states", Arrays.toString(moduleStates));
-        
+
 
         setModuleStates(moduleStates);
     }
+
 
 }
 
