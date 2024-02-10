@@ -11,12 +11,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.CollectorCommands;
 import frc.robot.commands.ShooterOnOffCommand;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.setHeading;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
@@ -46,7 +44,6 @@ public class FortissiMOEContainer{
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
     double maxRPS = Math.PI*2;
-
     private final SwerveModule backLeftModule = new SwerveModule(
             3,
             2,
@@ -110,6 +107,8 @@ public class FortissiMOEContainer{
 
 
     ////////////////////////////////////////////////////////////////////////////commands
+
+
 
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),

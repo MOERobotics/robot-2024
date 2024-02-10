@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import java.util.function.Supplier;
+
 public class HeadSubsystem extends SubsystemBase {
     /** Creates a new ExampleSubsystem. */
     private final CANSparkMax shooterTop;
@@ -137,17 +139,17 @@ public class HeadSubsystem extends SubsystemBase {
             collectorState = true;
         }
     }
-    public Command runCollectorCommandsForTeleop (final double speed, BooleanSupplier button1, BooleanSupplier button2){
+    public Command runCollectorCommandsForTeleop (final double speed, Supplier<Boolean> button1, Supplier<Boolean> button2){
         SmartDashboard.putBoolean("started collector", collectorState);
         return Commands.run(() -> {
             double finalSpeed = speed;
-            if(button1.getAsBoolean() && !button2.getAsBoolean()){
+            if(button1.get() && !button2.get()){
                 finalSpeed = -finalSpeed;
-            } else if(!button1.getAsBoolean()&&!button2.getAsBoolean()){
+            } else if(!button1.get()&&!button2.get()){
                 finalSpeed = 0;
-            } else if(button2.getAsBoolean()&&isCollected()/*&&!readyShoot()*/){
+            } else if(button2.get()&&isCollected()/*&&!readyShoot()*/){
                 finalSpeed = 0;
-            } else if(button1.getAsBoolean()&&button2.getAsBoolean()){
+            } else if(button1.get()&&button2.get()){
                 finalSpeed = 0;
             }
             updateCollectorSpeed(finalSpeed);
