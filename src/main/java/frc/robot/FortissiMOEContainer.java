@@ -15,10 +15,7 @@ import frc.robot.commands.CollectorCommands;
 import frc.robot.commands.ShooterOnOffCommand;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.SwerveModule;
-import frc.robot.subsystems.HeadSubsystem;
+import frc.robot.subsystems.*;
 
 import java.awt.*;
 
@@ -100,6 +97,8 @@ public class FortissiMOEContainer{
 
 	private final HeadSubsystem headSubsystem = new HeadSubsystem(5,13,6,
 			0,0,0,driveFF,0.01,0,0,0,7);
+    private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem(6,
+            0.01,0,0,0,7);
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -119,7 +118,7 @@ public class FortissiMOEContainer{
     );
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
-    Command collectorCommand = headSubsystem.runCollectorCommandsForTeleop(
+    Command collectorCommand = collectorSubsystem.runCollectorCommandsForTeleop(
             0.75,
             ()->functionJoystick.getRawButton(1),
             ()->functionJoystick.getRawButton(2)
