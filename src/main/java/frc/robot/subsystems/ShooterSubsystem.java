@@ -39,11 +39,13 @@ public class ShooterSubsystem extends SubsystemBase {
     }
     public void setShooterTopSpeed(double speed){
         SmartDashboard.putNumber("shooterTopDesired", speed);
-        shooterTopController.setReference(speed, CANSparkBase.ControlType.kVelocity);
+        //shooterTopController.setReference(speed, CANSparkBase.ControlType.kVelocity);
+        shooterTop.set(speed);
     }
     public void setShooterBottomSpeed(double speed){
         SmartDashboard.putNumber("shooterBottomDesired", speed);
-        shooterBottomController.setReference(speed, CANSparkBase.ControlType.kVelocity);
+        //shooterBottomController.setReference(speed, CANSparkBase.ControlType.kVelocity);
+        shooterBottom.set(speed);
     }
     public void setShooterSpeeds(double topSpeed, double bottomSpeed){
         setShooterTopSpeed(topSpeed); setShooterBottomSpeed(bottomSpeed);

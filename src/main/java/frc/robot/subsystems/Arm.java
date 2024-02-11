@@ -23,15 +23,22 @@ public class Arm extends SubsystemBase {
     private final CANcoder shoulderEncoder;
     private final CANcoder wristEncoder;
 
+    private final RelativeEncoder shoulderRelEncoder;
+    private final RelativeEncoder wristRelEncoder;
+
     private final PIDController shoulderController;
     private final PIDController wristController;
 
+    private final PIDController shoulderRelController, wristRelController;
+
     private Rotation2d extremeShoulder, extremeWrist, interShoulder, interWrist;
+    private double currShoulder, currWrist;
     private double maxSpeed, maxAccel, shoulderLength, wristLength;
 
     public Arm(int rightShoulderMotorID, int leftShoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
                double kPShoulder, double kIShoulder, double kDShoulder,
                double kPWrist, double kIWrist, double kDWrist,
+               double kP, double kI, double kD,
                double shoulderLength, double wristLength,
                Rotation2d criticalShoulderAngle, Rotation2d criticalWristAngle,
                double maxSpeed, double maxAccel) {
@@ -53,11 +60,16 @@ public class Arm extends SubsystemBase {
         shoulderEncoder = new CANcoder(shoulderEncoderID);
         wristEncoder = new CANcoder(wristEncoderID);
 
+        shoulderRelEncoder = shoulderMotorLeft.getEncoder();
+        wristRelEncoder = wristMotor.getEncoder();
+
         this.maxAccel = maxAccel; this.maxSpeed = maxSpeed;
         this.shoulderLength = shoulderLength; this.wristLength = wristLength;
 
         shoulderController = new PIDController(kPShoulder, kIShoulder, kDShoulder);
         wristController = new PIDController(kPWrist, kIWrist, kDWrist);
+        shoulderRelController = new PIDController(kP, kI, kD);
+        wristRelController = new PIDController(kP, kI, kD);
         extremeShoulder = criticalShoulderAngle; extremeWrist = criticalWristAngle;
         interShoulder = criticalShoulderAngle; interWrist = criticalWristAngle;
     }
@@ -66,6 +78,8 @@ public class Arm extends SubsystemBase {
         //TODO: make the mechanism 2d object in here
         SmartDashboard.putNumber("shoulderValue", shoulderState().getDegrees());
         SmartDashboard.putNumber("wristValue", wristState().getDegrees());
+        SmartDashboard.putNumber("shoulderRel", shoulderPosRel());
+        SmartDashboard.putNumber("wristRel", wristPosRel());
     }
 
     public void pathFollow(Rotation2d shoulder, Rotation2d wrist){
@@ -83,9 +97,11 @@ public class Arm extends SubsystemBase {
     }
 
     public void shoulderPower(double power){
+        SmartDashboard.putNumber("shoulderpow", power);
         shoulderMotorLeft.set(power);
     }
     public void wristPower(double power){
+        SmartDashboard.putNumber("wristpow", power);
         wristMotor.set(power);
     }
 
@@ -130,6 +146,42 @@ public class Arm extends SubsystemBase {
 
     public Rotation2d wristState(){
         return Rotation2d.fromDegrees(wristEncoder.getAbsolutePosition().getValueAsDouble());
+    }
+    public double shoulderPosRel(){
+        return shoulderRelEncoder.getPosition();
+    }
+    public double wristPosRel(){
+        return wristRelEncoder.getPosition();
+    }
+
+    public void shoulderPowerController(double shoulderPow){
+        shoulderPower(shoulderPow);
+        setShoulderDesState(shoulderPosRel());
+    }
+    public void wristPowerController(double wristPow){
+        wristPower(wristPow);
+        setWristDestState(wristPosRel());
+    }
+    public void setShoulderDesState(double pos){
+        currShoulder = pos;
+    }
+    public void setWristDestState(double pos){
+        currWrist = pos;
+    }
+    public double getShoulderDesState(){
+        return currShoulder;
+    }
+    public double getWristDesState(){
+        return currWrist;
+    }
+
+    public void holdPos(double shoulderRel, double wristRel){
+        SmartDashboard.putNumber("shoulderRelSetpt", shoulderRel);
+        SmartDashboard.putNumber("wristRelSetpt", wristRel);
+        wristRelController.setSetpoint(wristRel);
+        shoulderRelController.setSetpoint(shoulderRel);
+        wristPower(wristRelController.calculate(wristPosRel()));
+        shoulderPower(shoulderRelController.calculate(shoulderPosRel()));
     }
 
 
