@@ -11,13 +11,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.CollectorCommands;
+import frc.robot.commands.CollectorControllerCommand;
 import frc.robot.commands.ShooterControllerCommand;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
-
-import java.awt.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -119,11 +117,12 @@ public class FortissiMOEContainer{
     );
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
-    Command collectorCommand = collectorSubsystem.runCollectorCommandsForTeleop(
+    Command collectorCommand = new CollectorControllerCommand(
             0.75,
             ()->functionJoystick.getRawButton(1),
             ()->functionJoystick.getRawButton(2),
-            ()->functionJoystick.getRawButton(3)
+            ()->functionJoystick.getRawButton(3),
+            collectorSubsystem
     );
     ////////////////////////////////////////////////////////////////////////////commands end
 
@@ -138,9 +137,7 @@ public class FortissiMOEContainer{
 //        var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
 
 
-        swerveSubsystem.setDefaultCommand(
-                Commands.parallel(drive,collectorCommand)
-        );
+        collectorSubsystem.setDefaultCommand(collectorCommand);
 
         shooterSubsystem.setDefaultCommand(shooterControl);
 	    // Configure the trigger bindings
