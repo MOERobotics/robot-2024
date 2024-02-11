@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 /** An example command that uses an example subsystem. */
 public class CollectorControllerCommand extends Command {
 
+
     private final double speed;
     private final Supplier<Boolean> buttonOut;
     private final Supplier<Boolean> buttonIn;
