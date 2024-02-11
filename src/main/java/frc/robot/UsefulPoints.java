@@ -10,18 +10,21 @@ import edu.wpi.first.math.util.Units;
 
 public final class UsefulPoints {
     public static class Points {
-        public Translation2d middleOfSpeaker = new Translation2d(
+        public static Translation2d middleOfSpeaker = new Translation2d(
                 0,Units.inchesToMeters(219));
-        public Translation2d WingedNoteLeft = new Translation2d(Units.inchesToMeters(27*12 - 211.6), Units.inchesToMeters(27*6 + 114));
-        public Translation2d WingedNoteMid = new Translation2d(Units.inchesToMeters(27*12 - 211.6), Units.inchesToMeters(27*6 + 57));
-        public Translation2d WingedNoteRight = new Translation2d(Units.inchesToMeters(27*12 - 211.6),Units.inchesToMeters(27*6));
+        public static Translation2d WingedNoteLeft = new Translation2d(Units.inchesToMeters(27*12 - 211.6), Units.inchesToMeters(27*6 + 114));
+        public static Translation2d WingedNoteMid = new Translation2d(Units.inchesToMeters(27*12 - 211.6), Units.inchesToMeters(27*6 + 57));
+        public static Translation2d WingedNoteRight = new Translation2d(Units.inchesToMeters(27*12 - 211.6),Units.inchesToMeters(27*6));
 
-        public Translation2d CenterLineMid = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6));
-        public Translation2d CenterLineFarLeft = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6 + 132));
-        public Translation2d CenterLineMidLeft = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6 + 66));
-        public Translation2d CenterLineFarRight = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6 - 132));
-        public Translation2d CenterLineMidRight = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6 -66));
+        public static Translation2d CenterLineMid = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6));
+        public static Translation2d CenterLineFarLeft = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6 + 132));
+        public static Translation2d CenterLineMidLeft = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6 + 66));
+        public static Translation2d CenterLineFarRight = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6 - 132));
+        public static Translation2d CenterLineMidRight = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6 -66));
 
+        public static Translation2d StartingPoint1 = new Translation2d(Units.inchesToMeters(26), Units.inchesToMeters(27*6 + 124));
+        public static Translation2d StartingPoint2 = new Translation2d(Units.inchesToMeters(26), Units.inchesToMeters(27*6 + 72));
+        public static Translation2d StartingPoint3 = new Translation2d(Units.inchesToMeters(26), Units.inchesToMeters(27*6 + 0));
 
 
 

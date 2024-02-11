@@ -5,17 +5,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.HeadSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import java.util.function.Supplier;
 
 /** An example command that uses an example subsystem. */
 public class ShooterControllerCommand extends Command {
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final ShooterSubsystem subsystem;
-    Supplier<Boolean> onoff;
-    boolean finished;
+    Supplier<Boolean> toggle;
     double shooterSpeedTop;
     double shooterSpeedBottom;
     int onState = 0;
@@ -25,11 +22,11 @@ public class ShooterControllerCommand extends Command {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public ShooterControllerCommand(ShooterSubsystem subsystem, double shooterSpeedTop, double shooterSpeedBottom, Supplier<Boolean> on) {
+    public ShooterControllerCommand(ShooterSubsystem subsystem, double shooterSpeedTop, double shooterSpeedBottom, Supplier<Boolean> toggle) {
         this.subsystem = subsystem;
         this.shooterSpeedTop = shooterSpeedTop;
         this.shooterSpeedBottom = shooterSpeedBottom;
-        onoff = on;
+        this.toggle = toggle;
         onState = 0;
         addRequirements(subsystem);
     }
@@ -42,7 +39,7 @@ public class ShooterControllerCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if(onoff.get()){
+        if(toggle.get()){
             onState += 1;
             onState %= 2;
         }
@@ -56,5 +53,10 @@ public class ShooterControllerCommand extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {}
+
+    @Override
+    public boolean isFinished(){
+        return subsystem.shooterAtSpeed();
+    }
 
 }

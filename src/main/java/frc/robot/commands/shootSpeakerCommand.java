@@ -5,65 +5,52 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.HeadSubsystem;
+import frc.robot.subsystems.CollectorSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class shootSpeakerCommand extends Command {
-    private double shooterSpeedTop;
-    private double shooterSpeedBottom;
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final HeadSubsystem headSubsystem;
-
-
+    //    private final HeadSubsystem headSubsystem;
+    private final ShooterSubsystem shooterSubsystem;
+    private  final CollectorSubsystem collectorSubsystem;
     /**
      * Creates a new ExampleCommand.
      *
-     * @param subsystem The subsystem used by this command.
+     * @param shooterSubsystem The shooter subsystem used by this command.
+     * @param collectorSubsystem The collector subsystem used by this command
      */
-    public shootSpeakerCommand(HeadSubsystem subsystem) {
-        headSubsystem = subsystem;
+    public shootSpeakerCommand(ShooterSubsystem shooterSubsystem,CollectorSubsystem collectorSubsystem) {
+        this.shooterSubsystem = shooterSubsystem;
+        this.collectorSubsystem = collectorSubsystem;
         // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(subsystem);
+        addRequirements(shooterSubsystem,collectorSubsystem);
     }
     //TODO: Calculate shooter speeds based on odometry.
     public double speedCalc(){
-        return 3000.0;
+        return 6000.0;
     }//placeholder value
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        //Set speed in RPM
-        shooterSpeedTop = speedCalc();//Placeholder
-	    shooterSpeedBottom = speedCalc();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        headSubsystem.setShooterTopSpeed(shooterSpeedTop);
-		headSubsystem.setShooterBottomSpeed(shooterSpeedBottom);
-//	    headSubsystem.setShooterPower(0.2);
-        if(/*headSubsystem.readyShoot()*/true){
-            headSubsystem.setCollectorSpeed(1);
-//	        headSubsystem.setCollectorSpeed(0.2);
-        }
+        shooterSubsystem.setShooterTopSpeed(speedCalc());
+        shooterSubsystem.setShooterBottomSpeed(speedCalc());
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        headSubsystem.stopCollector();
-//	    headSubsystem.setCollectorSpeed(0.0);
+        collectorSubsystem.stopCollector();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        //TODO: Need to fix the condition for when the command is finished.
-//        if(!headSubsystem.isCollected()){
-//            return true;
-//        }
         return false;
     }
 }

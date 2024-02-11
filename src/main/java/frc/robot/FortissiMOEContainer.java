@@ -5,19 +5,17 @@
 package frc.robot;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import frc.robot.commands.autos.doubleNoteAutos;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.CollectorCommands;
 import frc.robot.commands.ShooterControllerCommand;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
-
-import java.awt.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -40,6 +38,8 @@ public class FortissiMOEContainer{
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
+
+    double maxMPSSquared = 6;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
             3,
@@ -86,7 +86,7 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS, 0, 0, 0);
+            ()->pigeon.getYaw(), maxMPS, maxMPSSquared,0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
@@ -160,7 +160,7 @@ public class FortissiMOEContainer{
     }
 
     public Command getAutonomousCommand() {
-        return null;
+        return new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto1();
         // return Autos.exampleAuto(m_drive);
     }
 }

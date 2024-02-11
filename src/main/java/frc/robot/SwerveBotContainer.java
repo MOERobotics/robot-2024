@@ -10,21 +10,17 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.Autos;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.autos.doubleNoteAutos;
 import frc.robot.commands.setHeading;
-import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
-
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -40,7 +36,6 @@ public class SwerveBotContainer {
     public DigitalOutput shooter;
 
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
-
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
     double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
@@ -53,7 +48,8 @@ public class SwerveBotContainer {
     double driveFF = 1.76182e-4;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
-    double maxMPS = 174/39.3701;
+    double maxMPS = 30/39.3701;
+    double maxMPSSquared = 6;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
             19,
@@ -100,7 +96,7 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS,0.04,0,0);
+            ()->pigeon.getYaw(), maxMPS,maxMPSSquared,0.04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -152,8 +148,8 @@ public class SwerveBotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return null;
-        // return Autos.exampleAuto(m_drive);
+        return new doubleNoteAutos(swerveSubsystem, 0, 0).DoubleNoteAuto1();
+       // return Autos.exampleAuto(m_drive);
     }
 }
 
