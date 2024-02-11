@@ -26,33 +26,40 @@ public class Arm extends SubsystemBase {
     private final PIDController shoulderController;
     private final PIDController wristController;
 
-    private Rotation2d extremeShoulder, extremeWrist;
-    private double maxSpeed, maxAccel;
+    private Rotation2d extremeShoulder, extremeWrist, interShoulder, interWrist;
+    private double maxSpeed, maxAccel, shoulderLength, wristLength;
 
     public Arm(int rightShoulderMotorID, int leftShoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
                double kPShoulder, double kIShoulder, double kDShoulder,
                double kPWrist, double kIWrist, double kDWrist,
-               Rotation2d extremeShoulderAngle, Rotation2d extremeWristAngle,
+               double shoulderLength, double wristLength,
+               Rotation2d criticalShoulderAngle, Rotation2d criticalWristAngle,
                double maxSpeed, double maxAccel) {
 
         shoulderMotorLeft = new CANSparkMax(leftShoulderMotorID, kBrushless);
         shoulderMotorRight = new CANSparkMax(rightShoulderMotorID, kBrushless);
         wristMotor = new CANSparkMax(wristMotorID, kBrushless);
 
+        shoulderMotorRight.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        shoulderMotorLeft.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        wristMotor.setIdleMode(CANSparkBase.IdleMode.kBrake);
+
         shoulderMotorLeft.setInverted(false);
         shoulderMotorRight.setInverted(true);
         wristMotor.setInverted(false);
 
-        shoulderMotorRight.follow(shoulderMotorLeft);
+        shoulderMotorRight.follow(shoulderMotorLeft, true);
 
         shoulderEncoder = new CANcoder(shoulderEncoderID);
         wristEncoder = new CANcoder(wristEncoderID);
 
         this.maxAccel = maxAccel; this.maxSpeed = maxSpeed;
+        this.shoulderLength = shoulderLength; this.wristLength = wristLength;
 
         shoulderController = new PIDController(kPShoulder, kIShoulder, kDShoulder);
         wristController = new PIDController(kPWrist, kIWrist, kDWrist);
-        extremeShoulder = extremeShoulderAngle; extremeWrist = extremeWristAngle;
+        extremeShoulder = criticalShoulderAngle; extremeWrist = criticalWristAngle;
+        interShoulder = criticalShoulderAngle; interWrist = criticalWristAngle;
     }
 
     public void periodic(){
@@ -64,9 +71,15 @@ public class Arm extends SubsystemBase {
     public void pathFollow(Rotation2d shoulder, Rotation2d wrist){
         //x is shoulder, y is wrist
         shoulderController.setSetpoint(shoulder.getDegrees());
-        shoulderPower(shoulderController.calculate(shoulderState().getDegrees()));
+        double shoulderPow = (shoulderController.calculate(shoulderState().getDegrees()));
         wristController.setSetpoint(wrist.getDegrees());
-        wristPower(wristController.calculate(wristState().getDegrees()));
+        double wristPow = (wristController.calculate(wristState().getDegrees()));
+        if (!boundChecker.inBounds(shoulder, wrist, shoulderLength, wristLength)){
+            if (boundChecker.negDerivShoulder(shoulderState(), shoulder, shoulderLength, wristLength)) shoulderPow = 0;
+            if (boundChecker.negDerivWrist(wristState(),wrist, wristLength)) wristPow = 0;
+        }
+        shoulderPower(shoulderPow);
+        wristPower(wristPow);
     }
 
     public void shoulderPower(double power){
@@ -94,6 +107,20 @@ public class Arm extends SubsystemBase {
                 new ArmPathFollow(this, safeShoulder, safeWrist, maxSpeed, maxAccel),
                 new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel)
         );
+    }
+
+    public Command controlRobot2O(Rotation2d shoulderPos, Rotation2d wristPos){
+        if (boundChecker.inPointyPart2O(shoulderState(), wristState())){
+            return new SequentialCommandGroup(
+                    new ArmPathFollow(this, interShoulder, interWrist, maxSpeed, maxAccel),
+                    new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel)
+            );
+        }
+        return new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel);
+    }
+
+    public void stopMotors(){
+        wristPower(0); shoulderPower(0);
     }
 
 

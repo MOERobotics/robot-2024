@@ -17,7 +17,6 @@ import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
 
-import java.awt.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -90,8 +89,9 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
-            0, 0, 0, 0, 0, 0, new Rotation2d(0), new Rotation2d(0),
-            0,0);
+            0, 0, 0, 0, 0, 0, 0, 0, new Rotation2d(0),
+            new Rotation2d(0), 0,0);
+
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
@@ -132,6 +132,7 @@ public class FortissiMOEContainer{
 
     public FortissiMOEContainer() {
         swerveSubsystem.setDefaultCommand(drive);
+        armSubsystem.setDefaultCommand(Commands.run(()->armSubsystem.stopMotors(), armSubsystem));
         // Configure the trigger bindings
         configureBindings();
 //        var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
@@ -153,10 +154,10 @@ public class FortissiMOEContainer{
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
-        new JoystickButton(driverJoystick, 2).onTrue(Commands.run(()->armSubsystem.shoulderPower(.1)));
-        new JoystickButton(driverJoystick, 4).onTrue(Commands.run(()->armSubsystem.wristPower(.1)));
-        new JoystickButton(driverJoystick, 6).onTrue(Commands.run(()->armSubsystem.shoulderPower(-.1)));
-        new JoystickButton(driverJoystick, 7).onTrue(Commands.run(()->armSubsystem.wristPower(-.1)));
+        new JoystickButton(driverJoystick, 2).whileTrue(Commands.run(()->armSubsystem.shoulderPower(.1)));
+        new JoystickButton(driverJoystick, 4).whileTrue(Commands.run(()->armSubsystem.wristPower(.1)));
+        new JoystickButton(driverJoystick, 6).whileTrue(Commands.run(()->armSubsystem.shoulderPower(-.1)));
+        new JoystickButton(driverJoystick, 7).whileTrue(Commands.run(()->armSubsystem.wristPower(-.1)));
     }
 
     public Command getAutonomousCommand() {
@@ -164,3 +165,16 @@ public class FortissiMOEContainer{
         // return Autos.exampleAuto(m_drive);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
