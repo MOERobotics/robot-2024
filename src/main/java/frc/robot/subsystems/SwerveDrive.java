@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -81,14 +80,16 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public double getYaw(){
-        return pigeon.get();
+        return MathUtil.inputModulus(pigeon.get(),-180,180);
     }
 
     public Rotation2d getRotation2d() {
         return Rotation2d.fromDegrees(getYaw());
     }
 
-    public Pose2d getPose() {return odometer.getPoseMeters();}
+    public Pose2d getPose() {
+        return new Pose2d(odometer.getPoseMeters().getTranslation(),Rotation2d.fromRadians(MathUtil.angleModulus(odometer.getPoseMeters().getRotation().getRadians())));
+    }
 
     public void resetOdometry(Pose2d pose) {
         odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
@@ -103,7 +104,8 @@ public class SwerveDrive extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        SmartDashboard.putNumber("yaw", pigeon.get());
+        SmartDashboard.putNumber("yaw", getYaw());
+        SmartDashboard.putNumber("odometer yaw", getPose().getRotation().getDegrees());
         SmartDashboard.putNumber("desired yaw", getDesiredYaw());
         odometer.update(getRotation2d(), getModulePositions());
         SmartDashboard.putNumber("Posex",getPose().getX());
@@ -125,9 +127,9 @@ public class SwerveDrive extends SubsystemBase {
 
     public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
         TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
-        PIDController xController = new PIDController(0.04,0,0);
-        PIDController yController = new PIDController(0.04,0,0);
-        var thetaController = new ProfiledPIDController(0.1,0,0,new TrapezoidProfile.Constraints(Math.PI,Math.PI));
+        PIDController xController = new PIDController(7.0,0,0.5);
+        PIDController yController = new PIDController(7.0,0,0.5);
+        var thetaController = new ProfiledPIDController(10.0,0,0.5,new TrapezoidProfile.Constraints(900,1800));
         config.setEndVelocity(endVelocityMetersPerSecond);
         config.setStartVelocity(startVelocityMetersPerSecond);
         var trajectory = TrajectoryGenerator.generateTrajectory(

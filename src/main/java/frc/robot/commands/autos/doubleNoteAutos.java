@@ -42,13 +42,12 @@ public class doubleNoteAutos {
         Rotation2d endRotation = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(endTranslation));
         Pose2d endPose = new Pose2d(endTranslation, endRotation);
 
-
 //        midPose = new Translation2d(2,1);
-        ArrayList<Translation2d> internalPoints1 = new ArrayList<Translation2d>();
+        ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
 //        internalPoints1.add(midPose);
-        Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints1,startVelocity,endVelocity);
+        Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 100);
 
-        return Commands.sequence(swerveDrive.setInitPosition(startPose), new Shoot(), trajCommand, new Collect(), new Shoot());
+        return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand/*, new Collect(), new Shoot()*/);
     }
 
 }

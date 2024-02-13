@@ -48,8 +48,8 @@ public class SwerveBotContainer {
     double driveFF = 1.76182e-4;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
-    double maxMPS = 30/39.3701;
-    double maxMPSSquared = 6;
+    double maxMPS = 100/39.3701;
+    double maxMPSSquared = 150;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
             19,
