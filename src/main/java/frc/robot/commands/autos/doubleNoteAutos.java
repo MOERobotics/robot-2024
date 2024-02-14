@@ -45,7 +45,7 @@ public class doubleNoteAutos {
 //        midPose = new Translation2d(2,1);
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
 //        internalPoints1.add(midPose);
-        Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 100);
+        Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
 
         return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand/*, new Collect(), new Shoot()*/);
     }
