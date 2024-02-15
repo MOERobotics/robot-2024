@@ -72,6 +72,8 @@ public class Arm extends SubsystemBase {
         wristRelController = new PIDController(kP, kI, kD);
         extremeShoulder = criticalShoulderAngle; extremeWrist = criticalWristAngle;
         interShoulder = criticalShoulderAngle; interWrist = criticalWristAngle;
+		setShoulderDesState(shoulderPosRel());
+		setWristDestState(wristPosRel());
     }
 
     public void periodic(){
