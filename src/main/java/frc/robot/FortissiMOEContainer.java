@@ -39,7 +39,7 @@ public class FortissiMOEContainer{
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
     double maxRPS = Math.PI*2;
-    private final SwerveModule backLeftModule = new SwerveModule(
+    private final SwerveModule frontRightModule = new SwerveModule(
             3,
             2,
             33,
@@ -50,7 +50,7 @@ public class FortissiMOEContainer{
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule backRightModule = new SwerveModule(
+    private final SwerveModule frontLeftModule = new SwerveModule(
             17,
             16,
             34,
@@ -61,7 +61,7 @@ public class FortissiMOEContainer{
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule frontLeftModule = new SwerveModule(
+    private final SwerveModule backRightModule = new SwerveModule(
             1,
             20,
             32,
@@ -72,7 +72,7 @@ public class FortissiMOEContainer{
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule frontRightModule = new SwerveModule(
+    private final SwerveModule backLeftModule = new SwerveModule(
             19,
             18,
             31,
