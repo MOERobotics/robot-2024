@@ -45,7 +45,7 @@ public class FortissiMOEContainer{
             33,
             false,
             true,
-            135,
+            -45,
             new Translation2d(-width, length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
@@ -56,7 +56,7 @@ public class FortissiMOEContainer{
             34,
             false,
             true,
-            -135,
+            45,
             new Translation2d(-width, -length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
@@ -67,7 +67,7 @@ public class FortissiMOEContainer{
             32,
             false,
             true,
-            45,
+            -135,
             new Translation2d(width, length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
@@ -78,7 +78,7 @@ public class FortissiMOEContainer{
             31,
             false,
             true,
-            -45,
+            135,
             new Translation2d(width, -length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
