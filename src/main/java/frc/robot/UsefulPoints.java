@@ -22,9 +22,9 @@ public final class UsefulPoints {
         public static Translation2d CenterLineFarRight = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6 - 132));
         public static Translation2d CenterLineMidRight = new Translation2d(Units.inchesToMeters(27*12), Units.inchesToMeters(27*6 -66));
 
-        public static Translation2d StartingPoint1 = new Translation2d(Units.inchesToMeters(26), Units.inchesToMeters(27*6 + 124));
-        public static Translation2d StartingPoint2 = new Translation2d(Units.inchesToMeters(26), Units.inchesToMeters(27*6 + 72));
-        public static Translation2d StartingPoint3 = new Translation2d(Units.inchesToMeters(26), Units.inchesToMeters(27*6 + 0));
+        public static Translation2d StartingPointA = new Translation2d(Units.inchesToMeters(26), Units.inchesToMeters(27*6 + 124));
+        public static Translation2d StartingPointB = new Translation2d(Units.inchesToMeters(26), Units.inchesToMeters(27*6 + 72));
+        public static Translation2d StartingPointC = new Translation2d(Units.inchesToMeters(26), Units.inchesToMeters(27*6 + 0));
 
 
 

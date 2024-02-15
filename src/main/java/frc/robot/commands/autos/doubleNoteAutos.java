@@ -10,8 +10,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.UsefulPoints;
-import frc.robot.commands.Collect;
-import frc.robot.commands.Shoot;
 import frc.robot.subsystems.SwerveDrive;
 
 import java.util.ArrayList;
@@ -37,7 +35,7 @@ public class doubleNoteAutos {
         Rotation2d startRotation = new Rotation2d(0);
         //x = dist center of robot when robot is pushed against the wall.
 
-        Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPoint1, startRotation);
+        Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointA, startRotation);
         Translation2d endTranslation = UsefulPoints.Points.WingedNoteLeft;
         Rotation2d endRotation = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(endTranslation));
         Pose2d endPose = new Pose2d(endTranslation, endRotation);
@@ -45,6 +43,20 @@ public class doubleNoteAutos {
 //        midPose = new Translation2d(2,1);
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
 //        internalPoints1.add(midPose);
+        Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
+
+        return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand/*, new Collect(), new Shoot()*/);
+    }
+
+    public Command DoubleNoteAuto2(){//TODO: Fix coordinates, create actual shoot and collect commands
+
+        Rotation2d startRotation = new Rotation2d(0);
+        //x = dist center of robot when robot is pushed against the wall.
+        Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointB, startRotation);
+        Translation2d endTranslation = UsefulPoints.Points.WingedNoteMid;
+        Pose2d endPose = new Pose2d(endTranslation, startRotation);
+
+        ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
 
         return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand/*, new Collect(), new Shoot()*/);

@@ -127,9 +127,9 @@ public class SwerveDrive extends SubsystemBase {
 
     public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
         TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
-        PIDController xController = new PIDController(7.0,0,0.5);
-        PIDController yController = new PIDController(7.0,0,0.5);
-        var thetaController = new ProfiledPIDController(10.0,0,0.5,new TrapezoidProfile.Constraints(900,1800));
+        PIDController xController = new PIDController(1.0,0,0/*0.5 */);
+        PIDController yController = new PIDController(1.0,0,0/*0.5*/);
+        var thetaController = new ProfiledPIDController(1.0,0,0/*0.5*/,new TrapezoidProfile.Constraints(Math.PI*4,Math.PI*40));
         config.setEndVelocity(endVelocityMetersPerSecond);
         config.setStartVelocity(startVelocityMetersPerSecond);
         var trajectory = TrajectoryGenerator.generateTrajectory(
