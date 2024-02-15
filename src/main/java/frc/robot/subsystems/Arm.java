@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.*;
 import edu.wpi.first.math.controller.PIDController;
@@ -20,8 +21,8 @@ public class Arm extends SubsystemBase {
     private final CANSparkMax shoulderMotorLeft, shoulderMotorRight;
     private final CANSparkMax wristMotor;
 
-    private final CANcoder shoulderEncoder;
-    private final CANcoder wristEncoder;
+    private final CANCoder shoulderEncoder;
+    private final CANCoder wristEncoder;
 
     private final RelativeEncoder shoulderRelEncoder;
     private final RelativeEncoder wristRelEncoder;
@@ -57,8 +58,8 @@ public class Arm extends SubsystemBase {
 
         shoulderMotorRight.follow(shoulderMotorLeft, true);
 
-        shoulderEncoder = new CANcoder(shoulderEncoderID);
-        wristEncoder = new CANcoder(wristEncoderID);
+        shoulderEncoder = new CANCoder(shoulderEncoderID);
+        wristEncoder = new CANCoder(wristEncoderID);
 
         shoulderRelEncoder = shoulderMotorLeft.getEncoder();
         wristRelEncoder = wristMotor.getEncoder();
@@ -72,8 +73,8 @@ public class Arm extends SubsystemBase {
         wristRelController = new PIDController(kP, kI, kD);
         extremeShoulder = criticalShoulderAngle; extremeWrist = criticalWristAngle;
         interShoulder = criticalShoulderAngle; interWrist = criticalWristAngle;
-		setShoulderDesState(shoulderPosRel());
-		setWristDestState(wristPosRel());
+		setShoulderDesState(shoulderState().getDegrees());
+		setWristDestState(wristState().getDegrees());
     }
 
     public void periodic(){
@@ -128,12 +129,14 @@ public class Arm extends SubsystemBase {
     }
 
     public Command controlRobot2O(Rotation2d shoulderPos, Rotation2d wristPos){
-        if (boundChecker.inPointyPart2O(shoulderState(), wristState())){
+        if (boundChecker.inPointyPart2O(shoulderState(), wristState())
+        || boundChecker.inPointyPart2O(shoulderPos, wristPos)){
             return new SequentialCommandGroup(
                     new ArmPathFollow(this, interShoulder, interWrist, maxSpeed, maxAccel),
                     new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel)
             );
         }
+
         return new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel);
     }
 
@@ -143,11 +146,11 @@ public class Arm extends SubsystemBase {
 
 
     public Rotation2d shoulderState(){
-        return Rotation2d.fromDegrees(shoulderEncoder.getAbsolutePosition().getValueAsDouble());
+        return Rotation2d.fromDegrees(shoulderEncoder.getAbsolutePosition()+90);
     }
 
     public Rotation2d wristState(){
-        return Rotation2d.fromDegrees(wristEncoder.getAbsolutePosition().getValueAsDouble());
+        return Rotation2d.fromDegrees(wristEncoder.getAbsolutePosition());
     }
     public double shoulderPosRel(){
         return shoulderRelEncoder.getPosition();
@@ -158,11 +161,11 @@ public class Arm extends SubsystemBase {
 
     public void shoulderPowerController(double shoulderPow){
         shoulderPower(shoulderPow);
-        setShoulderDesState(shoulderPosRel());
+        setShoulderDesState(shoulderState().getDegrees());
     }
     public void wristPowerController(double wristPow){
         wristPower(wristPow);
-        setWristDestState(wristPosRel());
+        setWristDestState(wristState().getDegrees());
     }
     public void setShoulderDesState(double pos){
         currShoulder = pos;
@@ -182,8 +185,8 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("wristRelSetpt", wristRel);
         wristRelController.setSetpoint(wristRel);
         shoulderRelController.setSetpoint(shoulderRel);
-        wristPower(wristRelController.calculate(wristPosRel()));
-        shoulderPower(shoulderRelController.calculate(shoulderPosRel()));
+        wristPower(wristRelController.calculate(wristState().getDegrees()));
+        shoulderPower(shoulderRelController.calculate(shoulderState().getDegrees()));
     }
 
 

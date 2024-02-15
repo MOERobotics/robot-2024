@@ -88,8 +88,8 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
-            0, 0, 0, 0, 0, 0, 1.0e-2,1.0e-3,0,0, 0, new Rotation2d(0),
-            new Rotation2d(0), 0,0);
+            0, 0, 0, 0, 0, 0, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(120),
+            Rotation2d.fromDegrees(-90), 30,30);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -160,6 +160,8 @@ public class FortissiMOEContainer{
         new JoystickButton(driverJoystick, 4).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
         new JoystickButton(driverJoystick, 6).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.1)));
         new JoystickButton(driverJoystick, 7).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
+        new JoystickButton(driverJoystick, 8).onTrue(Commands.run(()->armSubsystem.controlRobot2O(Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(-30))));
+        new JoystickButton(driverJoystick, 9).onTrue(Commands.run(()->armSubsystem.controlRobot2O(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-90))));
     }
 
     public Command getAutonomousCommand() {
