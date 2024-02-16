@@ -80,15 +80,15 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public double getYaw(){
-        return MathUtil.inputModulus(pigeon.get(),-180,180);
+        return pigeon.get();
     }
 
     public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getYaw());
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(getYaw(),-180,180));
     }
 
     public Pose2d getPose() {
-        return new Pose2d(odometer.getPoseMeters().getTranslation(),Rotation2d.fromRadians(MathUtil.angleModulus(odometer.getPoseMeters().getRotation().getRadians())));
+        return odometer.getPoseMeters();
     }
 
     public void resetOdometry(Pose2d pose) {
@@ -130,6 +130,7 @@ public class SwerveDrive extends SubsystemBase {
         PIDController xController = new PIDController(1.0,0,0/*0.5 */);
         PIDController yController = new PIDController(1.0,0,0/*0.5*/);
         var thetaController = new ProfiledPIDController(1.0,0,0/*0.5*/,new TrapezoidProfile.Constraints(Math.PI*4,Math.PI*40));
+        thetaController.enableContinuousInput(-180,180);
         config.setEndVelocity(endVelocityMetersPerSecond);
         config.setStartVelocity(startVelocityMetersPerSecond);
         var trajectory = TrajectoryGenerator.generateTrajectory(

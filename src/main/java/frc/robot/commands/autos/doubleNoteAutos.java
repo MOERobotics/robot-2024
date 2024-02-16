@@ -32,7 +32,7 @@ public class doubleNoteAutos {
 
     public Command DoubleNoteAuto1(){//TODO: Fix coordinates, create actual shoot and collect commands
 
-        Rotation2d startRotation = new Rotation2d(0);
+        Rotation2d startRotation = new Rotation2d(180);
         //x = dist center of robot when robot is pushed against the wall.
 
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointA, startRotation);
@@ -50,7 +50,7 @@ public class doubleNoteAutos {
 
     public Command DoubleNoteAuto2(){//TODO: Create actual shoot and collect commands
 
-        Rotation2d startRotation = new Rotation2d(0);
+        Rotation2d startRotation = Rotation2d.fromDegrees(180);
         //x = dist center of robot when robot is pushed against the wall.
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointB, startRotation);
         Translation2d endTranslation = UsefulPoints.Points.WingedNote2;
@@ -59,7 +59,7 @@ public class doubleNoteAutos {
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
 
-        return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand/*, new Collect(), new Shoot()*/);
+        return Commands.sequence(swerveDrive.setInitPosition(startPose)/*, new Shoot()*/, trajCommand/*, new Collect(), new Shoot()*/);
     }
     public Command FCenterAuto(){//TODO: Create actual shoot and collect commands
         Rotation2d startRotation = new Rotation2d(0);
