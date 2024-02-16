@@ -98,7 +98,7 @@ public class SwerveDrive extends SubsystemBase {
     public double getAngleBetweenSpeaker(Translation2d pos) {
         Translation2d speaker = AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker);
         Translation2d diff = pos.minus(speaker);
-        return (MathUtil.angleModulus(Math.atan2(diff.getY(),diff.getX())+Math.PI));
+        return (MathUtil.angleModulus((Math.atan2(diff.getY(),diff.getX())+Math.PI) + Math.PI));
     }
 
     @Override

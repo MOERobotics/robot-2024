@@ -48,7 +48,7 @@ public class SwerveBotContainer {
     double driveFF = 1.76182e-4;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
-    double maxMPS = 60/39.3701;
+    double maxMPS = 100/39.3701;
     double maxMPSSquared = 60;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
@@ -148,7 +148,7 @@ public class SwerveBotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new doubleNoteAutos(swerveSubsystem, 0, 0).FCenterAuto();
+        return new doubleNoteAutos(swerveSubsystem, 0, 0).DoubleNoteAuto2();
        // return Autos.exampleAuto(m_drive);
     }
 }
