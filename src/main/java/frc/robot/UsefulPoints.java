@@ -40,7 +40,7 @@ public final class UsefulPoints {
         public static Translation2d CenterStage = new Translation2d(Units.inchesToMeters(193.6),Units.inchesToMeters(161.6));
         public static Translation2d OutOfStage = new Translation2d(Units.inchesToMeters(258.6),Units.inchesToMeters(161.6));
 
-        public Translation2d DetourPoint = new Translation2d(Units.inchesToMeters(233.6), Units.inchesToMeters(44.6));
+        public static Translation2d DetourPoint = new Translation2d(Units.inchesToMeters(233.6), Units.inchesToMeters(44.6));
 
 
 

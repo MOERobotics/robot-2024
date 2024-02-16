@@ -48,7 +48,7 @@ public class doubleNoteAutos {
         return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand/*, new Collect(), new Shoot()*/);
     }
 
-    public Command DoubleNoteAuto2(){//TODO: Fix coordinates, create actual shoot and collect commands
+    public Command DoubleNoteAuto2(){//TODO: Create actual shoot and collect commands
 
         Rotation2d startRotation = new Rotation2d(0);
         //x = dist center of robot when robot is pushed against the wall.
@@ -61,5 +61,24 @@ public class doubleNoteAutos {
 
         return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand/*, new Collect(), new Shoot()*/);
     }
+    public Command FCenterAuto(){//TODO: Create actual shoot and collect commands
+        Rotation2d startRotation = new Rotation2d(0);
+        Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointF, startRotation);
+        Translation2d endTranslation = UsefulPoints.Points.CenterNote5;
+        Pose2d endPose = new Pose2d(endTranslation, startRotation);
+        ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
+        internalPoints.add(UsefulPoints.Points.DetourPoint);
+        Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
+
+        Pose2d startPose2 = new Pose2d(UsefulPoints.Points.CenterNote5,startRotation);
+        Rotation2d endRotation2 = new Rotation2d().fromDegrees(120);
+        Pose2d endPose2 = new Pose2d(UsefulPoints.Points.StartingPointD,endRotation2);
+        ArrayList<Translation2d> internalPoints2 = new ArrayList<Translation2d>();
+        internalPoints2.add(UsefulPoints.Points.DetourPoint);
+        Command trajCommand2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints2, 0, 0);
+
+        return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand,trajCommand2/*, new Collect(), new Shoot()*/);
+    }
+
 
 }
