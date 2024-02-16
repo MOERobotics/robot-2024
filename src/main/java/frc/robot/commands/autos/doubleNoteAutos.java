@@ -36,7 +36,7 @@ public class doubleNoteAutos {
         //x = dist center of robot when robot is pushed against the wall.
 
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointA, startRotation);
-        Translation2d endTranslation = UsefulPoints.Points.WingedNoteLeft;
+        Translation2d endTranslation = UsefulPoints.Points.WingedNote1;
         Rotation2d endRotation = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(endTranslation));
         Pose2d endPose = new Pose2d(endTranslation, endRotation);
 
@@ -53,7 +53,7 @@ public class doubleNoteAutos {
         Rotation2d startRotation = new Rotation2d(0);
         //x = dist center of robot when robot is pushed against the wall.
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointB, startRotation);
-        Translation2d endTranslation = UsefulPoints.Points.WingedNoteMid;
+        Translation2d endTranslation = UsefulPoints.Points.WingedNote2;
         Pose2d endPose = new Pose2d(endTranslation, startRotation);
 
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
