@@ -23,6 +23,8 @@ public class SwerveDrive extends SubsystemBase {
     private final double maxMetersPerSec;
     SwerveDriveKinematics kDriveKinematics;
     double desiredYaw;
+    boolean align = false;
+
     private final PIDController drivePID;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
                        Supplier<Double> pigeon, double maxMetersPerSec, double kP, double kI, double kD) {
@@ -41,7 +43,7 @@ public class SwerveDrive extends SubsystemBase {
         kDriveKinematics = new SwerveDriveKinematics(FRModule.moduleTranslation(), FLModule.moduleTranslation(),
                 BRModule.moduleTranslation(), BLModule.moduleTranslation());
         odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0), getModulePositions());
-
+        align = false;
     }
 
     public double getDesiredYaw(){
@@ -50,6 +52,10 @@ public class SwerveDrive extends SubsystemBase {
 
     public void setDesiredYaw(double yaw){
         desiredYaw = yaw;
+        headingCorrect(true);
+    }
+    public void headingCorrect(boolean correct){
+        align = correct;
     }
 
     public double getYaw(){
@@ -74,6 +80,9 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboard.putNumber("yaw", pigeon.get());
         SmartDashboard.putNumber("desired yaw", getDesiredYaw());
         odometer.update(getRotation2d(), getModulePositions());
+        SmartDashboard.putNumber("Posex",getPose().getX());
+        SmartDashboard.putNumber("Posey",getPose().getY());
+        SmartDashboard.putNumber("Rotation",getPose().getRotation().getDegrees());
     }
 
     public void stopModules() {
@@ -94,6 +103,9 @@ public class SwerveDrive extends SubsystemBase {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxMetersPerSec);
         SmartDashboard.putString("FL state", desiredStates[0].toString());
+        SmartDashboard.putString("FR state", desiredStates[1].toString());
+        SmartDashboard.putString("BL state", desiredStates[2].toString());
+        SmartDashboard.putString("BR state", desiredStates[3].toString());
         FRModule.setDesiredState(desiredStates[0]);
         FLModule.setDesiredState(desiredStates[1]);
         BRModule.setDesiredState(desiredStates[2]);
@@ -101,10 +113,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented){
-        if (turnspd != 0){
-            desiredYaw = pigeon.get();
-        }
-        else{
+        if (align){
             turnspd = drivePID.calculate(pigeon.get(), desiredYaw);
         }
         ChassisSpeeds chassisSpeeds;
@@ -118,6 +127,7 @@ public class SwerveDrive extends SubsystemBase {
         SwerveModuleState[] moduleStates = kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
 
         SmartDashboard.putString("module states", Arrays.toString(moduleStates));
+
 
         setModuleStates(moduleStates);
     }
