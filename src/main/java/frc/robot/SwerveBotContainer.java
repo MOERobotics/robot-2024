@@ -49,7 +49,7 @@ public class SwerveBotContainer {
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
     double maxMPS = 100/39.3701;
-    double maxMPSSquared = 60;
+    double maxMPSSquared = 5;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
             19,

@@ -63,7 +63,7 @@ public class doubleNoteAutos {
 //        internalPoints1.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
 
-        return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand/*, new Collect(), new Shoot()*/);
+        return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand, Commands.runOnce(()->swerveDrive.stopModules())/*, new Collect(), new Shoot()*/);
     }
 
     public Command DoubleNoteAuto3(){//TODO: Fix coordinates, create actual shoot and collect commands
