@@ -18,9 +18,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.autos.doubleNoteAutos;
+import frc.robot.commands.autos.tripleNoteAutos;
 import frc.robot.commands.setHeading;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
+
+import java.util.ArrayList;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -148,9 +151,11 @@ public class SwerveBotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new doubleNoteAutos(swerveSubsystem, 0, 0).DoubleNoteAuto2();
+        //return new doubleNoteAutos(swerveSubsystem, 0, 0).DoubleNoteAuto2();
+        return new tripleNoteAutos(swerveSubsystem, 0,0).AW1W2();
        // return Autos.exampleAuto(m_drive);
     }
+
 }
 
 
