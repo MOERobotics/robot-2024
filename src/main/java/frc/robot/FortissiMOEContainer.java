@@ -39,46 +39,46 @@ public class FortissiMOEContainer{
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
     double maxRPS = Math.PI*2;
-    private final SwerveModule backLeftModule = new SwerveModule(
+    private final SwerveModule frontRightModule = new SwerveModule(
             3,
             2,
             33,
             false,
             true,
-            135,
+            -45,
             new Translation2d(-width, length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule backRightModule = new SwerveModule(
+    private final SwerveModule frontLeftModule = new SwerveModule(
             17,
             16,
             34,
             false,
             true,
-            -135,
+            45,
             new Translation2d(-width, -length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule frontLeftModule = new SwerveModule(
+    private final SwerveModule backRightModule = new SwerveModule(
             1,
             20,
             32,
             false,
             true,
-            45,
+            -135,
             new Translation2d(width, length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule frontRightModule = new SwerveModule(
+    private final SwerveModule backLeftModule = new SwerveModule(
             19,
             18,
             31,
             false,
             true,
-            -45,
+            135,
             new Translation2d(width, -length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
@@ -118,13 +118,16 @@ public class FortissiMOEContainer{
     );
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
-    Command collectorCommand = collectorSubsystem.runCollectorCommandsForTeleop(
+    Command collectorCommand = new CollectorControllerCommand(
             0.75/2,
             ()->functionJoystick.getRawButton(1),
             ()->functionJoystick.getRawButton(2),
-            ()->functionJoystick.getRawButton(3)
+            ()->functionJoystick.getRawButton(3),
+            collectorSubsystem
     );
-    Command shooterControl = new ShooterControllerCommand(shooterSubsystem, 5000,5000,
+    ////////////////////////////////////////////////////////////////////////////commands end
+
+    Command shooterControl = new ShooterControllerCommand(shooterSubsystem, 6000,6000,
             ()->functionJoystick.getRawButtonPressed(4));
     ////////////////////////////////////////////////////////////////////////////commands end
 
@@ -142,9 +145,7 @@ public class FortissiMOEContainer{
 //        var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
 
 
-        swerveSubsystem.setDefaultCommand(
-                Commands.parallel(drive,collectorCommand)
-        );
+        collectorSubsystem.setDefaultCommand(collectorCommand);
 
         shooterSubsystem.setDefaultCommand(shooterControl);
 	    // Configure the trigger bindings
