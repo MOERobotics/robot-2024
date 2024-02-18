@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -51,6 +53,9 @@ public class SwerveBotContainer {
     double maxMPS = 100/39.3701;
     double maxMPSSquared = 5;
     double maxRPS = Math.PI*2;
+    private final SendableChooser<Command> m_chooser = new SendableChooser<>();
+
+
     private final SwerveModule backLeftModule = new SwerveModule(
             19,
             18,
@@ -123,6 +128,14 @@ public class SwerveBotContainer {
 
         pigeon.reset();
         swerveSubsystem.setDefaultCommand(drive);
+        m_chooser.setDefaultOption("Double Note Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto1());
+        m_chooser.addOption("Double Note Auto 2", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto2());
+        m_chooser.addOption("Double Note Auto 3", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto3());
+        m_chooser.addOption("Double Note Auto 4", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto4());
+        m_chooser.addOption("Center Line Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).CenterLineAuto1());
+        m_chooser.addOption("FCenter Auto", new doubleNoteAutos(swerveSubsystem,0,0).FCenterAuto());
+        SmartDashboard.putData(m_chooser);
+
         // Configure the trigger bindings
         configureBindings();
         var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
@@ -148,7 +161,7 @@ public class SwerveBotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new doubleNoteAutos(swerveSubsystem, 0, 0).DoubleNoteAuto2();
+        return m_chooser.getSelected();
        // return Autos.exampleAuto(m_drive);
     }
 }
