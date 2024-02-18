@@ -83,6 +83,8 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("wristValue", wristState().getDegrees());
         SmartDashboard.putNumber("shoulderRel", shoulderPosRel());
         SmartDashboard.putNumber("wristRel", wristPosRel());
+        SmartDashboard.putNumber("desiredShould", getShoulderDesState());
+        SmartDashboard.putNumber("desiredWrist", getWristDesState());
     }
 
     public void pathFollow(Rotation2d shoulder, Rotation2d wrist){
