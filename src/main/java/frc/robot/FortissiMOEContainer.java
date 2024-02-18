@@ -89,13 +89,13 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
             0, 0, 0, 0, 0, 0, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(120),
-            Rotation2d.fromDegrees(-90), 30,30);
+            Rotation2d.fromDegrees(-70), 30,30);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(5,
-            13,0, 0,0,driveFF);
+            13,1.0e-2, 0,0,driveFF);
     private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem(6,
             0.01,0,0,0,7);
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
@@ -119,12 +119,12 @@ public class FortissiMOEContainer{
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
     Command collectorCommand = collectorSubsystem.runCollectorCommandsForTeleop(
-            0.75,
+            0.75/2,
             ()->functionJoystick.getRawButton(1),
             ()->functionJoystick.getRawButton(2),
             ()->functionJoystick.getRawButton(3)
     );
-    Command shooterControl = new ShooterControllerCommand(shooterSubsystem, .8,.8,
+    Command shooterControl = new ShooterControllerCommand(shooterSubsystem, 5000,5000,
             ()->functionJoystick.getRawButtonPressed(4));
     ////////////////////////////////////////////////////////////////////////////commands end
 
@@ -135,6 +135,7 @@ public class FortissiMOEContainer{
         //collectorSubsystem.setDefaultCommand(collectorCommand);
         armSubsystem.setDefaultCommand(Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(),
                 armSubsystem.getWristDesState()), armSubsystem));
+        //armSubsystem.setDefaultCommand(Commands.run(()->armSubsystem.stopMotors(), armSubsystem));
         // Configure the trigger bindings
         configureBindings();
 //        var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
@@ -160,8 +161,8 @@ public class FortissiMOEContainer{
         new JoystickButton(driverJoystick, 4).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
         new JoystickButton(driverJoystick, 6).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.1)));
         new JoystickButton(driverJoystick, 7).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
-        new JoystickButton(driverJoystick, 8).onTrue(Commands.run(()->armSubsystem.controlRobot2O(Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(-30))));
-        new JoystickButton(driverJoystick, 9).onTrue(Commands.run(()->armSubsystem.controlRobot2O(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-90))));
+        new JoystickButton(driverJoystick, 8).onTrue(Commands.run(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(95), Rotation2d.fromDegrees(-35))));
+        new JoystickButton(driverJoystick, 9).onTrue(Commands.run(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-90))));
     }
 
     public Command getAutonomousCommand() {

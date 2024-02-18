@@ -52,9 +52,9 @@ public class Arm extends SubsystemBase {
         shoulderMotorLeft.setIdleMode(CANSparkBase.IdleMode.kBrake);
         wristMotor.setIdleMode(CANSparkBase.IdleMode.kBrake);
 
-        shoulderMotorLeft.setInverted(false);
-        shoulderMotorRight.setInverted(true);
-        wristMotor.setInverted(false);
+        shoulderMotorLeft.setInverted(true);
+        shoulderMotorRight.setInverted(false);
+        wristMotor.setInverted(true);
 
         shoulderMotorRight.follow(shoulderMotorLeft, true);
 
@@ -189,6 +189,8 @@ public class Arm extends SubsystemBase {
         shoulderRelController.setSetpoint(shoulderRel);
         wristPower(wristRelController.calculate(wristState().getDegrees()));
         shoulderPower(shoulderRelController.calculate(shoulderState().getDegrees()));
+        //wristPower(0);
+        //shoulderPower(0);
     }
 
 
