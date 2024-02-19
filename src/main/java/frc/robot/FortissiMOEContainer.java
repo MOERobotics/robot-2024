@@ -11,6 +11,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.CollectorControllerCommand;
 import frc.robot.commands.ShooterControllerCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.SwerveController;
@@ -37,7 +38,7 @@ public class FortissiMOEContainer{
     double driveFF = 1.76182e-4;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
-    double maxMPS = 174/39.3701;
+    double maxMPS = 169/39.3701;
     double maxRPS = Math.PI*2;
     private final SwerveModule frontRightModule = new SwerveModule(
             3,
@@ -112,9 +113,9 @@ public class FortissiMOEContainer{
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
-            () -> -driverJoystick.getRawAxis(2),
+            () -> driverJoystick.getRawAxis(2),
             () -> driverJoystick.getRawButton(5),
-            () -> driverJoystick.getRawButton(3), 6,6, maxMPS, maxRPS
+            () -> driverJoystick.getRawButton(3), 2,2, maxMPS, maxRPS
     );
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
@@ -127,14 +128,14 @@ public class FortissiMOEContainer{
     );
     ////////////////////////////////////////////////////////////////////////////commands end
 
-    Command shooterControl = new ShooterControllerCommand(shooterSubsystem, 6000,6000,
+    Command shooterControl = new ShooterControllerCommand(shooterSubsystem, 5000,5000,
             ()->functionJoystick.getRawButtonPressed(4));
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
 
     public FortissiMOEContainer() {
-        //swerveSubsystem.setDefaultCommand(drive);
+        swerveSubsystem.setDefaultCommand(drive);
         //collectorSubsystem.setDefaultCommand(collectorCommand);
         armSubsystem.setDefaultCommand(Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(),
                 armSubsystem.getWristDesState()), armSubsystem));
@@ -163,7 +164,7 @@ public class FortissiMOEContainer{
         new JoystickButton(driverJoystick, 6).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.1)));
         new JoystickButton(driverJoystick, 7).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
         new JoystickButton(driverJoystick, 8).onTrue(Commands.run(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(95), Rotation2d.fromDegrees(-35))));
-        new JoystickButton(driverJoystick, 9).onTrue(Commands.run(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-90))));
+       // new JoystickButton(driverJoystick, 9).onTrue(Commands.run(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(100), Rotation2d.fromDegrees(-30))));
     }
 
     public Command getAutonomousCommand() {

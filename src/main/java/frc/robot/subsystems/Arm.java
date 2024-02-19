@@ -11,6 +11,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.ArmPathFollow;
@@ -111,23 +112,23 @@ public class Arm extends SubsystemBase {
     }
 
     public Command goToPoint(Rotation2d shoulderPos, Rotation2d wristPos) {
-
+        SmartDashboard.putNumber("movingToPoint", shoulderPos.getDegrees());
         Rotation2d safeShoulder, safeWrist;
         if (wristState().getDegrees() < extremeWrist.getDegrees() && wristPos.getDegrees() < extremeWrist.getDegrees() ||
         wristState().getDegrees() > extremeWrist.getDegrees() && wristPos.getDegrees() < extremeWrist.getDegrees()){
-            return new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel);
+            return Commands.run(()->new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel));
         }
-        safeShoulder = Rotation2d.fromDegrees((wristPos.getDegrees()-wristState().getDegrees())/
+        Rotation2d shoul = Rotation2d.fromDegrees((wristPos.getDegrees()-wristState().getDegrees())/
                 (extremeWrist.getDegrees()-wristPos.getDegrees())
                 *(extremeShoulder.getDegrees()-shoulderPos.getDegrees()));
-        if (safeShoulder.getDegrees() >= extremeShoulder.getDegrees()){
-            return new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel);
+        if (shoul.getDegrees() >= extremeShoulder.getDegrees()){
+            return Commands.run(()->new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel));
         }
         safeShoulder = extremeShoulder; safeWrist = extremeWrist;
-        return new SequentialCommandGroup(
+        return Commands.run(()->  new SequentialCommandGroup(
                 new ArmPathFollow(this, safeShoulder, safeWrist, maxSpeed, maxAccel),
                 new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel)
-        );
+        ));
     }
 
     public Command controlRobot2O(Rotation2d shoulderPos, Rotation2d wristPos){
