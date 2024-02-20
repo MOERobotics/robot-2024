@@ -96,7 +96,7 @@ public class FortissiMOEContainer{
 
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(5,
-            13,1.0e-2, 0,0,driveFF);
+            13,0, 0,0,driveFF);
     private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem(6,
             0.01,0,0,0,7);
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
@@ -159,12 +159,18 @@ public class FortissiMOEContainer{
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
-        new JoystickButton(driverJoystick, 2).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.1)));
-        new JoystickButton(driverJoystick, 4).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
-        new JoystickButton(driverJoystick, 6).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.1)));
-        new JoystickButton(driverJoystick, 7).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
-        new JoystickButton(driverJoystick, 8).onTrue(Commands.run(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(95), Rotation2d.fromDegrees(-35))));
-       // new JoystickButton(driverJoystick, 9).onTrue(Commands.run(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(100), Rotation2d.fromDegrees(-30))));
+        new JoystickButton(functionJoystick, 5).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.1)));
+        new JoystickButton(functionJoystick, 7).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
+        new JoystickButton(functionJoystick, 6).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.1)));
+        new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
+        new JoystickButton(driverJoystick, 8).onTrue(Commands.run(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(87), Rotation2d.fromDegrees(-45)))
+                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(5) ||
+                        functionJoystick.getRawButtonPressed(6) || functionJoystick.getRawButton(8) ||
+                        driverJoystick.getRawButton(9))));
+        new JoystickButton(driverJoystick, 9).onTrue(Commands.run(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(105), Rotation2d.fromDegrees(-25)))
+                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(5) ||
+                        functionJoystick.getRawButtonPressed(6) || functionJoystick.getRawButton(8) ||
+                        driverJoystick.getRawButton(8))));
     }
 
     public Command getAutonomousCommand() {

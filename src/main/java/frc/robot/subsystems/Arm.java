@@ -112,19 +112,24 @@ public class Arm extends SubsystemBase {
     }
 
     public Command goToPoint(Rotation2d shoulderPos, Rotation2d wristPos) {
+        setWristDestState(wristPos.getDegrees());
+        setShoulderDesState(shoulderPos.getDegrees());
         SmartDashboard.putNumber("movingToPoint", shoulderPos.getDegrees());
         Rotation2d safeShoulder, safeWrist;
         if (wristState().getDegrees() < extremeWrist.getDegrees() && wristPos.getDegrees() < extremeWrist.getDegrees() ||
         wristState().getDegrees() > extremeWrist.getDegrees() && wristPos.getDegrees() < extremeWrist.getDegrees()){
+            SmartDashboard.putBoolean("inside convex region 1", true);
             return Commands.run(()->new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel));
         }
         Rotation2d shoul = Rotation2d.fromDegrees((wristPos.getDegrees()-wristState().getDegrees())/
                 (extremeWrist.getDegrees()-wristPos.getDegrees())
                 *(extremeShoulder.getDegrees()-shoulderPos.getDegrees()));
         if (shoul.getDegrees() >= extremeShoulder.getDegrees()){
+            SmartDashboard.putBoolean("inside convex region 2", true);
             return Commands.run(()->new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel));
         }
         safeShoulder = extremeShoulder; safeWrist = extremeWrist;
+        SmartDashboard.putBoolean("transition spot", true);
         return Commands.run(()->  new SequentialCommandGroup(
                 new ArmPathFollow(this, safeShoulder, safeWrist, maxSpeed, maxAccel),
                 new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel)

@@ -52,6 +52,6 @@ public class ArmPathFollow extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return startPoint.getDistance(desiredPoint) <= .2;
+        return startPoint.getDistance(desiredPoint) <= 1;
     }
 }
