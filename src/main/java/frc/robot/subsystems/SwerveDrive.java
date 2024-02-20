@@ -3,7 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -33,7 +35,7 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModule BLModule;
     SwerveModule FRModule;
     SwerveModule BRModule;
-    Supplier<Double> pigeon;
+    WPI_Pigeon2 pigeon;
     private final SwerveDriveOdometry odometer;
     private final double maxMetersPerSec;
     private final double maxMetersPerSecSquared;
@@ -43,7 +45,7 @@ public class SwerveDrive extends SubsystemBase {
 
     private final PIDController drivePID;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
-                       Supplier<Double> pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD) {
+                       WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD) {
 
         this.pigeon = pigeon;
         this.maxMetersPerSec = maxMetersPerSec;
@@ -69,6 +71,8 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public Command setInitPosition(Pose2d initPose){
+		setPigeon(initPose.getRotation().getDegrees());
+		odometer.update(getRotation2d(),getModulePositions());
         return Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose)));
     }
     public void setDesiredYaw(double yaw){
@@ -80,8 +84,12 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public double getYaw(){
-        return pigeon.get();
+        return pigeon.getYaw();
     }
+
+	public void setPigeon(double Yaw){
+		pigeon.setYaw(Yaw);
+	}
 
     public Rotation2d getRotation2d() {
         return Rotation2d.fromDegrees(MathUtil.inputModulus(getYaw(),-180,180));
@@ -105,7 +113,6 @@ public class SwerveDrive extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("yaw", getYaw());
-        SmartDashboard.putNumber("odometer yaw", getPose().getRotation().getDegrees());
         SmartDashboard.putNumber("desired yaw", getDesiredYaw());
         odometer.update(getRotation2d(), getModulePositions());
         SmartDashboard.putNumber("Posex",getPose().getX());
@@ -175,7 +182,7 @@ public class SwerveDrive extends SubsystemBase {
 
     public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented){
         if (align){
-            turnspd = drivePID.calculate(pigeon.get(), desiredYaw);
+            turnspd = drivePID.calculate(pigeon.getYaw(), desiredYaw);
         }
         ChassisSpeeds chassisSpeeds;
         if (fieldOriented){
