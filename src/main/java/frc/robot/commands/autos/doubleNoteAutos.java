@@ -45,7 +45,12 @@ public class doubleNoteAutos {
 //        internalPoints1.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
 
-        return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand/*, new Collect(), new Shoot()*/);
+        return Commands.sequence(
+				swerveDrive.setInitPosition(startPose),
+		        //shoot
+		        trajCommand
+		        //collect and shoot
+        );
     }
 
     public Command DoubleNoteAuto2(){//TODO: Fix coordinates, create actual shoot and collect commands
@@ -63,7 +68,12 @@ public class doubleNoteAutos {
 //        internalPoints1.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
 
-        return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand, Commands.runOnce(()->swerveDrive.stopModules())/*, new Collect(), new Shoot()*/);
+        return Commands.sequence(
+				swerveDrive.setInitPosition(startPose),
+		        //shoot
+		        trajCommand
+		        //collect and shoot
+        );
     }
 
     public Command DoubleNoteAuto3(){//TODO: Fix coordinates, create actual shoot and collect commands
@@ -99,7 +109,12 @@ public class doubleNoteAutos {
 //        internalPoints1.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
 
-        return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand/*, new Collect(), new Shoot()*/);
+        return Commands.sequence(
+				swerveDrive.setInitPosition(startPose),
+		        //shoot
+		        trajCommand
+	            //collect and shoot
+        );
     }
 
     public Command CenterLineAuto1(){//TODO: Fix coordinates, create actual shoot and collect commands
@@ -126,7 +141,13 @@ public class doubleNoteAutos {
         Command trajCommand1 = swerveDrive.generateTrajectory(startPose1,endPose1,internalPoints1, 0, 0);
         Command trajCommand2 = swerveDrive.generateTrajectory(startPose2, endPose2, internalPoints2, 0, 0);
 
-        return Commands.sequence(swerveDrive.setInitPosition(startPose1), /*new Shoot(),*/ trajCommand1, trajCommand2/*, new Collect(), new Shoot()*/);
+        return Commands.sequence(
+				swerveDrive.setInitPosition(startPose1),
+		        //new Shoot(),
+		        //trajCommand1,
+		        //trajCommand2,
+		        //collect and shoot
+		);
     }
 
     public Command FCenterAuto(){//TODO: Create actual shoot and collect commands
@@ -136,7 +157,7 @@ public class doubleNoteAutos {
         Pose2d endPose = new Pose2d(endTranslation, startRotation);
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
         internalPoints.add(UsefulPoints.Points.DetourPoint);
-        Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
+        Command trajCommand1 = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
 
         Pose2d startPose2 = new Pose2d(UsefulPoints.Points.CenterNote5,startRotation);
         Rotation2d endRotation2 = new Rotation2d().fromDegrees(120);
@@ -145,8 +166,12 @@ public class doubleNoteAutos {
         internalPoints2.add(UsefulPoints.Points.DetourPoint);
         Command trajCommand2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints2, 0, 0);
 
-        return Commands.sequence(swerveDrive.setInitPosition(startPose), /*new Shoot(),*/ trajCommand,trajCommand2/*, new Collect(), new Shoot()*/);
+        return Commands.sequence(
+				swerveDrive.setInitPosition(startPose),
+		        /*new Shoot(),*/
+		        trajCommand1,
+		        trajCommand2
+				//collect and shoot
+        );
     }
-
-
 }

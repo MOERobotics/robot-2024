@@ -51,7 +51,10 @@ public class tripleNoteAutos {
         Command traj1 = swerveDrive.generateTrajectory(startPose1,endPose1,internalPoints,0,0);
         Command traj2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints,0,0);
 
-        return Commands.sequence(swerveDrive.setInitPosition(startPose1),traj1, traj2);
+        return Commands.sequence(
+				swerveDrive.setInitPosition(startPose1),
+		        traj1,
+		        traj2);
     }
 
     public Command EW3W2(){
@@ -71,7 +74,10 @@ public class tripleNoteAutos {
         Command traj1 = swerveDrive.generateTrajectory(startPose1,endPose1,internalPoints,0,0);
         Command traj2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints,0,0);
 
-        return Commands.sequence(traj1, traj2);
+        return Commands.sequence(
+		        swerveDrive.setInitPosition(startPose1),
+				traj1,
+		        traj2);
     }
 
     public Command BW1W2(){ //0 red collector; shoot blue
@@ -130,6 +136,7 @@ public class tripleNoteAutos {
         Command traj2 = swerveDrive.generateTrajectory(startPose2, endPose2, internalPoints,0,0);
 
         return Commands.sequence(
+		        swerveDrive.setInitPosition(startPose1),
                 //shoot
                 traj1,
                 //collect and shoot
@@ -137,7 +144,4 @@ public class tripleNoteAutos {
                 //collect and shoot
         );
     }
-
-
-
 }
