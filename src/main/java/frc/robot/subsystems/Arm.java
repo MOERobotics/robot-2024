@@ -33,7 +33,7 @@ public class Arm extends SubsystemBase {
 
     private final PIDController shoulderRelController, wristRelController;
 
-    private Rotation2d extremeShoulder, extremeWrist, interShoulder, interWrist;
+    private Rotation2d interShoulder, interWrist;
     private double currShoulder, currWrist;
     private double maxSpeed, maxAccel, shoulderLength, wristLength;
 
@@ -72,7 +72,6 @@ public class Arm extends SubsystemBase {
         wristController = new PIDController(kPWrist, kIWrist, kDWrist);
         shoulderRelController = new PIDController(kP, kI, kD);
         wristRelController = new PIDController(kP, kI, kD);
-        extremeShoulder = criticalShoulderAngle; extremeWrist = criticalWristAngle;
         interShoulder = criticalShoulderAngle; interWrist = criticalWristAngle;
 		setShoulderDesState(shoulderState().getDegrees());
 		setWristDestState(wristState().getDegrees());
@@ -116,19 +115,12 @@ public class Arm extends SubsystemBase {
         setShoulderDesState(shoulderPos.getDegrees());
         SmartDashboard.putNumber("movingToPoint", shoulderPos.getDegrees());
         Rotation2d safeShoulder, safeWrist;
-        if (wristState().getDegrees() < extremeWrist.getDegrees() && wristPos.getDegrees() < extremeWrist.getDegrees() ||
-        wristState().getDegrees() > extremeWrist.getDegrees() && wristPos.getDegrees() < extremeWrist.getDegrees()){
-            SmartDashboard.putBoolean("inside convex region 1", true);
-            return Commands.run(()->new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel));
+        if ((shoulderState().getDegrees() < interShoulder.getDegrees() && shoulderPos.getDegrees() < interShoulder.getDegrees()) ||
+                (shoulderState().getDegrees() > interShoulder.getDegrees() && shoulderPos.getDegrees() > interShoulder.getDegrees())) {
+            SmartDashboard.putBoolean("inside convex region 1 or 2", true);
+            return Commands.run(() -> new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel));
         }
-        Rotation2d shoul = Rotation2d.fromDegrees((wristPos.getDegrees()-wristState().getDegrees())/
-                (extremeWrist.getDegrees()-wristPos.getDegrees())
-                *(extremeShoulder.getDegrees()-shoulderPos.getDegrees()));
-        if (shoul.getDegrees() >= extremeShoulder.getDegrees()){
-            SmartDashboard.putBoolean("inside convex region 2", true);
-            return Commands.run(()->new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel));
-        }
-        safeShoulder = extremeShoulder; safeWrist = extremeWrist;
+        safeShoulder = interShoulder; safeWrist = interWrist;
         SmartDashboard.putBoolean("transition spot", true);
         return Commands.run(()->  new SequentialCommandGroup(
                 new ArmPathFollow(this, safeShoulder, safeWrist, maxSpeed, maxAccel),
