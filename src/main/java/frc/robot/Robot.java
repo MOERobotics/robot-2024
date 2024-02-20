@@ -4,17 +4,11 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.pathfinding.Pathfinding;
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.pathplanner.lib.pathfinding.LocalADStar;
-
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -58,7 +52,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    CommandScheduler.getInstance().run();
+      CommandScheduler.getInstance().run();
   }
 
   @Override
@@ -89,20 +83,20 @@ public class Robot extends TimedRobot {
     }
   }
 
-  @Override
-  public void teleopPeriodic() {}
+	@Override
+	public void teleopPeriodic() {}
 
-  @Override
-  public void testInit() {
-    CommandScheduler.getInstance().cancelAll();
-  }
+	@Override
+	public void testInit() {
+		CommandScheduler.getInstance().cancelAll();
+	}
 
-  @Override
-  public void testPeriodic() {}
+	@Override
+	public void testPeriodic() {}
 
-  @Override
-  public void simulationInit() {}
+	@Override
+	public void simulationInit() {}
 
-  @Override
-  public void simulationPeriodic() {}
+	@Override
+	public void simulationPeriodic() {}
 }
