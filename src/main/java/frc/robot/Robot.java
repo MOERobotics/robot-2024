@@ -29,7 +29,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-      CommandScheduler.getInstance().run();
+    SmartDashboard.putData("running command", CommandScheduler.getInstance());
+    CommandScheduler.getInstance().run();
   }
 
   @Override
@@ -60,20 +61,20 @@ public class Robot extends TimedRobot {
     }
   }
 
-	@Override
-	public void teleopPeriodic() {}
+  @Override
+  public void teleopPeriodic() {}
 
-	@Override
-	public void testInit() {
-		CommandScheduler.getInstance().cancelAll();
-	}
+  @Override
+  public void testInit() {
+    CommandScheduler.getInstance().cancelAll();
+  }
 
-	@Override
-	public void testPeriodic() {}
+  @Override
+  public void testPeriodic() {}
 
-	@Override
-	public void simulationInit() {}
+  @Override
+  public void simulationInit() {}
 
-	@Override
-	public void simulationPeriodic() {}
+  @Override
+  public void simulationPeriodic() {}
 }
