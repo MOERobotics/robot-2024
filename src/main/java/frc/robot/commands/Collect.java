@@ -5,14 +5,20 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CollectorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class Collect extends Command {
-    public Collect(){
-
+    private final double speed;
+    private boolean index;
+    private CollectorSubsystem collector;
+    public Collect(CollectorSubsystem collector, double speed, boolean index){
+        this.collector=collector;
+        this.speed=speed;
+        this.index=index;
     }
 
 
@@ -24,16 +30,32 @@ public class Collect extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        double finalSpeed = 0;
+        if(speed<0){
+            finalSpeed=speed;
+        }
+        if (speed>0 && ((index&&collector.isCollected())||!collector.isCollected())) { //collector in no note
+            finalSpeed = speed;
+        }
+        collector.updateCollectorSpeed(finalSpeed);
+        SmartDashboard.putBoolean("started collector", collector.getCollectorState());
+        SmartDashboard.putNumber("collector speed", finalSpeed);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        collector.stopCollector();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return true;
+        if(!index&& collector.isCollected()){
+            return true;
+        }else if(index&&!collector.isCollected()){
+            return true;
+        }
+        return false;
     }
 }

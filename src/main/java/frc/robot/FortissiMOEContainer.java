@@ -181,7 +181,7 @@ public class FortissiMOEContainer{
     }
 
     public Command getAutonomousCommand() {
-        return new doubleNoteAutos(swerveSubsystem,0,0).FCenterAuto();
+        return new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DoubleNoteAuto2();
         // return Autos.exampleAuto(m_drive);
     }
 }
