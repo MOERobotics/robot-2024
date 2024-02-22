@@ -16,10 +16,9 @@ import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 public class ClimberArm extends SubsystemBase {
 
 
-    private final CANSparkMax climberMotorRight;
+    private final CANSparkMax climberMotor;
 
 
-    private final CANSparkMax climberMotorLeft;
 
 
     private double speed;
@@ -28,8 +27,7 @@ public class ClimberArm extends SubsystemBase {
 
     private final double climberMaxHeight = 800;
 
-    private boolean rightArmLimit;
-    private boolean LeftArmLimit;
+    private boolean ArmLimit;
 
     private double tolerance;
 
@@ -41,34 +39,30 @@ public class ClimberArm extends SubsystemBase {
 
     private final RelativeEncoder climberEncoder;
 
-    private Pigeon2 pigeon2 = new Pigeon2(88);
+    private Pigeon2 pigeon2;
 
    private AHRS navx = new AHRS(SPI.Port.kMXP, (byte) 50);
 
 
-    public ClimberArm(int climberIDRight,int climberIDLeft, int topHookLimitSwitchID, int bottomHookLimitSwitchID) {
+    public ClimberArm(int climberID, int topHookLimitSwitchID, int bottomHookLimitSwitchID, Pigeon2 pigeon2. AHRS navx) {
 
 
+        this.pigeon2=pigeon2;
         topHookLimitSwitch= new DigitalInput(topHookLimitSwitchID);
         bottomHookLimitSwitch= new DigitalInput(bottomHookLimitSwitchID);
-        climberMotorRight = new CANSparkMax(climberIDRight, kBrushless);
-        climberMotorLeft = new CANSparkMax(climberIDLeft, kBrushless);
-        climberEncoder = climberMotorRight.getEncoder();
-
-
+        climberMotor = new CANSparkMax(climberID, kBrushless);
+        climberEncoder = climberMotor.getEncoder();
     }
 
 
-    public void driveRight(double speed){
-        climberMotorRight.set(speed);
+    public void drive(double speed){
+        climberMotor.set(speed);
     }
-    public void driveLeft(double speed){
-        climberMotorLeft.set(speed);
-    }
+
 
 
     public void stop(){
-        climberMotorRight.stopMotor();
+        climberMotor.stopMotor();
     }
 
     public Command exampleMethodCommand() {
@@ -80,7 +74,10 @@ public class ClimberArm extends SubsystemBase {
                 });
     }
 
-
+    /**
+     *
+     * @return distance in meters,feet, ticks
+     */
     public double getPositionDistance() {
         return climberEncoder.getPosition();
     }
@@ -92,24 +89,19 @@ public class ClimberArm extends SubsystemBase {
 
 
 
-    public boolean canGoUpRight(){
-       return   !climberMotorRight.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen).isPressed();
+    public boolean canGoUp(){
+       return   !climberMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen).isPressed();
     }
 
 
-    public boolean canGoUpLeft(){
-        return   !climberMotorRight.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen).isPressed();
+
+
+    public boolean canGoDown(){
+        return   !climberMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen).isPressed();
     }
 
 
-    public boolean canGoDownRight(){
-        return   !climberMotorLeft.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen).isPressed();
-    }
 
-
-    public boolean canGoDownLeft(){
-        return   !climberMotorLeft.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen).isPressed();
-    }
 
     public double getRoll(){
 
@@ -130,12 +122,12 @@ public class ClimberArm extends SubsystemBase {
             climberMotorLeft.stopMotor();
             if (canGoDownRight()) {
                 finalSpeed = -speed;
-                climberMotorRight.set(finalSpeed);
+                climberMotor.set(finalSpeed);
             } else {
-                climberMotorRight.stopMotor();
+                climberMotor.stopMotor();
             }
         } else if (roll < -tolerance) {
-            climberMotorRight.stopMotor();
+            climberMotor.stopMotor();
             if (canGoDownLeft()) {
                 finalSpeed = -speed;
                 climberMotorLeft.set(finalSpeed);
@@ -144,7 +136,7 @@ public class ClimberArm extends SubsystemBase {
             }
         } else {
             climberMotorLeft.stopMotor();
-            climberMotorRight.stopMotor();
+            climberMotor.stopMotor();
         }
     }
 
@@ -172,8 +164,8 @@ public class ClimberArm extends SubsystemBase {
         // This method will be called once per scheduler
         SmartDashboard.putBoolean("Top Hook has" , hasChainTop());
         SmartDashboard.putBoolean("Bottom Hook has" , hasChainBottom());
-        SmartDashboard.putBoolean("Go up?" , canGoUpRight());
-        SmartDashboard.putBoolean("Go down?" , canGoDownRight());
+        SmartDashboard.putBoolean("Go up?" , canGoUp());
+        SmartDashboard.putBoolean("Go down?" , canGoDown());
     }
 
     @Override
