@@ -15,6 +15,7 @@ public class ShooterControllerCommand extends Command {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final ShooterSubsystem subsystem;
     Supplier<Boolean> onoff;
+    Supplier<Double> desShoulder;
     boolean finished;
     double shooterSpeedTop;
     double shooterSpeedBottom;
@@ -25,10 +26,11 @@ public class ShooterControllerCommand extends Command {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public ShooterControllerCommand(ShooterSubsystem subsystem, double shooterSpeedTop, double shooterSpeedBottom, Supplier<Boolean> on) {
+    public ShooterControllerCommand(ShooterSubsystem subsystem, Supplier <Double> desShoulder, Supplier<Boolean> on) {
         this.subsystem = subsystem;
-        this.shooterSpeedTop = shooterSpeedTop;
-        this.shooterSpeedBottom = shooterSpeedBottom;
+        this.shooterSpeedTop = 5000;
+        this.shooterSpeedBottom = 5000;
+        this.desShoulder = desShoulder;
         onoff = on;
         onState = 0;
         addRequirements(subsystem);
@@ -47,6 +49,8 @@ public class ShooterControllerCommand extends Command {
             onState %= 2;
         }
         if (onState%2 == 1){
+            shooterSpeedTop = 5000; shooterSpeedBottom = 5000;
+            if (desShoulder.get() <= 85) {shooterSpeedTop = 4000; shooterSpeedBottom = 4000;}
             subsystem.setShooterSpeeds(shooterSpeedTop, shooterSpeedBottom);
         } else{
             subsystem.stopShooter();

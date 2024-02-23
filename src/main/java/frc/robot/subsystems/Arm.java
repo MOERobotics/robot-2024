@@ -36,6 +36,8 @@ public class Arm extends SubsystemBase {
     private Rotation2d interShoulder, interWrist;
     private double currShoulder, currWrist;
     private double maxSpeed, maxAccel, shoulderLength, wristLength;
+    private double wristOffset = 76.376953125-128+7-60+20;
+    private double shoulderOffset = 90;
 
     public Arm(int rightShoulderMotorID, int leftShoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
                double kPShoulder, double kIShoulder, double kDShoulder,
@@ -75,6 +77,7 @@ public class Arm extends SubsystemBase {
         interShoulder = criticalShoulderAngle; interWrist = criticalWristAngle;
 		setShoulderDesState(shoulderState().getDegrees());
 		setWristDestState(wristState().getDegrees());
+
     }
 
     public void periodic(){
@@ -93,10 +96,10 @@ public class Arm extends SubsystemBase {
         double shoulderPow = (shoulderController.calculate(shoulderState().getDegrees()));
         wristController.setSetpoint(wrist.getDegrees());
         double wristPow = (wristController.calculate(wristState().getDegrees()));
-        if (!boundChecker.inBounds(shoulder, wrist, shoulderLength, wristLength)){
+        /*if (!boundChecker.inBounds(shoulder, wrist, shoulderLength, wristLength)){
             if (boundChecker.negDerivShoulder(shoulderState(), shoulder, shoulderLength, wristLength)) shoulderPow = 0;
             if (boundChecker.negDerivWrist(wristState(),wrist, wristLength)) wristPow = 0;
-        }
+        }*/
         shoulderPower(shoulderPow);
         wristPower(wristPow);
     }
@@ -111,21 +114,20 @@ public class Arm extends SubsystemBase {
     }
 
     public Command goToPoint(Rotation2d shoulderPos, Rotation2d wristPos) {
-        setWristDestState(wristPos.getDegrees());
-        setShoulderDesState(shoulderPos.getDegrees());
+
         SmartDashboard.putNumber("movingToPoint", shoulderPos.getDegrees());
         Rotation2d safeShoulder, safeWrist;
         if ((shoulderState().getDegrees() < interShoulder.getDegrees() && shoulderPos.getDegrees() < interShoulder.getDegrees()) ||
                 (shoulderState().getDegrees() > interShoulder.getDegrees() && shoulderPos.getDegrees() > interShoulder.getDegrees())) {
             SmartDashboard.putBoolean("inside convex region 1 or 2", true);
-            return Commands.run(() -> new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel));
+            return new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel).withName("Arm to dest");
         }
         safeShoulder = interShoulder; safeWrist = interWrist;
         SmartDashboard.putBoolean("transition spot", true);
-        return Commands.run(()->  new SequentialCommandGroup(
-                new ArmPathFollow(this, safeShoulder, safeWrist, maxSpeed, maxAccel),
-                new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel)
-        ));
+        return new SequentialCommandGroup(
+                new ArmPathFollow(this, safeShoulder, safeWrist, maxSpeed, maxAccel).withName("Arm to safe"),
+                new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel).withName("Arm safe -> dest")
+        );
     }
 
     public Command controlRobot2O(Rotation2d shoulderPos, Rotation2d wristPos){
@@ -145,12 +147,18 @@ public class Arm extends SubsystemBase {
     }
 
 
-    public Rotation2d shoulderState(){
-        return Rotation2d.fromDegrees(shoulderEncoder.getAbsolutePosition()+90);
+    public Rotation2d shoulderState() {
+        double deg = shoulderEncoder.getAbsolutePosition()+shoulderOffset;
+        if (deg < -180) deg = deg + 360;
+        if (deg > 180) deg = deg - 360;
+        return Rotation2d.fromDegrees(deg);
     }
 
     public Rotation2d wristState(){
-        return Rotation2d.fromDegrees(wristEncoder.getAbsolutePosition());
+        double deg = wristEncoder.getAbsolutePosition() + wristOffset;
+        if (deg < -180) deg = deg + 360;
+        if (deg > 180) deg = deg - 360;
+        return Rotation2d.fromDegrees(deg);
     }
     public double shoulderPosRel(){
         return shoulderRelEncoder.getPosition();
@@ -173,6 +181,10 @@ public class Arm extends SubsystemBase {
     public void setWristDestState(double pos){
         currWrist = pos;
     }
+
+    public void setState(double shoulderDesState, double wristDesState){
+        setShoulderDesState(shoulderDesState); setWristDestState(wristDesState);
+    }
     public double getShoulderDesState(){
         return currShoulder;
     }
@@ -183,10 +195,10 @@ public class Arm extends SubsystemBase {
     public void holdPos(double shoulderRel, double wristRel){
         SmartDashboard.putNumber("shoulderRelSetpt", shoulderRel);
         SmartDashboard.putNumber("wristRelSetpt", wristRel);
-        wristRelController.setSetpoint(wristRel);
-        shoulderRelController.setSetpoint(shoulderRel);
-        wristPower(wristRelController.calculate(wristState().getDegrees()));
-        shoulderPower(shoulderRelController.calculate(shoulderState().getDegrees()));
+        wristController.setSetpoint(wristRel);
+        shoulderController.setSetpoint(shoulderRel);
+        wristPower(wristController.calculate(wristState().getDegrees()));
+        shoulderPower(shoulderController.calculate(shoulderState().getDegrees()));
         //wristPower(0);
         //shoulderPower(0);
     }
