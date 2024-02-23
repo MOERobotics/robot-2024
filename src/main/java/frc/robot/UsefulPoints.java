@@ -28,7 +28,7 @@ public final class UsefulPoints {
         public static Rotation2d RotationOfStartingPointB = new Rotation2d().fromDegrees(60);
         public static Translation2d StartingPointC = new Translation2d(Units.inchesToMeters(53.1 + 3.125), Units.inchesToMeters(219.6));
         public static Translation2d StartingPointD = new Translation2d(Units.inchesToMeters(25.6), Units.inchesToMeters(170.6));
-        public static Rotation2d RotationOfStartingPointD = new Rotation2d().fromDegrees(-120);
+        public static Rotation2d RotationOfStartingPointD = new Rotation2d().fromDegrees(-60);
         public static Translation2d StartingPointE = new Translation2d(Units.inchesToMeters(18.6), Units.inchesToMeters(138.6));
         public static Translation2d StartingPointF = new Translation2d(Units.inchesToMeters(18.6), Units.inchesToMeters(92.6));
 

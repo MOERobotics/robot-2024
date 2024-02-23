@@ -58,11 +58,10 @@ public class tripleNoteAutos {
     }
 
     public Command EW3W2(){
-        Rotation2d startRotation1 = new Rotation2d(0);
+        Rotation2d startRotation1 = Rotation2d.fromDegrees(0);
         Pose2d startPose1 = new Pose2d(UsefulPoints.Points.StartingPointE, startRotation1);
-        Translation2d wingedNote3 = UsefulPoints.Points.WingedNote3;
-        Rotation2d endRotation1 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(wingedNote3));
-        Pose2d endPose1 = new Pose2d(wingedNote3, endRotation1);
+        Rotation2d endRotation1 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote3));
+        Pose2d endPose1 = new Pose2d(UsefulPoints.Points.WingedNote3, endRotation1);
 
         Rotation2d startRotation2 = new Rotation2d(swerveDrive.getYaw());
         Pose2d startPose2 = new Pose2d(UsefulPoints.Points.WingedNote3, startRotation2);
@@ -146,67 +145,73 @@ public class tripleNoteAutos {
     }
 
     public Command DDetourBottomC5C4() {
-        //shoot, at
         Pose2d startPose1 = new Pose2d(UsefulPoints.Points.StartingPointD, UsefulPoints.Points.RotationOfStartingPointD);
         Rotation2d endRotation1 = new Rotation2d(0);
-        Pose2d endPose1 = new Pose2d(UsefulPoints.Points.DetourPointBottom, endRotation1);
+        Pose2d endPose1 = new Pose2d(UsefulPoints.Points.CenterNote5, endRotation1);
 
         Rotation2d endRotation2 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.DetourPointBottom));
-        Pose2d startPose2 = new Pose2d(UsefulPoints.Points.DetourPointBottom, new Rotation2d(0));
+        Pose2d startPose2 = new Pose2d(UsefulPoints.Points.CenterNote5, new Rotation2d(0));
         Pose2d endPose2 = new Pose2d(UsefulPoints.Points.DetourPointBottom, endRotation2);
 
-        Pose2d startPose3 = new Pose2d(UsefulPoints.Points.DetourPointBottom, endRotation2);
-        Pose2d endPose3 = new Pose2d(UsefulPoints.Points.DetourPointBottom, endRotation2);
+        Pose2d startPose3 = new Pose2d(UsefulPoints.Points.DetourPointBottom, new Rotation2d(0));
+        Pose2d endPose3 = new Pose2d(UsefulPoints.Points.CenterNote4, endRotation2);
+
+        Pose2d startPose4 = new Pose2d(UsefulPoints.Points.CenterNote4, endRotation2);
+        Pose2d endPose4 = new Pose2d(UsefulPoints.Points.DetourPointBottom, endRotation2);
 
         ArrayList<Translation2d> internalPoints1 = new ArrayList<Translation2d>();
         ArrayList<Translation2d> internalPoints2 = new ArrayList<Translation2d>();
         ArrayList<Translation2d> internalPoints3 = new ArrayList<Translation2d>();
 
-        internalPoints2.add(UsefulPoints.Points.CenterNote5);
-        internalPoints3.add(UsefulPoints.Points.CenterNote4);
 
         Command traj1 = swerveDrive.generateTrajectory(startPose1,endPose1, internalPoints1, 0,0);
         Command traj2 = swerveDrive.generateTrajectory(startPose2,endPose2, internalPoints2, 0,0);
         Command traj3 = swerveDrive.generateTrajectory(startPose3,endPose3, internalPoints3, 0,0);
+        Command traj4 = swerveDrive.generateTrajectory(startPose4,endPose4, internalPoints3, 0,0);
 
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose1),
-                //shoot
                 traj1,
                 traj2,
-                traj3
+                traj3,
+                traj4
         );
     }
 
     public Command BDetourTopC1C2(){
         Pose2d startPose1 = new Pose2d(UsefulPoints.Points.StartingPointB, UsefulPoints.Points.RotationOfStartingPointB);
         Rotation2d endRotation1 = new Rotation2d(0);
-        Pose2d endPose1 = new Pose2d(UsefulPoints.Points.DetourPointTop, endRotation1);
+        Pose2d endPose1 = new Pose2d(UsefulPoints.Points.CenterNote1, endRotation1);
 
         Rotation2d endRotation2 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.DetourPointTop));
-        Pose2d startPose2 = new Pose2d(UsefulPoints.Points.DetourPointTop, new Rotation2d(0));
+        Pose2d startPose2 = new Pose2d(UsefulPoints.Points.CenterNote1, new Rotation2d(0));
         Pose2d endPose2 = new Pose2d(UsefulPoints.Points.DetourPointTop, endRotation2);
 
-        Pose2d startPose3 = new Pose2d(UsefulPoints.Points.DetourPointTop, endRotation2);
-        Pose2d endPose3 = new Pose2d(UsefulPoints.Points.DetourPointTop, endRotation2);
+        Pose2d startPose3 = new Pose2d(UsefulPoints.Points.DetourPointTop, new Rotation2d(0));
+        Pose2d endPose3 = new Pose2d(UsefulPoints.Points.CenterNote2, endRotation2);
+
+        Pose2d startPose4 = new Pose2d(UsefulPoints.Points.CenterNote2, endRotation2);
+        Pose2d endPose4 = new Pose2d(UsefulPoints.Points.DetourPointTop, endRotation2);
 
         ArrayList<Translation2d> internalPoints1 = new ArrayList<Translation2d>();
         ArrayList<Translation2d> internalPoints2 = new ArrayList<Translation2d>();
         ArrayList<Translation2d> internalPoints3 = new ArrayList<Translation2d>();
 
-        internalPoints2.add(UsefulPoints.Points.CenterNote1);
-        internalPoints3.add(UsefulPoints.Points.CenterNote2);
 
         Command traj1 = swerveDrive.generateTrajectory(startPose1,endPose1, internalPoints1, 0,0);
         Command traj2 = swerveDrive.generateTrajectory(startPose2,endPose2, internalPoints2, 0,0);
         Command traj3 = swerveDrive.generateTrajectory(startPose3,endPose3, internalPoints3, 0,0);
+        Command traj4 = swerveDrive.generateTrajectory(startPose4,endPose4, internalPoints3, 0,0);
 
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose1),
                 traj1,
                 traj2,
-                traj3
+                traj3,
+                traj4
         );
     }
+
+
 
 }
