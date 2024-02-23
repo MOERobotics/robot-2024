@@ -8,13 +8,17 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.*;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.ArmPathFollow;
+
+import java.util.function.Supplier;
 
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 
@@ -130,6 +134,7 @@ public class Arm extends SubsystemBase {
         );
     }
 
+
     public Command controlRobot2O(Rotation2d shoulderPos, Rotation2d wristPos){
         if (boundChecker.inPointyPart2O(shoulderState(), wristState())
         || boundChecker.inPointyPart2O(shoulderPos, wristPos)){
@@ -201,6 +206,10 @@ public class Arm extends SubsystemBase {
         shoulderPower(shoulderController.calculate(shoulderState().getDegrees()));
         //wristPower(0);
         //shoulderPower(0);
+    }
+    public Translation2d getAutoArmPosition(Supplier<Pose2d> currPose){
+        //return a math function that interpolates this
+        return new Translation2d(105, -31); //this is a placeholder
     }
 
 
