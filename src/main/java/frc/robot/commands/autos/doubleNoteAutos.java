@@ -142,7 +142,7 @@ public class doubleNoteAutos {
         Command trajCommand2 = swerveDrive.generateTrajectory(startPose2, endPose2, internalPoints2, 0, 0);
 
         return Commands.sequence(
-				swerveDrive.setInitPosition(startPose1),
+				swerveDrive.setInitPosition(startPose1)
 		        //new Shoot(),
 		        //trajCommand1,
 		        //trajCommand2,
@@ -156,14 +156,14 @@ public class doubleNoteAutos {
         Translation2d endTranslation = UsefulPoints.Points.CenterNote5;
         Pose2d endPose = new Pose2d(endTranslation, startRotation);
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
-        internalPoints.add(UsefulPoints.Points.DetourPoint);
+        internalPoints.add(UsefulPoints.Points.DetourPointBottom);
         Command trajCommand1 = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
 
         Pose2d startPose2 = new Pose2d(UsefulPoints.Points.CenterNote5,startRotation);
         Rotation2d endRotation2 = new Rotation2d().fromDegrees(120);
         Pose2d endPose2 = new Pose2d(UsefulPoints.Points.StartingPointD,endRotation2);
         ArrayList<Translation2d> internalPoints2 = new ArrayList<Translation2d>();
-        internalPoints2.add(UsefulPoints.Points.DetourPoint);
+        internalPoints2.add(UsefulPoints.Points.DetourPointBottom);
         Command trajCommand2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints2, 0, 0);
 
         return Commands.sequence(
@@ -174,4 +174,6 @@ public class doubleNoteAutos {
 				//collect and shoot
         );
     }
+
+
 }
