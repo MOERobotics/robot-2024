@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.helpers.LineHelpers;
 import frc.robot.subsystems.Arm;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,6 +30,7 @@ public class ArmPathFollow extends Command {
 
     @Override
     public void initialize() {
+        SmartDashboard.putNumber("made it to init", timer.get());
         startPoint = new Translation2d(armSubsystem.shoulderState().getDegrees(), armSubsystem.wristState().getDegrees());
         targetDist = startPoint.getDistance(desiredPoint);
         timer.restart();
@@ -36,6 +38,7 @@ public class ArmPathFollow extends Command {
 
     @Override
     public void execute() {
+        SmartDashboard.putNumber("made it", timer.get());
         double s = LineHelpers.getS(targetDist, speed, accel, timer.get());
         double shoulderPos = LineHelpers.getPositionX(startPoint, desiredPoint, s);
         double wristPos = LineHelpers.getPositionY(startPoint, desiredPoint, s);
@@ -49,6 +52,6 @@ public class ArmPathFollow extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return startPoint.getDistance(desiredPoint) <= .2;
+        return startPoint.getDistance(desiredPoint) <= 1;
     }
 }

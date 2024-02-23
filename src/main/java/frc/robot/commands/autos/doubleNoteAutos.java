@@ -10,6 +10,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.UsefulPoints;
+import frc.robot.commands.Collect;
+import frc.robot.commands.setHeading;
+import frc.robot.commands.shootSpeakerCommand;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.CollectorSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveDrive;
 
 import java.util.ArrayList;
@@ -17,17 +23,23 @@ import java.util.ArrayList;
 public class doubleNoteAutos {
     private static Translation2d midPose;
     private SwerveDrive swerveDrive;
+    private Arm armSubsystem;
 
     private final double bumperSize = 0;
 
     private final double startVelocity; //Velocities are in meters/second.
     private final double endVelocity;
+    private ShooterSubsystem shooter;
+    private CollectorSubsystem collector;
 
     /** Example static factory for an autonomous command. */
-    public doubleNoteAutos(SwerveDrive subsystem, double startVelocity, double endVelocity) {
+    public doubleNoteAutos(SwerveDrive subsystem, Arm armSubsystem, ShooterSubsystem shooter, CollectorSubsystem collector, double startVelocity, double endVelocity) {
         swerveDrive=subsystem;
+        this.armSubsystem = armSubsystem;
         this.startVelocity = startVelocity;
         this.endVelocity = endVelocity;
+        this.shooter = shooter;
+        this.collector = collector;
     }
 
     public Command DoubleNoteAuto1(){//TODO: Fix coordinates, create actual shoot and collect commands
@@ -58,7 +70,8 @@ public class doubleNoteAutos {
         Rotation2d startRotation = new Rotation2d(0);
         //x = dist center of robot when robot is pushed against the wall.
 
-        Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointA, startRotation);
+        Pose2d initPose = new Pose2d(UsefulPoints.Points.StartingPointA, startRotation);
+        Pose2d startPose = new Pose2d(initPose.getTranslation(),Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(initPose.getTranslation())));
         Translation2d endTranslation = UsefulPoints.Points.WingedNote2;
         Rotation2d endRotation = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(endTranslation));
         Pose2d endPose = new Pose2d(endTranslation, endRotation);
@@ -67,12 +80,18 @@ public class doubleNoteAutos {
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
 //        internalPoints1.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
-
+        Command collectorPosition = armSubsystem.goToPoint(Rotation2d.fromDegrees(105), Rotation2d.fromDegrees(-31));
+        Command aimSpeaker = new setHeading(swerveDrive,()->0.0,()->0.0, startPose.getRotation());
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command collectNote = new Collect(collector,1,false);
         return Commands.sequence(
-				swerveDrive.setInitPosition(startPose),
-		        //shoot
-		        trajCommand
-		        //collect and shoot
+                swerveDrive.setInitPosition(initPose),
+                aimSpeaker,
+                collectorPosition,
+                shootNote,
+                Commands.parallel(trajCommand,collectorPosition,collectNote),
+                //aim arm at speaker,
+		        shootNote
         );
     }
 

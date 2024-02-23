@@ -12,9 +12,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.CollectorControllerCommand;
 import frc.robot.commands.ShooterControllerCommand;
-import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.SwerveController;
 import frc.robot.subsystems.*;
 
 /**
@@ -41,46 +42,46 @@ public class FortissiMOEContainer{
 
     double maxMPSSquared = 6;
     double maxRPS = Math.PI*2;
-    private final SwerveModule backLeftModule = new SwerveModule(
+    private final SwerveModule frontRightModule = new SwerveModule(
             3,
             2,
             33,
             false,
             true,
-            135,
+            -45,
             new Translation2d(-width, length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule backRightModule = new SwerveModule(
+    private final SwerveModule frontLeftModule = new SwerveModule(
             17,
             16,
             34,
             false,
             true,
-            -135,
+            45,
             new Translation2d(-width, -length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule frontLeftModule = new SwerveModule(
+    private final SwerveModule backRightModule = new SwerveModule(
             1,
             20,
             32,
             false,
             true,
-            45,
+            -135,
             new Translation2d(width, length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule frontRightModule = new SwerveModule(
+    private final SwerveModule backLeftModule = new SwerveModule(
             19,
             18,
             31,
             false,
             true,
-            -45,
+            135,
             new Translation2d(width, -length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
@@ -90,13 +91,14 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
-            0, 0, 0, 0, 0, 0, new Rotation2d(0), new Rotation2d(0),
-            0,0);
+            0, 0, 0, 0, 0, 0, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(102),
+            Rotation2d.fromDegrees(-65), 30,30);
+
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(5,
-            13,0, 0,0,driveFF);
+            13,1e-3, 0,0,driveFF);
     private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem(6,
             0.01,0,0,0,7);
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
@@ -113,34 +115,40 @@ public class FortissiMOEContainer{
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
-            () -> -driverJoystick.getRawAxis(2),
+            () -> driverJoystick.getRawAxis(2),
             () -> driverJoystick.getRawButton(5),
-            () -> driverJoystick.getRawButton(3), 6,6, maxMPS, maxRPS
+            () -> driverJoystick.getRawButton(3), 2,2, maxMPS, maxRPS
     );
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
-    Command collectorCommand = collectorSubsystem.runCollectorCommandsForTeleop(
-            0.75,
-            ()->functionJoystick.getRawButton(1),
-            ()->functionJoystick.getRawButton(2),
-            ()->functionJoystick.getRawButton(3)
+    Command collectorCommand = new CollectorControllerCommand(
+            0.6,
+            ()->functionJoystick.getRawAxis(2)>=0.5,
+            ()->functionJoystick.getRawAxis(3)>=0.5,
+            ()->functionJoystick.getRawButton(6),
+            collectorSubsystem
     );
     ////////////////////////////////////////////////////////////////////////////commands end
 
-    Command shooterControl = new ShooterControllerCommand(shooterSubsystem, 6000,6000,
-            ()->functionJoystick.getRawButtonPressed(4));
+    Command shooterControl = new ShooterControllerCommand(shooterSubsystem, 5000,5000,
+            ()->functionJoystick.getRawButtonPressed(5));
+    ////////////////////////////////////////////////////////////////////////////commands end
+
+
 
     public FortissiMOEContainer() {
         swerveSubsystem.setDefaultCommand(drive);
+        //collectorSubsystem.setDefaultCommand(collectorCommand);
+        armSubsystem.setDefaultCommand(Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(),
+                armSubsystem.getWristDesState()), armSubsystem));
+        //armSubsystem.setDefaultCommand(Commands.run(()->armSubsystem.stopMotors(), armSubsystem));
         // Configure the trigger bindings
         configureBindings();
 //        var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
 //        var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
 
 
-        swerveSubsystem.setDefaultCommand(
-                Commands.parallel(drive,collectorCommand)
-        );
+        collectorSubsystem.setDefaultCommand(collectorCommand);
 
         shooterSubsystem.setDefaultCommand(shooterControl);
 	    // Configure the trigger bindings
@@ -153,14 +161,27 @@ public class FortissiMOEContainer{
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
-        new JoystickButton(driverJoystick, 2).onTrue(Commands.run(()->armSubsystem.shoulderPower(.1)));
-        new JoystickButton(driverJoystick, 4).onTrue(Commands.run(()->armSubsystem.wristPower(.1)));
-        new JoystickButton(driverJoystick, 6).onTrue(Commands.run(()->armSubsystem.shoulderPower(-.1)));
-        new JoystickButton(driverJoystick, 7).onTrue(Commands.run(()->armSubsystem.wristPower(-.1)));
+        new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.1)));
+        new JoystickButton(functionJoystick, 100).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
+        new JoystickButton(functionJoystick, 7).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.1)));
+        new JoystickButton(functionJoystick, 101).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
+        new JoystickButton(functionJoystick, 1).onTrue(Commands.run(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(78), Rotation2d.fromDegrees(-37)))
+                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
+                        functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
+                        driverJoystick.getRawButton(9))));
+        new JoystickButton(functionJoystick, 2).onTrue(Commands.run(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(105), Rotation2d.fromDegrees(-31)))
+                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
+                        functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
+                        driverJoystick.getRawButton(8))));
+        new JoystickButton(functionJoystick, 4).onTrue(Commands.run(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(104), Rotation2d.fromDegrees(-41)))
+                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
+                        functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
+                        driverJoystick.getRawButton(8))));
+        //104,-41
     }
 
     public Command getAutonomousCommand() {
-        return new doubleNoteAutos(swerveSubsystem,0,0).FCenterAuto();
+        return new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DoubleNoteAuto1();
         // return Autos.exampleAuto(m_drive);
     }
 }
