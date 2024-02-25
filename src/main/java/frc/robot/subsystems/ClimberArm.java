@@ -32,9 +32,9 @@ public class ClimberArm extends SubsystemBase {
 
 
 
-   // private final DigitalInput topHookLimitSwitch;
+    // private final DigitalInput topHookLimitSwitch;
 
-   // private final DigitalInput bottomHookLimitSwitch;
+    // private final DigitalInput bottomHookLimitSwitch;
 
 
     private final AnalogInput stringPot;
@@ -57,8 +57,8 @@ public class ClimberArm extends SubsystemBase {
 
     public ClimberArm(int climberID, /* int topHookLimitSwitchID, int bottomHookLimitSwitchID, */ int stringPotID) {
         stringPot = new AnalogInput(stringPotID);
-       // topHookLimitSwitch= new DigitalInput(topHookLimitSwitchID);
-       // bottomHookLimitSwitch= new DigitalInput(bottomHookLimitSwitchID);
+        // topHookLimitSwitch= new DigitalInput(topHookLimitSwitchID);
+        // bottomHookLimitSwitch= new DigitalInput(bottomHookLimitSwitchID);
         climberMotor = new CANSparkMax(climberID, kBrushless);
         climberEncoder = climberMotor.getEncoder();
     }
@@ -108,14 +108,14 @@ public class ClimberArm extends SubsystemBase {
     }
      */
     public boolean canGoUp(){
-       return  stringPot.getVoltage() < MAX_VOLTAGE;
+        return  stringPot.getVoltage() < MAX_VOLTAGE;
     }
     public boolean canGoDown(){
         return stringPot.getVoltage() > MIN_VOLTAGE;
     }
 
     public double getRoll(){
-      return  0;
+        return  0;
     }
 
     /*
@@ -132,8 +132,8 @@ public class ClimberArm extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler
-      //  SmartDashboard.putBoolean("Top Hook has" , hasChainTop());
-      //  SmartDashboard.putBoolean("Bottom Hook has" , hasChainBottom());
+        //  SmartDashboard.putBoolean("Top Hook has" , hasChainTop());
+        //  SmartDashboard.putBoolean("Bottom Hook has" , hasChainBottom());
         SmartDashboard.putBoolean("Go up?" , canGoUp());
         SmartDashboard.putBoolean("Go down?" , canGoDown());
         SmartDashboard.putNumber("String pot Voltage:", stringPot.getVoltage());
