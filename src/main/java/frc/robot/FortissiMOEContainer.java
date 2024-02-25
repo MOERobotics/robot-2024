@@ -47,7 +47,7 @@ public class FortissiMOEContainer{
     double maxMPS = 174/39.3701;
     double maxRPS = Math.PI;
 
-    double maxMPSSquared = 6;
+    double maxMPSSquared = 2;
     private final SwerveModule frontRightModule = new SwerveModule(
             3,
             2,
@@ -93,7 +93,7 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS, maxMPSSquared,0, 0, 0);
+            pigeon, maxMPS, maxMPSSquared,0.04, 0, 0, .01, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
@@ -143,6 +143,7 @@ public class FortissiMOEContainer{
 
 
     public FortissiMOEContainer() {
+        shooterSubsystem.setShooterRPMTolerance(500);
         swerveSubsystem.setDefaultCommand(drive);
         //collectorSubsystem.setDefaultCommand(collectorCommand);
         armSubsystem.setDefaultCommand(Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(),
@@ -194,7 +195,7 @@ public class FortissiMOEContainer{
     }
 
     public Command getAutonomousCommand() {
-        return new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DoubleNoteAuto1();
+        return new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DoubleNoteAuto2();
         // return Autos.exampleAuto(m_drive);
     }
     public Command resetArmPos(){
