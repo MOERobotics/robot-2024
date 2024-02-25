@@ -44,7 +44,7 @@ public class FortissiMOEContainer{
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
-    double maxRPS = Math.PI*2;
+    double maxRPS = Math.PI;
     private final SwerveModule frontRightModule = new SwerveModule(
             3,
             2,
