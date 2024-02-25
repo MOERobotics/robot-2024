@@ -82,9 +82,12 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public Command setInitPosition(Pose2d initPose){
-		setPigeon(initPose.getRotation().getDegrees());
-		odometer.update(getRotation2d(),getModulePositions());
-        return Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose)));
+	    odometer.update(getRotation2d(),getModulePositions());
+	    resetOdometry(AllianceFlip.apply(initPose));
+        return Commands.sequence(Commands.runOnce(()->setPigeon(AllianceFlip.apply(initPose).getRotation().getDegrees())),
+		        Commands.runOnce(()->odometer.update(getRotation2d(),getModulePositions())),
+		        Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose)))
+        );
     }
     public void setDesiredYaw(double yaw){
         desiredYaw = yaw;
@@ -127,10 +130,11 @@ public class SwerveDrive extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("yaw", getYaw());
+		SmartDashboard.putNumber("Yaw2d",getRotation2d().getDegrees());
         SmartDashboard.putNumber("desired yaw", getDesiredYaw());
         odometer.update(getRotation2d(), getModulePositions());
         field.setRobotPose(odometer.getPoseMeters());
-        vision.setOdometryPosition(odometer.getPoseMeters());
+//        vision.setOdometryPosition(odometer.getPoseMeters());
         SmartDashboard.putNumber("Posex",getPose().getX());
         SmartDashboard.putNumber("Posey",getPose().getY());
         SmartDashboard.putNumber("Rotation",getPose().getRotation().getDegrees());
@@ -152,7 +156,7 @@ public class SwerveDrive extends SubsystemBase {
         TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
         PIDController xController = new PIDController(xykP,xykI,xykD);
         PIDController yController = new PIDController(xykP,xykI,xykD);
-        var thetaController = new ProfiledPIDController(kP,kI,kD,new TrapezoidProfile.Constraints(maxMetersPerSec,maxMetersPerSecSquared));
+        var thetaController = new ProfiledPIDController(tkP,tkI,tkD,new TrapezoidProfile.Constraints(maxMetersPerSec,maxMetersPerSecSquared));
         thetaController.enableContinuousInput(-180,180);
         config.setEndVelocity(endVelocityMetersPerSecond);
         config.setStartVelocity(startVelocityMetersPerSecond);
@@ -165,7 +169,8 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboard.putNumber("Time",trajectory.getTotalTimeSeconds());
         SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                 trajectory,
-                vision::getRobotPosition,
+//                vision::getRobotPosition,
+		        this::getPose,
                 kDriveKinematics,
                 xController,
                 yController,
