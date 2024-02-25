@@ -16,14 +16,14 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
 //  private FortissiMOEContainer m_robotContainer;
-  private SwerveBotContainer m_robotContainer;
+  private FortissiMOEContainer m_robotContainer;
 
 
 
   @Override
   public void robotInit() {
 //    m_robotContainer = new FortissiMOEContainer();
-     m_robotContainer = new SwerveBotContainer();
+     m_robotContainer = new FortissiMOEContainer();
   }
 
 
@@ -59,6 +59,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.resetArmPos().schedule();
   }
 
   @Override

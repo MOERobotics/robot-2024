@@ -42,10 +42,12 @@ public class SwerveDrive extends SubsystemBase {
     public SwerveDriveKinematics kDriveKinematics;
     double desiredYaw;
     boolean align = false;
+    double kP, kI, kD, xykP, xykI, xykD;
 
     private final PIDController drivePID;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
-                       WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD) {
+                       WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD,
+                       double xykP, double xykI, double xykD) {
 
         this.pigeon = pigeon;
         this.maxMetersPerSec = maxMetersPerSec;
@@ -57,6 +59,8 @@ public class SwerveDrive extends SubsystemBase {
         this.BLModule = BLModule;
 
         this.FRModule = FRModule;
+        this.kP = kP; this.kD = kD; this.kI = kI;
+        this.xykP = xykP; this.xykI = xykI; this.xykD = xykD;
 
         this.BRModule = BRModule;
         drivePID = new PIDController(kP, kI, kD);
@@ -134,9 +138,9 @@ public class SwerveDrive extends SubsystemBase {
 
     public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
         TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
-        PIDController xController = new PIDController(1,0,0/*0.5 */);
-        PIDController yController = new PIDController(1,0,0/*0.5*/);
-        var thetaController = new ProfiledPIDController(1.0,0,0/*0.5*/,new TrapezoidProfile.Constraints(Math.PI*4,Math.PI*40));
+        PIDController xController = new PIDController(xykP,xykI,xykD);
+        PIDController yController = new PIDController(xykP,xykI,xykD);
+        var thetaController = new ProfiledPIDController(kP,kI,kD,new TrapezoidProfile.Constraints(maxMetersPerSec,maxMetersPerSecSquared));
         thetaController.enableContinuousInput(-180,180);
         config.setEndVelocity(endVelocityMetersPerSecond);
         config.setStartVelocity(startVelocityMetersPerSecond);

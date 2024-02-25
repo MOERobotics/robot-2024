@@ -56,7 +56,7 @@ public class CollectorControllerCommand extends Command {
             finalSpeed = speed;
         }
         if(index.get()){
-            finalSpeed = speed;
+            finalSpeed = 1;
 
         }
 

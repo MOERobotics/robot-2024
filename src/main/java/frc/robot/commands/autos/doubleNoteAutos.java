@@ -59,7 +59,7 @@ public class doubleNoteAutos {
 
         return Commands.sequence(
 				swerveDrive.setInitPosition(startPose),
-		        //shoot
+
 		        trajCommand
 		        //collect and shoot
         );
@@ -70,9 +70,9 @@ public class doubleNoteAutos {
         Rotation2d startRotation = new Rotation2d(0);
         //x = dist center of robot when robot is pushed against the wall.
 
-        Pose2d initPose = new Pose2d(UsefulPoints.Points.StartingPointA, startRotation);
+        Pose2d initPose = new Pose2d(UsefulPoints.Points.StartingPointB, UsefulPoints.Points.RotationOfStartingPointB);
         Pose2d startPose = new Pose2d(initPose.getTranslation(),Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(initPose.getTranslation())));
-        Translation2d endTranslation = UsefulPoints.Points.WingedNote2;
+        Translation2d endTranslation = UsefulPoints.Points.WingedNote1;
         Rotation2d endRotation = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(endTranslation));
         Pose2d endPose = new Pose2d(endTranslation, endRotation);
 
@@ -83,15 +83,23 @@ public class doubleNoteAutos {
         Command collectorPosition = armSubsystem.goToPoint(Rotation2d.fromDegrees(105), Rotation2d.fromDegrees(-31));
         Command aimSpeaker = new setHeading(swerveDrive,()->0.0,()->0.0, startPose.getRotation());
         Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
         Command collectNote = new Collect(collector,1,false);
+        Command shootPosition = armSubsystem.goToPoint(Rotation2d.fromDegrees(104), Rotation2d.fromDegrees(-41));
         return Commands.sequence(
                 swerveDrive.setInitPosition(initPose),
-                aimSpeaker,
-                collectorPosition,
+                //collectorPosition,
                 shootNote,
-                Commands.parallel(trajCommand,collectorPosition,collectNote),
-                //aim arm at speaker,
-		        shootNote
+                trajCommand,
+                /*aimSpeaker,
+                shootNote,
+
+                shootNote*/
+                collectNote,
+                shootAnotherNote
+
+                //shootPosition,
+		        //shootNote
         );
     }
 

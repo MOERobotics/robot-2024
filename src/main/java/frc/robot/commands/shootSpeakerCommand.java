@@ -27,7 +27,7 @@ public class shootSpeakerCommand extends Command {
     }
     //TODO: Calculate shooter speeds based on odometry.
     public double speedCalc(){
-        return 5000.0;
+        return 3000.0;
     }//placeholder value
 
     // Called when the command is initially scheduled.
