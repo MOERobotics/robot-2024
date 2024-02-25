@@ -2,11 +2,9 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.AnalogInput;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkLimitSwitch;
+import com.revrobotics.*;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,9 +32,20 @@ public class ClimberArm extends SubsystemBase {
 
 
 
-    private DigitalInput topHookLimitSwitch;
+   // private final DigitalInput topHookLimitSwitch;
 
-    private DigitalInput bottomHookLimitSwitch;
+   // private final DigitalInput bottomHookLimitSwitch;
+
+
+    private final AnalogInput stringPot;
+
+
+    private final static double MIN_VOLTAGE = 0.7;
+
+    private final static double MAX_VOLTAGE = 3.5;
+
+
+    private final static double CONVERSATION_INCHES_FACTOR = 9.956;
 
     private final RelativeEncoder climberEncoder;
 
@@ -44,22 +53,20 @@ public class ClimberArm extends SubsystemBase {
 
 
 
-   private final AHRS navx;
 
 
-    public ClimberArm(int climberID, int topHookLimitSwitchID, int bottomHookLimitSwitchID, AHRS navx) {
-
-
-        this.navx = navx;
-
-        topHookLimitSwitch= new DigitalInput(topHookLimitSwitchID);
-        bottomHookLimitSwitch= new DigitalInput(bottomHookLimitSwitchID);
+    public ClimberArm(int climberID, /* int topHookLimitSwitchID, int bottomHookLimitSwitchID, */ int stringPotID) {
+        stringPot = new AnalogInput(stringPotID);
+       // topHookLimitSwitch= new DigitalInput(topHookLimitSwitchID);
+       // bottomHookLimitSwitch= new DigitalInput(bottomHookLimitSwitchID);
         climberMotor = new CANSparkMax(climberID, kBrushless);
         climberEncoder = climberMotor.getEncoder();
     }
 
 
     public void drive(double speed) {
+        this.speed = speed;
+
         if (speed > 0 && canGoUp()) {
             climberMotor.set(speed);
         }
@@ -68,6 +75,8 @@ public class ClimberArm extends SubsystemBase {
         } else {
             climberMotor.stopMotor();
         }
+
+
     }
 
 
@@ -75,48 +84,41 @@ public class ClimberArm extends SubsystemBase {
         climberMotor.stopMotor();
     }
 
-    public Command exampleMethodCommand() {
-        // Inline construction of command goes here.
-        // Subsystem::RunOnce implicitly requires `this` subsystem.
-        return runOnce(
-                () -> {
-                    /* one-time action goes here */
-                });
-    }
-
     /**
      *
      * @return distance in meters,feet, ticks
      */
+
+    // TODO get rid of distance and percent positions
     public double getPositionDistance() {
         return climberEncoder.getPosition();
     }
 
+    public double getPositionInches() {
+        return stringPot.getVoltage()* CONVERSATION_INCHES_FACTOR;
+    }
 
     public double getPositionPercent() {
         return climberEncoder.getPosition()/climberMaxHeight ;
     }
 
-
-
-    public boolean canGoUp(){
-       return   !climberMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen).isPressed();
+    /*
+    public double getPositionPercent() {
+        return stringPot.getVoltage()/MAX_VOLTAGE ;
     }
-
-
-
-
+     */
+    public boolean canGoUp(){
+       return  stringPot.getVoltage() < MAX_VOLTAGE;
+    }
     public boolean canGoDown(){
-        return   !climberMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen).isPressed();
+        return stringPot.getVoltage() > MIN_VOLTAGE;
     }
 
     public double getRoll(){
-
-      return  navx.getRoll();
-
+      return  0;
     }
 
-
+    /*
     public boolean hasChainBottom(){
         return bottomHookLimitSwitch.get();
     }
@@ -125,22 +127,19 @@ public class ClimberArm extends SubsystemBase {
         return topHookLimitSwitch.get();
     }
 
-
-    public boolean exampleCondition() {
-        // Query some boolean state, such as a digital sensor.
-        return false;
-    }
-
-
-
+     */
 
     @Override
     public void periodic() {
         // This method will be called once per scheduler
-        SmartDashboard.putBoolean("Top Hook has" , hasChainTop());
-        SmartDashboard.putBoolean("Bottom Hook has" , hasChainBottom());
+      //  SmartDashboard.putBoolean("Top Hook has" , hasChainTop());
+      //  SmartDashboard.putBoolean("Bottom Hook has" , hasChainBottom());
         SmartDashboard.putBoolean("Go up?" , canGoUp());
         SmartDashboard.putBoolean("Go down?" , canGoDown());
+        SmartDashboard.putNumber("String pot Voltage:", stringPot.getVoltage());
+        SmartDashboard.putNumber("Speed:", speed);
+        SmartDashboard.putNumber("NavX Roll", getRoll());
+
     }
 
     @Override

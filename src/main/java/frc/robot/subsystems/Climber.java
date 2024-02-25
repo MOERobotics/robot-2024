@@ -21,11 +21,11 @@ public class Climber extends SubsystemBase {
 
     private AHRS navx;
 
-    public Climber(int climberIDRight, int climberIDLeft, int topLimitSwitchIDRight,  int topLimitSwitchLeft, int bottomLimitSwitchIDRight,  int bottomLimitSwitchLeft) {
+    public Climber(int climberIDRight, int climberIDLeft, int topLimitSwitchIDRight,  int topLimitSwitchLeft, int bottomLimitSwitchIDRight,  int bottomLimitSwitchLeft, int stringPotIDRight, int stringPotIDLeft) {
 
 
-        climberArmRight = new ClimberArm(climberIDRight,topLimitSwitchIDRight,bottomLimitSwitchIDRight, navx);
-        climberArmLeft = new ClimberArm(climberIDLeft,topLimitSwitchLeft,bottomLimitSwitchLeft, navx );
+        climberArmRight = new ClimberArm(climberIDRight,/*topLimitSwitchIDRight,bottomLimitSwitchIDRight,*/ stringPotIDRight);
+        climberArmLeft = new ClimberArm(climberIDLeft,/*topLimitSwitchLeft,bottomLimitSwitchLeft,*/ stringPotIDLeft);
 
     }
 
@@ -79,7 +79,12 @@ public class Climber extends SubsystemBase {
     public double getPositionPercentLeft() {
         return climberArmLeft.getPositionPercent();
     }
-
+    public double getPositionInchesRight() {
+        return climberArmRight.getPositionInches();
+    }
+    public double getPositionInchesLeft() {
+        return climberArmLeft.getPositionInches();
+    }
 
     public boolean canGoUpRight(){
         return climberArmRight.canGoUp();
@@ -98,7 +103,7 @@ public class Climber extends SubsystemBase {
     public boolean canGoDownLeft(){
         return  climberArmLeft.canGoDown();
     }
-
+/*
     public boolean hasChainBottomRight(){
         return climberArmRight.hasChainBottom();
     }
@@ -115,6 +120,9 @@ public class Climber extends SubsystemBase {
     public boolean hasChainTopLeft(){
         return climberArmLeft.hasChainTop();
     }
+
+
+ */
     public double getRoll(){
 
        return climberArmRight.getRoll();

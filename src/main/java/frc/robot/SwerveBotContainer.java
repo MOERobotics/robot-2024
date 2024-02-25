@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalOutput;
@@ -21,7 +22,9 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.setHeading;
+import frc.robot.commands.testCommand;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.ClimberArm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
 
@@ -36,10 +39,39 @@ public class SwerveBotContainer {
 
     // public Solenoid shooter;
 
-
     public DigitalOutput shooter;
+    public AHRS navx;
+
+    public ClimberArm climberArm  = new ClimberArm(14,0);
+    ;
+
 
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
+
+    public SwerveBotContainer() {
+
+        shooter = new DigitalOutput(4);
+        pigeon.reset();
+        swerveSubsystem.setDefaultCommand(drive);
+        climberArm.setDefaultCommand(moveArm);
+        // Configure the trigger bindings
+        configureBindings();
+        var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
+        button8.whileTrue(new setHeading(swerveSubsystem,
+                () -> -driverJoystick.getRawAxis(1),
+                () -> -driverJoystick.getRawAxis(0),60*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?1:-1)));
+
+        var button7 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
+        button7.whileTrue(new setHeading(swerveSubsystem,
+                () -> -driverJoystick.getRawAxis(1),
+                () -> -driverJoystick.getRawAxis(0),90*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?-1:1)));
+
+
+
+
+
+
+    }
 
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
@@ -108,6 +140,8 @@ public class SwerveBotContainer {
 
     ////////////////////////////////////////////////////////////////////////////commands
 
+
+
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
@@ -118,27 +152,15 @@ public class SwerveBotContainer {
 
     ////////////////////////////////////////////////////////////////////////////commands end
 
+    private final Command moveArm = new testCommand(
+            climberArm,
+            () -> driverJoystick.getRawButton(4),
+            () -> driverJoystick.getRawButton(5)
+
+    );
 
 
 
-    public SwerveBotContainer() {
-
-        shooter = new DigitalOutput(4);
-
-        pigeon.reset();
-        swerveSubsystem.setDefaultCommand(drive);
-        // Configure the trigger bindings
-        configureBindings();
-        var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
-        button8.whileTrue(new setHeading(swerveSubsystem,
-                () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),60*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?1:-1)));
-
-        var button7 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
-        button7.whileTrue(new setHeading(swerveSubsystem,
-                () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),90*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?-1:1)));
-    }
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
