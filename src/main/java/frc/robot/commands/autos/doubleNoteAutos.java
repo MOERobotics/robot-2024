@@ -94,7 +94,7 @@ public class doubleNoteAutos {
                 //collectorPosition,
                 shootNote,
                 Commands.parallel(trajCommand, collectNote),
-                Commands.parallel(aimSpeaker, collectorPosition),
+                collectorPosition,
                 shootAnotherNote
 
                 //shootPosition
