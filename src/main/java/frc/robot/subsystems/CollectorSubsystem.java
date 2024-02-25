@@ -32,6 +32,7 @@ public class CollectorSubsystem extends SubsystemBase {
         collectorController.setOutputRange(-1, 1);
     }
     public boolean isCollected(){
+        SmartDashboard.putBoolean("Beambreak", collectorBeam.get());
         return collectorBeam.get();
     }
     public void setCollectorSpeed(double speed){

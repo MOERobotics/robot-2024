@@ -45,6 +45,7 @@ public class SwerveDrive extends SubsystemBase {
     double kP, kI, kD, xykP, xykI, xykD;
 
     private final PIDController drivePID;
+    Field2d field = new Field2d();
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
                        WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD,
                        double xykP, double xykI, double xykD) {
@@ -64,10 +65,12 @@ public class SwerveDrive extends SubsystemBase {
 
         this.BRModule = BRModule;
         drivePID = new PIDController(kP, kI, kD);
+        drivePID.enableContinuousInput(-180,180);
         kDriveKinematics = new SwerveDriveKinematics(FRModule.moduleTranslation(), FLModule.moduleTranslation(),
                 BRModule.moduleTranslation(), BLModule.moduleTranslation());
         odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0), getModulePositions());
         align = false;
+        SmartDashboard.putData("odometry", field);
     }
 
     public double getDesiredYaw(){
@@ -85,6 +88,9 @@ public class SwerveDrive extends SubsystemBase {
     }
     public void headingCorrect(boolean correct){
         align = correct;
+    }
+    public double getYawCorrection(){
+        return drivePID.calculate(getYaw()-desiredYaw);
     }
 
     public double getYaw(){
@@ -110,7 +116,7 @@ public class SwerveDrive extends SubsystemBase {
     public double getAngleBetweenSpeaker(Translation2d pos) {
         Translation2d speaker = AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker);
         Translation2d diff = pos.minus(speaker);
-        return (MathUtil.angleModulus((Math.atan2(diff.getY(),diff.getX())+Math.PI) + Math.PI));
+        return (MathUtil.angleModulus((Math.atan2(diff.getY(),diff.getX())-3*Math.PI/2)));
     }
 
     @Override
@@ -119,6 +125,7 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboard.putNumber("yaw", getYaw());
         SmartDashboard.putNumber("desired yaw", getDesiredYaw());
         odometer.update(getRotation2d(), getModulePositions());
+        field.setRobotPose(odometer.getPoseMeters());
         SmartDashboard.putNumber("Posex",getPose().getX());
         SmartDashboard.putNumber("Posey",getPose().getY());
         SmartDashboard.putNumber("Rotation",getPose().getRotation().getDegrees());
@@ -132,11 +139,11 @@ public class SwerveDrive extends SubsystemBase {
     }
 
 
-    public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints) {
+    public Command generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints) {
         return generateTrajectory(start, end, internalPoints, 0,0);
     }
 
-    public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
+    public Command generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
         TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
         PIDController xController = new PIDController(xykP,xykI,xykD);
         PIDController yController = new PIDController(xykP,xykI,xykD);
@@ -161,7 +168,10 @@ public class SwerveDrive extends SubsystemBase {
                 this::setModuleStates,
                 this
         );
-        return trajCommand;
+        return Commands.parallel(
+                Commands.runOnce(() -> field.getObject("traj").setTrajectory(trajectory)),
+                trajCommand
+        );
     }
 
     public SwerveModulePosition[] getModulePositions(){
