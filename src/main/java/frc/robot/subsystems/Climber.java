@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.SparkLimitSwitch;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,17 +15,17 @@ public class Climber extends SubsystemBase {
 
 
     private Pigeon2 pigeon2;
-    private ClimberArm climberArmRight;
-    private ClimberArm climberArmLeft;
+    private final ClimberArm climberArmRight;
+    private final ClimberArm climberArmLeft;
 
 
-    public Climber() {
+    private AHRS navx;
+
+    public Climber(int climberIDRight, int climberIDLeft, int topLimitSwitchIDRight,  int topLimitSwitchLeft, int bottomLimitSwitchIDRight,  int bottomLimitSwitchLeft) {
 
 
-        climberArmRight = new ClimberArm(90,99,98, pigeon2 );
-        climberArmLeft = new ClimberArm(90,99,98, pigeon2 );
-
-
+        climberArmRight = new ClimberArm(climberIDRight,topLimitSwitchIDRight,bottomLimitSwitchIDRight, navx);
+        climberArmLeft = new ClimberArm(climberIDLeft,topLimitSwitchLeft,bottomLimitSwitchLeft, navx );
 
     }
 
@@ -114,18 +115,10 @@ public class Climber extends SubsystemBase {
     public boolean hasChainTopLeft(){
         return climberArmLeft.hasChainTop();
     }
-
-
-
     public double getRoll(){
 
        return climberArmRight.getRoll();
     }
-    public boolean exampleCondition() {
-        // Query some boolean state, such as a digital sensor.
-        return false;
-    }
-
     @Override
     public void periodic() {
         // This method will be called once per scheduler run

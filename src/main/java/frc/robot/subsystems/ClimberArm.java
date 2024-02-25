@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
+import com.revrobotics.AnalogInput;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkLimitSwitch;
@@ -39,15 +40,18 @@ public class ClimberArm extends SubsystemBase {
 
     private final RelativeEncoder climberEncoder;
 
-    private Pigeon2 pigeon2;
-
-   private AHRS navx = new AHRS(SPI.Port.kMXP, (byte) 50);
+    // TODO make analog input and new canGoUp and down methods(0.2 -1.6)
 
 
-    public ClimberArm(int climberID, int topHookLimitSwitchID, int bottomHookLimitSwitchID, Pigeon2 pigeon2. AHRS navx) {
+
+   private final AHRS navx;
 
 
-        this.pigeon2=pigeon2;
+    public ClimberArm(int climberID, int topHookLimitSwitchID, int bottomHookLimitSwitchID, AHRS navx) {
+
+
+        this.navx = navx;
+
         topHookLimitSwitch= new DigitalInput(topHookLimitSwitchID);
         bottomHookLimitSwitch= new DigitalInput(bottomHookLimitSwitchID);
         climberMotor = new CANSparkMax(climberID, kBrushless);
@@ -55,10 +59,16 @@ public class ClimberArm extends SubsystemBase {
     }
 
 
-    public void drive(double speed){
-        climberMotor.set(speed);
+    public void drive(double speed) {
+        if (speed > 0 && canGoUp()) {
+            climberMotor.set(speed);
+        }
+        else if (speed < 0 && canGoDown()) {
+            climberMotor.set(speed);
+        } else {
+            climberMotor.stopMotor();
+        }
     }
-
 
 
     public void stop(){
@@ -100,46 +110,11 @@ public class ClimberArm extends SubsystemBase {
         return   !climberMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen).isPressed();
     }
 
-
-
-
     public double getRoll(){
 
       return  navx.getRoll();
 
     }
-
-
-
-    public void pullUp () {
-        double roll = navx.getRoll();
-        double finalSpeed;
-
-        if (canGoUpRight() && canGoUpLeft()) {
-            driveLeft(speed);
-            driveRight(speed);
-        } else if (roll > tolerance) {
-            climberMotorLeft.stopMotor();
-            if (canGoDownRight()) {
-                finalSpeed = -speed;
-                climberMotor.set(finalSpeed);
-            } else {
-                climberMotor.stopMotor();
-            }
-        } else if (roll < -tolerance) {
-            climberMotor.stopMotor();
-            if (canGoDownLeft()) {
-                finalSpeed = -speed;
-                climberMotorLeft.set(finalSpeed);
-            } else {
-                climberMotorLeft.stopMotor();
-            }
-        } else {
-            climberMotorLeft.stopMotor();
-            climberMotor.stopMotor();
-        }
-    }
-
 
 
     public boolean hasChainBottom(){

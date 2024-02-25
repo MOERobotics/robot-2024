@@ -6,7 +6,6 @@ package frc.robot.commands;
 
 
 import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
@@ -18,7 +17,7 @@ public class ClimbUpCommand extends Command {
 
     private final double speed;
 
-    private double intialRoll;
+    private double initialRoll;
 
     public ClimbUpCommand(Climber climber, double speed) {
         this.climber = climber;
@@ -29,33 +28,39 @@ public class ClimbUpCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-         intialRoll = climber.getRoll();
+         initialRoll = climber.getRoll();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double roll = climber.getRoll();
+        double roll = climber.getRoll() - initialRoll;
         double finalSpeed;
 
-        if (climber.canGoUpRight() && climber.canGoUpLeft()) {
-            climber.driveLeft(speed);
-            climber.driveRight(speed);
-        } else if (roll > intialRoll) {
-            climber.stopLeft();
-            if (climber.canGoDownRight()) {
-                finalSpeed = -speed;
-               climber.driveRight(finalSpeed);
-            } else {
+        if (climber.canGoUpLeft() && climber.canGoUpRight()) {
+            if (roll < -tolerance) {
+                climber.stopLeft();
+                finalSpeed =-speed;
+                climber.driveRight(finalSpeed);
+            } else if (roll > tolerance) {
+                finalSpeed =-speed;
+                climber.driveLeft(finalSpeed);
                 climber.stopRight();
+            } else {
+                finalSpeed =-speed;
+                climber.driveLeft(finalSpeed);
+                climber.driveRight(finalSpeed);
             }
-        } else if (roll < -intialRoll) {
-            climber.stopRight();
-            if (climber.canGoDownLeft()) {
-                finalSpeed = -speed;
-               climber.driveLeft(finalSpeed);
+        } else if (climber.canGoUpLeft() || climber.canGoUpRight()) {
+            if (roll < -tolerance) {
+                climber.driveLeft(speed);
+                climber.stopRight();
+            } else if (roll > tolerance) {
+                climber.stopLeft();
+                climber.driveRight(speed);
             } else {
                 climber.stopLeft();
+                climber.stopRight();
             }
         } else {
             climber.stopLeft();

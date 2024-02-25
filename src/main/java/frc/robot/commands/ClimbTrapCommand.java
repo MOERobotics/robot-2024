@@ -67,8 +67,7 @@ public class ClimbTrapCommand extends Command {
 
        */
 
-        climberArmLeft.driveRight(finalSpeed);
-        climberArmRight.driveLeft(finalSpeed);
+
 
         SmartDashboard.putNumber("climber speed", finalSpeed);
 
