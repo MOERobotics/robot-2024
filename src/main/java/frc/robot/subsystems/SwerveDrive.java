@@ -82,8 +82,6 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public Command setInitPosition(Pose2d initPose){
-	    odometer.update(getRotation2d(),getModulePositions());
-	    resetOdometry(AllianceFlip.apply(initPose));
         return Commands.sequence(Commands.runOnce(()->setPigeon(AllianceFlip.apply(initPose).getRotation().getDegrees())),
 		        Commands.runOnce(()->odometer.update(getRotation2d(),getModulePositions())),
 		        Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose)))
@@ -121,9 +119,9 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public double getAngleBetweenSpeaker(Translation2d pos) {
-        Translation2d speaker = AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker);
+        Translation2d speaker = UsefulPoints.Points.middleOfSpeaker;
         Translation2d diff = pos.minus(speaker);
-        return (MathUtil.angleModulus((Math.atan2(diff.getY(),diff.getX())-3*Math.PI/2)));
+        return (MathUtil.angleModulus((Math.atan2(diff.getY(),diff.getX()))));
     }
 
     @Override
