@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.AllianceFlip;
 import frc.robot.UsefulPoints;
+import frc.robot.vision.Vision;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,13 +43,15 @@ public class SwerveDrive extends SubsystemBase {
     public SwerveDriveKinematics kDriveKinematics;
     double desiredYaw;
     boolean align = false;
-    double kP, kI, kD, xykP, xykI, xykD;
+    double kP, kI, kD, xykP, xykI, xykD, tkP, tkI, tkD;
+
+    Vision vision = new Vision();
 
     private final PIDController drivePID;
     Field2d field = new Field2d();
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
                        WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD,
-                       double xykP, double xykI, double xykD) {
+                       double xykP, double xykI, double xykD, double tkP, double tkI, double tkD) {
 
         this.pigeon = pigeon;
         this.maxMetersPerSec = maxMetersPerSec;
@@ -62,6 +65,7 @@ public class SwerveDrive extends SubsystemBase {
         this.FRModule = FRModule;
         this.kP = kP; this.kD = kD; this.kI = kI;
         this.xykP = xykP; this.xykI = xykI; this.xykD = xykD;
+        this.tkP = tkP; this.tkI = tkI; this.tkD = tkD;
 
         this.BRModule = BRModule;
         drivePID = new PIDController(kP, kI, kD);
@@ -78,9 +82,10 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public Command setInitPosition(Pose2d initPose){
-		setPigeon(initPose.getRotation().getDegrees());
-		odometer.update(getRotation2d(),getModulePositions());
-        return Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose)));
+        return Commands.sequence(Commands.runOnce(()->setPigeon(AllianceFlip.apply(initPose).getRotation().getDegrees())),
+		        Commands.runOnce(()->odometer.update(getRotation2d(),getModulePositions())),
+		        Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose)))
+        );
     }
     public void setDesiredYaw(double yaw){
         desiredYaw = yaw;
@@ -114,18 +119,20 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public double getAngleBetweenSpeaker(Translation2d pos) {
-        Translation2d speaker = AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker);
+        Translation2d speaker = UsefulPoints.Points.middleOfSpeaker;
         Translation2d diff = pos.minus(speaker);
-        return (MathUtil.angleModulus((Math.atan2(diff.getY(),diff.getX())-3*Math.PI/2)));
+        return (MathUtil.angleModulus((Math.atan2(diff.getY(),diff.getX()))));
     }
 
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("yaw", getYaw());
+		SmartDashboard.putNumber("Yaw2d",getRotation2d().getDegrees());
         SmartDashboard.putNumber("desired yaw", getDesiredYaw());
         odometer.update(getRotation2d(), getModulePositions());
         field.setRobotPose(odometer.getPoseMeters());
+//        vision.setOdometryPosition(odometer.getPoseMeters());
         SmartDashboard.putNumber("Posex",getPose().getX());
         SmartDashboard.putNumber("Posey",getPose().getY());
         SmartDashboard.putNumber("Rotation",getPose().getRotation().getDegrees());
@@ -147,7 +154,7 @@ public class SwerveDrive extends SubsystemBase {
         TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
         PIDController xController = new PIDController(xykP,xykI,xykD);
         PIDController yController = new PIDController(xykP,xykI,xykD);
-        var thetaController = new ProfiledPIDController(kP,kI,kD,new TrapezoidProfile.Constraints(maxMetersPerSec,maxMetersPerSecSquared));
+        var thetaController = new ProfiledPIDController(tkP,tkI,tkD,new TrapezoidProfile.Constraints(maxMetersPerSec,maxMetersPerSecSquared));
         thetaController.enableContinuousInput(-180,180);
         config.setEndVelocity(endVelocityMetersPerSecond);
         config.setStartVelocity(startVelocityMetersPerSecond);
@@ -160,7 +167,8 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboard.putNumber("Time",trajectory.getTotalTimeSeconds());
         SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                 trajectory,
-                this::getPose,
+//                vision::getRobotPosition,
+		        this::getPose,
                 kDriveKinematics,
                 xController,
                 yController,

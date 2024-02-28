@@ -7,6 +7,7 @@ package frc.robot.commands.autos;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.UsefulPoints;
@@ -196,19 +197,20 @@ public class tripleNoteAutos {
         ArrayList<Translation2d> internalPoints1 = new ArrayList<Translation2d>();
         ArrayList<Translation2d> internalPoints2 = new ArrayList<Translation2d>();
         ArrayList<Translation2d> internalPoints3 = new ArrayList<Translation2d>();
+	    ArrayList<Translation2d> internalPoints4 = new ArrayList<Translation2d>();
 
 
         Command traj1 = swerveDrive.generateTrajectory(startPose1,endPose1, internalPoints1, 0,0);
         Command traj2 = swerveDrive.generateTrajectory(startPose2,endPose2, internalPoints2, 0,0);
         Command traj3 = swerveDrive.generateTrajectory(startPose3,endPose3, internalPoints3, 0,0);
-        Command traj4 = swerveDrive.generateTrajectory(startPose4,endPose4, internalPoints3, 0,0);
+        Command traj4 = swerveDrive.generateTrajectory(startPose4,endPose4, internalPoints4, 0,0);
 
         return Commands.sequence(
-                swerveDrive.setInitPosition(startPose1),
-                traj1,
-                traj2,
-                traj3,
-                traj4
+                swerveDrive.setInitPosition(startPose1)
+//                traj1
+//                traj2,
+//                traj3,
+//                traj4
         );
     }
 
