@@ -8,24 +8,25 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.SparkLimitSwitch;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
 
 
-    private Pigeon2 pigeon2;
+
     private final ClimberArm climberArmRight;
     private final ClimberArm climberArmLeft;
 
 
     private AHRS navx;
 
-    public Climber(int climberIDRight, int climberIDLeft, int topLimitSwitchIDRight,  int topLimitSwitchLeft, int bottomLimitSwitchIDRight,  int bottomLimitSwitchLeft, int stringPotIDRight, int stringPotIDLeft) {
+    public Climber(int climberIDRight, int climberIDLeft, int stringPotIDRight, int stringPotIDLeft) {
 
 
-        climberArmRight = new ClimberArm(climberIDRight,/*topLimitSwitchIDRight,bottomLimitSwitchIDRight,*/ stringPotIDRight);
-        climberArmLeft = new ClimberArm(climberIDLeft,/*topLimitSwitchLeft,bottomLimitSwitchLeft,*/ stringPotIDLeft);
+        climberArmRight = new ClimberArm(climberIDRight, stringPotIDRight);
+        climberArmLeft = new ClimberArm(climberIDLeft, stringPotIDLeft);
 
     }
 
@@ -40,7 +41,7 @@ public class Climber extends SubsystemBase {
 
     public void stop(){
         climberArmRight.stop();
-        climberArmRight.stop();
+        climberArmLeft.stop();
 
     }
     public void stopRight(){
@@ -50,28 +51,6 @@ public class Climber extends SubsystemBase {
     public void stopLeft(){
         climberArmLeft.stop();
     }
-
-    public Command exampleMethodCommand() {
-        // Inline construction of command goes here.
-        // Subsystem::RunOnce implicitly requires `this` subsystem.
-        return runOnce(
-                () -> {
-                    /* one-time action goes here */
-                });
-    }
-
-    /**
-     *
-     * @return distance in meters,feet, ticks
-     */
-    public double getPositionDistanceRight() {
-        return climberArmRight.getPositionDistance();
-    }
-
-    public double getPositionDistanceLeft() {
-        return climberArmRight.getPositionDistance();
-    }
-
 
     public double getPositionPercentRight() {
         return climberArmRight.getPositionPercent();
@@ -103,33 +82,25 @@ public class Climber extends SubsystemBase {
     public boolean canGoDownLeft(){
         return  climberArmLeft.canGoDown();
     }
-/*
-    public boolean hasChainBottomRight(){
-        return climberArmRight.hasChainBottom();
+
+    public double getPositionVoltageRight(){
+        return climberArmRight.getPositionVoltage();
+    }
+    public double getPositionVoltageLeft(){
+        return climberArmLeft.getPositionVoltage();
     }
 
-    public boolean hasChainBottomLeft(){
-        return climberArmLeft.hasChainBottom();
-    }
-
-    public boolean hasChainTopRight(){
-        return climberArmRight.hasChainTop();
-    }
-
-
-    public boolean hasChainTopLeft(){
-        return climberArmLeft.hasChainTop();
-    }
-
-
- */
-    public double getRoll(){
-
-       return climberArmRight.getRoll();
-    }
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        SmartDashboard.putBoolean("Go up left?" , canGoUpLeft());
+        SmartDashboard.putBoolean("Go down left?" , canGoDownRight());
+        SmartDashboard.putBoolean("Go up right?" , canGoUpRight());
+        SmartDashboard.putBoolean("Go down right?" , canGoDownRight());
+        SmartDashboard.putNumber("String pot Voltage left:", getPositionVoltageLeft());
+        SmartDashboard.putNumber("String pot Voltage right:", getPositionVoltageRight());
+        SmartDashboard.putNumber("Speed left:", climberArmLeft.getSpeed());
+        SmartDashboard.putNumber("Speed right:", climberArmRight.getSpeed());
     }
 
     @Override

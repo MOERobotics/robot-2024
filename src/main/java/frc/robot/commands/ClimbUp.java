@@ -8,8 +8,10 @@ package frc.robot.commands;
 import frc.robot.subsystems.Climber;
 import edu.wpi.first.wpilibj2.command.Command;
 
+import java.util.function.Supplier;
+
 /** An example command that uses an example subsystem. */
-public class ClimbUpCommand extends Command {
+public class ClimbUp extends Command {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Climber climber;
 
@@ -19,7 +21,12 @@ public class ClimbUpCommand extends Command {
 
     private double initialRoll;
 
-    public ClimbUpCommand(Climber climber, double speed) {
+
+    private final Supplier<Double> rollSupplier;
+
+
+    public ClimbUp(Climber climber, double speed, Supplier<Double> rollSupplier) {
+        this.rollSupplier = rollSupplier;
         this.climber = climber;
         this.speed=speed;
         addRequirements(climber);
@@ -27,15 +34,16 @@ public class ClimbUpCommand extends Command {
 
     // Called when the command is initially scheduled.
     public void initialize() {
-         initialRoll = climber.getRoll();
+         initialRoll = rollSupplier.get();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     public void execute() {
-        double roll = climber.getRoll() - initialRoll;
+        double roll = rollSupplier.get() - initialRoll;
         double finalSpeed;
 
         if (climber.canGoUpLeft() && climber.canGoUpRight()) {
+
             if (roll < -tolerance) {
                 climber.stopLeft();
                 finalSpeed =-speed;

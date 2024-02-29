@@ -8,25 +8,15 @@ import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.Autos;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.setHeading;
-import frc.robot.commands.testCommand;
-import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.ClimberArm;
-import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.SwerveModule;
+import frc.robot.commands.TestClimber;
+import frc.robot.subsystems.*;
 
 
 /**
@@ -40,38 +30,17 @@ public class SwerveBotContainer {
     // public Solenoid shooter;
 
     public DigitalOutput shooter;
-    public AHRS navx;
+    public AHRS navx = new AHRS(I2C.Port.kMXP, (byte)50);
 
-    public ClimberArm climberArm  = new ClimberArm(14,0);
-    ;
+ //   public ClimberArm climberArmRight  = new ClimberArm(14,0);
+
+   // public ClimberArm climberArmLeft  = new ClimberArm(7,2);
+
+
+    public Climber climber = new Climber(14,7,0,2);
 
 
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
-
-    public SwerveBotContainer() {
-
-        shooter = new DigitalOutput(4);
-        pigeon.reset();
-        swerveSubsystem.setDefaultCommand(drive);
-        climberArm.setDefaultCommand(moveArm);
-        // Configure the trigger bindings
-        configureBindings();
-        var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
-        button8.whileTrue(new setHeading(swerveSubsystem,
-                () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),60*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?1:-1)));
-
-        var button7 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
-        button7.whileTrue(new setHeading(swerveSubsystem,
-                () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),90*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?-1:1)));
-
-
-
-
-
-
-    }
 
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
@@ -138,6 +107,9 @@ public class SwerveBotContainer {
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
     private final Joystick funcOpJoystick = new Joystick(0);
 
+
+    private  final Joystick testJoystick = new Joystick(2);
+
     ////////////////////////////////////////////////////////////////////////////commands
 
 
@@ -152,14 +124,49 @@ public class SwerveBotContainer {
 
     ////////////////////////////////////////////////////////////////////////////commands end
 
-    private final Command moveArm = new testCommand(
-            climberArm,
-            () -> driverJoystick.getRawButton(4),
-            () -> driverJoystick.getRawButton(5)
+
+    // use buttons 1,2,4,5
+    private final Command moveArms= new TestClimber(
+            climber,
+            () -> testJoystick.getRawButton(1),
+            () -> testJoystick.getRawButton(2),
+            () -> testJoystick.getRawButton(3),
+            () -> testJoystick.getRawButton(4)
 
     );
 
 
+ 
+
+
+    public SwerveBotContainer() {
+
+        shooter = new DigitalOutput(4);
+        pigeon.reset();
+
+        swerveSubsystem.setDefaultCommand(drive);
+        climber.setDefaultCommand(moveArms);
+
+
+
+        // Configure the trigger bindings
+        configureBindings();
+        /*var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
+        button8.whileTrue(new setHeading(swerveSubsystem,
+                () -> -driverJoystick.getRawAxis(1),
+                () -> -driverJoystick.getRawAxis(0),60*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?1:-1)));
+
+        var button7 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
+        button7.whileTrue(new setHeading(swerveSubsystem,
+                () -> -driverJoystick.getRawAxis(1),
+                () -> -driverJoystick.getRawAxis(0),90*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?-1:1)));
+*/
+
+
+
+
+
+    }
 
 
     private void configureBindings() {

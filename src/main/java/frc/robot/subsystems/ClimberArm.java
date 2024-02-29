@@ -16,10 +16,6 @@ public class ClimberArm extends SubsystemBase {
 
 
     private final CANSparkMax climberMotor;
-
-
-
-
     private double speed;
 
     // need to change max height
@@ -39,13 +35,12 @@ public class ClimberArm extends SubsystemBase {
 
     private final AnalogInput stringPot;
 
+    private final static double CONVERSION_FACTOR_INCHES = 9.956;
 
-    private final static double MIN_VOLTAGE = 0.7;
+    private final static double MIN_INCHES = 0.5 * CONVERSION_FACTOR_INCHES;
 
-    private final static double MAX_VOLTAGE = 3.5;
+    private final static double MAX_INCHES = 3.5 * CONVERSION_FACTOR_INCHES;
 
-
-    private final static double CONVERSATION_INCHES_FACTOR = 9.956;
 
     private final RelativeEncoder climberEncoder;
 
@@ -65,37 +60,34 @@ public class ClimberArm extends SubsystemBase {
 
 
     public void drive(double speed) {
-        this.speed = speed;
 
-        if (speed > 0 && canGoUp()) {
-            climberMotor.set(speed);
+        if (speed > 0 && !canGoUp()) {
+            speed = 0;
         }
-        else if (speed < 0 && canGoDown()) {
-            climberMotor.set(speed);
-        } else {
-            climberMotor.stopMotor();
+        else if (speed < 0 && !canGoDown()) {
+            speed = 0;
         }
+
+        climberMotor.set(speed);
+        this.speed = speed;
 
 
     }
 
 
     public void stop(){
-        climberMotor.stopMotor();
+        drive(0);
     }
 
-    /**
-     *
-     * @return distance in meters,feet, ticks
-     */
 
-    // TODO get rid of distance and percent positions
-    public double getPositionDistance() {
-        return climberEncoder.getPosition();
+
+    public double getPositionVoltage(){
+        return stringPot.getVoltage();
     }
+
 
     public double getPositionInches() {
-        return stringPot.getVoltage()* CONVERSATION_INCHES_FACTOR;
+        return getPositionVoltage()* CONVERSION_FACTOR_INCHES;
     }
 
     public double getPositionPercent() {
@@ -107,38 +99,32 @@ public class ClimberArm extends SubsystemBase {
         return stringPot.getVoltage()/MAX_VOLTAGE ;
     }
      */
+
+
+
     public boolean canGoUp(){
-        return  stringPot.getVoltage() < MAX_VOLTAGE;
+        return  getPositionInches()< MAX_INCHES;
     }
     public boolean canGoDown(){
-        return stringPot.getVoltage() > MIN_VOLTAGE;
+        return getPositionInches() > MIN_INCHES;
     }
 
-    public double getRoll(){
-        return  0;
+
+    public double getSpeed(){
+        return  speed;
     }
 
-    /*
-    public boolean hasChainBottom(){
-        return bottomHookLimitSwitch.get();
+    public void setSpeed(double speed){
+        this.speed=  speed;
     }
-
-    public boolean hasChainTop(){
-        return topHookLimitSwitch.get();
-    }
-
-     */
 
     @Override
     public void periodic() {
         // This method will be called once per scheduler
         //  SmartDashboard.putBoolean("Top Hook has" , hasChainTop());
         //  SmartDashboard.putBoolean("Bottom Hook has" , hasChainBottom());
-        SmartDashboard.putBoolean("Go up?" , canGoUp());
-        SmartDashboard.putBoolean("Go down?" , canGoDown());
-        SmartDashboard.putNumber("String pot Voltage:", stringPot.getVoltage());
-        SmartDashboard.putNumber("Speed:", speed);
-        SmartDashboard.putNumber("NavX Roll", getRoll());
+
+      //  SmartDashboard.putNumber("NavX Roll", getRoll());
 
     }
 

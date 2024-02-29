@@ -42,7 +42,6 @@ public class SwerveModule extends SubsystemBase {
         this.moduleTran = moduleTran;
 
         driveMotor = new CANSparkMax(driveMotorID, kBrushless);
-
         pivotMotor = new CANSparkMax(pivotMotorID, kBrushless);
 
         driveMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
