@@ -43,15 +43,16 @@ public class SwerveDrive extends SubsystemBase {
     public SwerveDriveKinematics kDriveKinematics;
     double desiredYaw;
     boolean align = false;
-    double kP, kI, kD, xykP, xykI, xykD, tkP, tkI, tkD;
+    double kP, kI, kD, xykP, xykI, xykD;
 
     Vision vision = new Vision();
 
-    private final PIDController drivePID;
+    private final ProfiledPIDController thetaController;
+    private final PIDController xController,yController;
     Field2d field = new Field2d();
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
                        WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD,
-                       double xykP, double xykI, double xykD, double tkP, double tkI, double tkD) {
+                       double xykP, double xykI, double xykD) {
 
         this.pigeon = pigeon;
         this.maxMetersPerSec = maxMetersPerSec;
@@ -65,11 +66,12 @@ public class SwerveDrive extends SubsystemBase {
         this.FRModule = FRModule;
         this.kP = kP; this.kD = kD; this.kI = kI;
         this.xykP = xykP; this.xykI = xykI; this.xykD = xykD;
-        this.tkP = tkP; this.tkI = tkI; this.tkD = tkD;
 
         this.BRModule = BRModule;
-        drivePID = new PIDController(kP, kI, kD);
-        drivePID.enableContinuousInput(-180,180);
+        thetaController = new ProfiledPIDController(kP, kI, kD, new TrapezoidProfile.Constraints(3*Math.PI,10*Math.PI));
+        thetaController.enableContinuousInput(-180,180);
+        xController = new PIDController(xykP,xykI,xykD);
+        yController = new PIDController(xykP,xykI,xykD);
         kDriveKinematics = new SwerveDriveKinematics(FRModule.moduleTranslation(), FLModule.moduleTranslation(),
                 BRModule.moduleTranslation(), BLModule.moduleTranslation());
         odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0), getModulePositions());
@@ -95,7 +97,7 @@ public class SwerveDrive extends SubsystemBase {
         align = correct;
     }
     public double getYawCorrection(){
-        return drivePID.calculate(getYaw()-desiredYaw);
+        return thetaController.calculate(getYaw()-desiredYaw);
     }
 
     public double getYaw(){
@@ -152,10 +154,6 @@ public class SwerveDrive extends SubsystemBase {
 
     public Command generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
         TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
-        PIDController xController = new PIDController(xykP,xykI,xykD);
-        PIDController yController = new PIDController(xykP,xykI,xykD);
-        var thetaController = new ProfiledPIDController(tkP,tkI,tkD,new TrapezoidProfile.Constraints(maxMetersPerSec,maxMetersPerSecSquared));
-        thetaController.enableContinuousInput(-180,180);
         config.setEndVelocity(endVelocityMetersPerSecond);
         config.setStartVelocity(startVelocityMetersPerSecond);
         var trajectory = TrajectoryGenerator.generateTrajectory(
@@ -203,9 +201,9 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented){
-        if (align){
-            turnspd = drivePID.calculate(pigeon.getYaw(), desiredYaw);
-        }
+//        if (align){
+//            turnspd = thetaController.calculate(pigeon.getYaw(), desiredYaw);
+//        }
         ChassisSpeeds chassisSpeeds;
         if (fieldOriented){
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xspd, yspd, turnspd, getRotation2d());

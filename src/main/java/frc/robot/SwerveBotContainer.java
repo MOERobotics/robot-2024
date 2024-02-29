@@ -100,7 +100,7 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS,maxMPSSquared,0.04,0,0, 1.0, 0, 0,1.0,0,0);
+            pigeon, maxMPS,maxMPSSquared,2.0,0,0, 1.0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -152,8 +152,8 @@ public class SwerveBotContainer {
     }
 
     public Command getAutonomousCommand() {
-//        return new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto1();
-        return new tripleNoteAutos(swerveSubsystem, 0,0).BDetourTopC1C2();
+      return new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto3();
+//        return new tripleNoteAutos(swerveSubsystem, 0,0).BDetourTopC1C2();
        // return Autos.exampleAuto(m_drive);
     }
 

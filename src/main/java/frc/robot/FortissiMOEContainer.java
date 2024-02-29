@@ -19,6 +19,7 @@ import frc.robot.commands.CollectorControllerCommand;
 import frc.robot.commands.ShooterControllerCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.SwerveController;
+import frc.robot.commands.autos.tripleNoteAutos;
 import frc.robot.subsystems.*;
 
 import java.util.Set;
@@ -47,7 +48,7 @@ public class FortissiMOEContainer{
     double maxMPS = 174/39.3701;
     double maxRPS = Math.PI;
 
-    double maxMPSSquared = 6;
+    double maxMPSSquared = 2;
     private final SwerveModule frontRightModule = new SwerveModule(
             3,
             2,
@@ -93,7 +94,7 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS, maxMPSSquared,0.04, 0, 0, 1.0, 0, 0,1.0,0,0);
+            pigeon, maxMPS, maxMPSSquared,1.0, 0, 0, 1.0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
