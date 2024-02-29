@@ -3,12 +3,27 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import frc.robot.AllianceFlip;
+import frc.robot.UsefulPoints;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
@@ -21,16 +36,19 @@ public class SwerveDrive extends SubsystemBase {
     Supplier<Double> pigeon;
     private final SwerveDriveOdometry odometer;
     private final double maxMetersPerSec;
-    SwerveDriveKinematics kDriveKinematics;
+    private final double maxMetersPerSecSquared;
+    public SwerveDriveKinematics kDriveKinematics;
     double desiredYaw;
     boolean align = false;
 
     private final PIDController drivePID;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
-                       Supplier<Double> pigeon, double maxMetersPerSec, double kP, double kI, double kD) {
+                       Supplier<Double> pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD) {
 
         this.pigeon = pigeon;
         this.maxMetersPerSec = maxMetersPerSec;
+
+        this.maxMetersPerSecSquared = maxMetersPerSecSquared;
 
         this.FLModule = FLModule;
 
@@ -50,6 +68,9 @@ public class SwerveDrive extends SubsystemBase {
         return desiredYaw;
     }
 
+    public Command setInitPosition(Pose2d initPose){
+        return Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose)));
+    }
     public void setDesiredYaw(double yaw){
         desiredYaw = yaw;
         headingCorrect(true);
@@ -63,7 +84,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getYaw());
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(getYaw(),-180,180));
     }
 
     public Pose2d getPose() {
@@ -74,10 +95,17 @@ public class SwerveDrive extends SubsystemBase {
         odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
     }
 
+    public double getAngleBetweenSpeaker(Translation2d pos) {
+        Translation2d speaker = AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker);
+        Translation2d diff = pos.minus(speaker);
+        return (MathUtil.angleModulus(Math.atan2(diff.getY(),diff.getX())+Math.PI));
+    }
+
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        SmartDashboard.putNumber("yaw", pigeon.get());
+        SmartDashboard.putNumber("yaw", getYaw());
+        SmartDashboard.putNumber("odometer yaw", getPose().getRotation().getDegrees());
         SmartDashboard.putNumber("desired yaw", getDesiredYaw());
         odometer.update(getRotation2d(), getModulePositions());
         SmartDashboard.putNumber("Posex",getPose().getX());
@@ -92,6 +120,39 @@ public class SwerveDrive extends SubsystemBase {
         BRModule.stop();
     }
 
+
+    public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints) {
+        return generateTrajectory(start, end, internalPoints, 0,0);
+    }
+
+    public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
+        TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
+        PIDController xController = new PIDController(1.0,0,0/*0.5 */);
+        PIDController yController = new PIDController(1.0,0,0/*0.5*/);
+        var thetaController = new ProfiledPIDController(1.0,0,0/*0.5*/,new TrapezoidProfile.Constraints(Math.PI*4,Math.PI*40));
+        thetaController.enableContinuousInput(-180,180);
+        config.setEndVelocity(endVelocityMetersPerSecond);
+        config.setStartVelocity(startVelocityMetersPerSecond);
+        var trajectory = TrajectoryGenerator.generateTrajectory(
+                AllianceFlip.apply(start),
+                AllianceFlip.apply(internalPoints),
+                AllianceFlip.apply(end),
+                config
+        );
+        SmartDashboard.putNumber("Time",trajectory.getTotalTimeSeconds());
+        SwerveControllerCommand trajCommand = new SwerveControllerCommand(
+                trajectory,
+                this::getPose,
+                kDriveKinematics,
+                xController,
+                yController,
+                thetaController,
+                this::setModuleStates,
+                this
+        );
+        return trajCommand;
+    }
+
     public SwerveModulePosition[] getModulePositions(){
         SwerveModulePosition[] modulePositions = {
                 FRModule.getPosition(), FLModule.getPosition(),
@@ -102,10 +163,10 @@ public class SwerveDrive extends SubsystemBase {
     public void setModuleStates(SwerveModuleState[] desiredStates) {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxMetersPerSec);
-        SmartDashboard.putString("FL state", desiredStates[0].toString());
-        SmartDashboard.putString("FR state", desiredStates[1].toString());
-        SmartDashboard.putString("BL state", desiredStates[2].toString());
-        SmartDashboard.putString("BR state", desiredStates[3].toString());
+        SmartDashboard.putString("FL state", desiredStates[1].toString());
+        SmartDashboard.putString("FR state", desiredStates[0].toString());
+        SmartDashboard.putString("BR state", desiredStates[2].toString());
+        SmartDashboard.putString("BL state", desiredStates[3].toString());
         FRModule.setDesiredState(desiredStates[0]);
         FLModule.setDesiredState(desiredStates[1]);
         BRModule.setDesiredState(desiredStates[2]);
@@ -128,31 +189,7 @@ public class SwerveDrive extends SubsystemBase {
 
         SmartDashboard.putString("module states", Arrays.toString(moduleStates));
 
-
         setModuleStates(moduleStates);
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

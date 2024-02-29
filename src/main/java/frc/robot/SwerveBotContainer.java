@@ -8,6 +8,10 @@ import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -15,9 +19,12 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.autos.doubleNoteAutos;
+import frc.robot.commands.setHeading;
+import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveModule;
 import frc.robot.commands.TestClimber;
 import frc.robot.subsystems.*;
-
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -54,7 +61,8 @@ public class SwerveBotContainer {
     double driveFF = 1.76182e-4;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
-    double maxMPS = 174/39.3701;
+    double maxMPS = 60/39.3701;
+    double maxMPSSquared = 60;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
             19,
@@ -101,7 +109,7 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS,0.04,0,0);
+            ()->pigeon.getYaw(), maxMPS,maxMPSSquared,0.04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -136,7 +144,7 @@ public class SwerveBotContainer {
     );
 
 
- 
+
 
 
     public SwerveBotContainer() {
@@ -151,7 +159,7 @@ public class SwerveBotContainer {
 
         // Configure the trigger bindings
         configureBindings();
-        /*var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
+        var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
         button8.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
                 () -> -driverJoystick.getRawAxis(0),60*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?1:-1)));
@@ -160,12 +168,6 @@ public class SwerveBotContainer {
         button7.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
                 () -> -driverJoystick.getRawAxis(0),90*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?-1:1)));
-*/
-
-
-
-
-
     }
 
 
@@ -181,8 +183,8 @@ public class SwerveBotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return null;
-        // return Autos.exampleAuto(m_drive);
+        return new doubleNoteAutos(swerveSubsystem, 0, 0).FCenterAuto();
+       // return Autos.exampleAuto(m_drive);
     }
 }
 

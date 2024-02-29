@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import frc.robot.commands.autos.doubleNoteAutos;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -38,6 +39,8 @@ public class FortissiMOEContainer{
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
+
+    double maxMPSSquared = 6;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
             3,
@@ -84,7 +87,7 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS, 0, 0, 0);
+            ()->pigeon.getYaw(), maxMPS, maxMPSSquared,0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
@@ -117,12 +120,11 @@ public class FortissiMOEContainer{
     );
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
-    Command collectorCommand = new CollectorControllerCommand(
+    Command collectorCommand = collectorSubsystem.runCollectorCommandsForTeleop(
             0.75,
             ()->functionJoystick.getRawButton(1),
             ()->functionJoystick.getRawButton(2),
-            ()->functionJoystick.getRawButton(3),
-            collectorSubsystem
+            ()->functionJoystick.getRawButton(3)
     );
     ////////////////////////////////////////////////////////////////////////////commands end
 
@@ -137,7 +139,9 @@ public class FortissiMOEContainer{
 //        var depositToAmp = CollectorCommands.setArmToAmpThenDeposit(headSubsystem, armSubsystem);
 
 
-        collectorSubsystem.setDefaultCommand(collectorCommand);
+        swerveSubsystem.setDefaultCommand(
+                Commands.parallel(drive,collectorCommand)
+        );
 
         shooterSubsystem.setDefaultCommand(shooterControl);
 	    // Configure the trigger bindings
@@ -157,7 +161,7 @@ public class FortissiMOEContainer{
     }
 
     public Command getAutonomousCommand() {
-        return null;
+        return new doubleNoteAutos(swerveSubsystem,0,0).FCenterAuto();
         // return Autos.exampleAuto(m_drive);
     }
 }
