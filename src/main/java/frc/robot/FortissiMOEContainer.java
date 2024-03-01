@@ -5,6 +5,9 @@
 package frc.robot;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.I2C;
+import frc.robot.commands.TestClimber;
 import frc.robot.commands.autos.doubleNoteAutos;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -25,7 +28,12 @@ import frc.robot.subsystems.*;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class FortissiMOEContainer{
+
+    public Climber climber = new Climber(12,7,0,1);
+    public AHRS navx = new AHRS(I2C.Port.kMXP, (byte)50);
+
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
+
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
     double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
@@ -107,6 +115,10 @@ public class FortissiMOEContainer{
 	private final Joystick functionJoystick = new Joystick(0);
 
 
+    private  final Joystick testJoystick = new Joystick(2);
+
+
+
     ////////////////////////////////////////////////////////////////////////////commands
 
 
@@ -120,12 +132,27 @@ public class FortissiMOEContainer{
     );
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
-    Command collectorCommand = collectorSubsystem.runCollectorCommandsForTeleop(
+    Command collectorCommand = new CollectorControllerCommand(
             0.75,
             ()->functionJoystick.getRawButton(1),
             ()->functionJoystick.getRawButton(2),
-            ()->functionJoystick.getRawButton(3)
+            ()->functionJoystick.getRawButton(3),
+            collectorSubsystem
     );
+
+
+
+    private final Command moveArms= new TestClimber(
+            climber,
+            () -> testJoystick.getRawButton(3),
+            () -> testJoystick.getRawButton(6),
+            () -> testJoystick.getRawButton(4),
+            () -> testJoystick.getRawButton(1)
+
+    );
+
+
+
     ////////////////////////////////////////////////////////////////////////////commands end
 
     Command shooterControl = new ShooterControllerCommand(shooterSubsystem, 6000,6000,
@@ -133,6 +160,9 @@ public class FortissiMOEContainer{
 
     public FortissiMOEContainer() {
         swerveSubsystem.setDefaultCommand(drive);
+
+        climber.setDefaultCommand(moveArms);
+
         // Configure the trigger bindings
         configureBindings();
 //        var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);

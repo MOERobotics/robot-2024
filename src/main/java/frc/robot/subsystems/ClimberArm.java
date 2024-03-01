@@ -39,7 +39,7 @@ public class ClimberArm extends SubsystemBase {
 
     private final static double MIN_INCHES = 0.5 * CONVERSION_FACTOR_INCHES;
 
-    private final static double MAX_INCHES = 3.5 * CONVERSION_FACTOR_INCHES;
+    private final static double MAX_INCHES = 3.6 * CONVERSION_FACTOR_INCHES;
 
 
     private final RelativeEncoder climberEncoder;

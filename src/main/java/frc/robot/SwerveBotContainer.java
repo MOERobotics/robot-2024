@@ -159,6 +159,7 @@ public class SwerveBotContainer {
 
         // Configure the trigger bindings
         configureBindings();
+        /*
         var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
         button8.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
@@ -168,6 +169,7 @@ public class SwerveBotContainer {
         button7.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
                 () -> -driverJoystick.getRawAxis(0),90*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?-1:1)));
+        */
     }
 
 
