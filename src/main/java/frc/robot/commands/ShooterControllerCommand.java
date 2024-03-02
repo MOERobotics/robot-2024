@@ -12,7 +12,9 @@ import java.util.function.Supplier;
 /** An example command that uses an example subsystem. */
 public class ShooterControllerCommand extends Command {
     private final ShooterSubsystem subsystem;
-    Supplier<Boolean> toggle;
+    Supplier<Boolean> onoff;
+    Supplier<Double> desShoulder;
+    boolean finished;
     double shooterSpeedTop;
     double shooterSpeedBottom;
     int onState = 0;
@@ -22,11 +24,12 @@ public class ShooterControllerCommand extends Command {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public ShooterControllerCommand(ShooterSubsystem subsystem, double shooterSpeedTop, double shooterSpeedBottom, Supplier<Boolean> toggle) {
+    public ShooterControllerCommand(ShooterSubsystem subsystem, Supplier <Double> desShoulder, Supplier<Boolean> on) {
         this.subsystem = subsystem;
-        this.shooterSpeedTop = shooterSpeedTop;
-        this.shooterSpeedBottom = shooterSpeedBottom;
-        this.toggle = toggle;
+        this.shooterSpeedTop = 5000;
+        this.shooterSpeedBottom = 5000;
+        this.desShoulder = desShoulder;
+        onoff = on;
         onState = 0;
         addRequirements(subsystem);
     }
@@ -39,14 +42,19 @@ public class ShooterControllerCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if(toggle.get()){
+        if(onoff.get()){
             onState += 1;
             onState %= 2;
         }
         if (onState%2 == 1){
+            shooterSpeedTop = 4000; shooterSpeedBottom = 4000;
+            if (desShoulder.get() <= 85) {shooterSpeedTop = 3000; shooterSpeedBottom = 3000;}
             subsystem.setShooterSpeeds(shooterSpeedTop, shooterSpeedBottom);
         } else{
-            subsystem.stopShooter();
+            shooterSpeedTop = 1000;
+            shooterSpeedBottom = 1000;
+            subsystem.setShooterSpeeds(shooterSpeedTop, shooterSpeedBottom);
+            //subsystem.stopShooter();
         }
     }
 
@@ -54,9 +62,5 @@ public class ShooterControllerCommand extends Command {
     @Override
     public void end(boolean interrupted) {}
 
-    @Override
-    public boolean isFinished(){
-        return subsystem.shooterAtSpeed();
-    }
 
 }

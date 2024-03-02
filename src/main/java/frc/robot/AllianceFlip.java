@@ -22,7 +22,7 @@ public class AllianceFlip {
 
 	public static Rotation2d apply(Rotation2d init){
 		if(shouldFlip()){
-			return new Rotation2d(-init.getCos(),init.getTan());
+			return new Rotation2d(-init.getCos(),init.getSin());
 		}
 		return init;
 	}

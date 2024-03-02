@@ -3,7 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.AllianceFlip;
 import frc.robot.UsefulPoints;
+import frc.robot.vision.Vision;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,17 +36,23 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModule BLModule;
     SwerveModule FRModule;
     SwerveModule BRModule;
-    Supplier<Double> pigeon;
+    WPI_Pigeon2 pigeon;
     private final SwerveDriveOdometry odometer;
     private final double maxMetersPerSec;
     private final double maxMetersPerSecSquared;
     public SwerveDriveKinematics kDriveKinematics;
     double desiredYaw;
     boolean align = false;
+    double kP, kI, kD, xykP, xykI, xykD;
 
-    private final PIDController drivePID;
+    Vision vision = new Vision();
+
+    private final ProfiledPIDController thetaController;
+    private final PIDController xController,yController;
+    Field2d field = new Field2d();
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
-                       Supplier<Double> pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD) {
+                       WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD,
+                       double xykP, double xykI, double xykD) {
 
         this.pigeon = pigeon;
         this.maxMetersPerSec = maxMetersPerSec;
@@ -55,13 +64,19 @@ public class SwerveDrive extends SubsystemBase {
         this.BLModule = BLModule;
 
         this.FRModule = FRModule;
+        this.kP = kP; this.kD = kD; this.kI = kI;
+        this.xykP = xykP; this.xykI = xykI; this.xykD = xykD;
 
         this.BRModule = BRModule;
-        drivePID = new PIDController(kP, kI, kD);
+        thetaController = new ProfiledPIDController(kP, kI, kD, new TrapezoidProfile.Constraints(3*Math.PI,10*Math.PI));
+        thetaController.enableContinuousInput(-180,180);
+        xController = new PIDController(xykP,xykI,xykD);
+        yController = new PIDController(xykP,xykI,xykD);
         kDriveKinematics = new SwerveDriveKinematics(FRModule.moduleTranslation(), FLModule.moduleTranslation(),
                 BRModule.moduleTranslation(), BLModule.moduleTranslation());
         odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0), getModulePositions());
         align = false;
+        SmartDashboard.putData("odometry", field);
     }
 
     public double getDesiredYaw(){
@@ -69,7 +84,10 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public Command setInitPosition(Pose2d initPose){
-        return Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose)));
+        return Commands.sequence(Commands.runOnce(()->setPigeon(AllianceFlip.apply(initPose).getRotation().getDegrees())),
+		        Commands.runOnce(()->odometer.update(getRotation2d(),getModulePositions())),
+		        Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose)))
+        );
     }
     public void setDesiredYaw(double yaw){
         desiredYaw = yaw;
@@ -78,10 +96,17 @@ public class SwerveDrive extends SubsystemBase {
     public void headingCorrect(boolean correct){
         align = correct;
     }
+    public double getYawCorrection(){
+        return thetaController.calculate(getYaw()-desiredYaw);
+    }
 
     public double getYaw(){
-        return pigeon.get();
+        return pigeon.getYaw();
     }
+
+	public void setPigeon(double Yaw){
+		pigeon.setYaw(Yaw);
+	}
 
     public Rotation2d getRotation2d() {
         return Rotation2d.fromDegrees(MathUtil.inputModulus(getYaw(),-180,180));
@@ -96,18 +121,20 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public double getAngleBetweenSpeaker(Translation2d pos) {
-        Translation2d speaker = AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker);
+        Translation2d speaker = UsefulPoints.Points.middleOfSpeaker;
         Translation2d diff = pos.minus(speaker);
-        return (MathUtil.angleModulus(Math.atan2(diff.getY(),diff.getX())+Math.PI));
+        return (MathUtil.angleModulus((Math.atan2(diff.getY(),diff.getX()))));
     }
 
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("yaw", getYaw());
-        SmartDashboard.putNumber("odometer yaw", getPose().getRotation().getDegrees());
+		SmartDashboard.putNumber("Yaw2d",getRotation2d().getDegrees());
         SmartDashboard.putNumber("desired yaw", getDesiredYaw());
         odometer.update(getRotation2d(), getModulePositions());
+        field.setRobotPose(odometer.getPoseMeters());
+//        vision.setOdometryPosition(odometer.getPoseMeters());
         SmartDashboard.putNumber("Posex",getPose().getX());
         SmartDashboard.putNumber("Posey",getPose().getY());
         SmartDashboard.putNumber("Rotation",getPose().getRotation().getDegrees());
@@ -121,16 +148,12 @@ public class SwerveDrive extends SubsystemBase {
     }
 
 
-    public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints) {
+    public Command generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints) {
         return generateTrajectory(start, end, internalPoints, 0,0);
     }
 
-    public SwerveControllerCommand generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
+    public Command generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
         TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
-        PIDController xController = new PIDController(1.0,0,0/*0.5 */);
-        PIDController yController = new PIDController(1.0,0,0/*0.5*/);
-        var thetaController = new ProfiledPIDController(1.0,0,0/*0.5*/,new TrapezoidProfile.Constraints(Math.PI*4,Math.PI*40));
-        thetaController.enableContinuousInput(-180,180);
         config.setEndVelocity(endVelocityMetersPerSecond);
         config.setStartVelocity(startVelocityMetersPerSecond);
         var trajectory = TrajectoryGenerator.generateTrajectory(
@@ -142,7 +165,8 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboard.putNumber("Time",trajectory.getTotalTimeSeconds());
         SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                 trajectory,
-                this::getPose,
+//                vision::getRobotPosition,
+		        this::getPose,
                 kDriveKinematics,
                 xController,
                 yController,
@@ -150,7 +174,10 @@ public class SwerveDrive extends SubsystemBase {
                 this::setModuleStates,
                 this
         );
-        return trajCommand;
+        return Commands.parallel(
+                Commands.runOnce(() -> field.getObject("traj").setTrajectory(trajectory)),
+                trajCommand
+        );
     }
 
     public SwerveModulePosition[] getModulePositions(){
@@ -174,9 +201,9 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented){
-        if (align){
-            turnspd = drivePID.calculate(pigeon.get(), desiredYaw);
-        }
+//        if (align){
+//            turnspd = thetaController.calculate(pigeon.getYaw(), desiredYaw);
+//        }
         ChassisSpeeds chassisSpeeds;
         if (fieldOriented){
             chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xspd, yspd, turnspd, getRotation2d());

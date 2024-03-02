@@ -5,7 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
-import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalOutput;
@@ -20,11 +20,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.autos.doubleNoteAutos;
+import frc.robot.commands.autos.tripleNoteAutos;
 import frc.robot.commands.setHeading;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
-import frc.robot.commands.TestClimber;
-import frc.robot.subsystems.*;
+
+import java.util.ArrayList;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,28 +37,8 @@ public class SwerveBotContainer {
 
     // public Solenoid shooter;
 
+
     public DigitalOutput shooter;
-    public AHRS navx = new AHRS(I2C.Port.kMXP, (byte)50);
-
- //   public ClimberArm climberArmRight  = new ClimberArm(14,0);
-
-   // public ClimberArm climberArmLeft  = new ClimberArm(7,2);
-
-
-    public Climber climber = new Climber(
-            7,
-            12,
-            1,
-            0,
-            false,
-            true,
-            0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            0.42 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            3.86 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            3.67 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            0.65 * ClimberArm.CONVERSION_FACTOR_INCHES
-    );
 
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
 
@@ -73,8 +54,8 @@ public class SwerveBotContainer {
     double driveFF = 1.76182e-4;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
-    double maxMPS = 60/39.3701;
-    double maxMPSSquared = 60;
+    double maxMPS = 100/39.3701;
+    double maxMPSSquared = 5;
     double maxRPS = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
             19,
@@ -121,18 +102,13 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS,maxMPSSquared,0.04,0,0);
+            pigeon, maxMPS,maxMPSSquared,2.0,0,0, 1.0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
     private final Joystick funcOpJoystick = new Joystick(0);
 
-
-    private  final Joystick testJoystick = new Joystick(2);
-
     ////////////////////////////////////////////////////////////////////////////commands
-
-
 
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
@@ -145,18 +121,6 @@ public class SwerveBotContainer {
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
-    // use buttons 1,2,4,5
-    private final Command moveArms= new TestClimber(
-            climber,
-            () -> testJoystick.getRawButton(1),
-            () -> testJoystick.getRawButton(4),
-            () -> testJoystick.getRawButton(3),
-            () -> testJoystick.getRawButton(6)
-
-    );
-
-
-
 
 
     public SwerveBotContainer() {
@@ -165,23 +129,17 @@ public class SwerveBotContainer {
         pigeon.reset();
 
         swerveSubsystem.setDefaultCommand(drive);
-        climber.setDefaultCommand(moveArms);
-
-
-
         // Configure the trigger bindings
         configureBindings();
-        /*
         var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
         button8.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),60*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?1:-1)));
+                () -> -driverJoystick.getRawAxis(0),AllianceFlip.apply(Rotation2d.fromDegrees(60))));
 
         var button7 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
         button7.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),90*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?-1:1)));
-        */
+                () -> -driverJoystick.getRawAxis(0),AllianceFlip.apply(Rotation2d.fromDegrees(90))));
     }
 
 
@@ -197,9 +155,11 @@ public class SwerveBotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new doubleNoteAutos(swerveSubsystem, 0, 0).FCenterAuto();
+      return new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto3();
+//        return new tripleNoteAutos(swerveSubsystem, 0,0).BDetourTopC1C2();
        // return Autos.exampleAuto(m_drive);
     }
+
 }
 
 

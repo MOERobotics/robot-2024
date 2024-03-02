@@ -11,8 +11,8 @@ import frc.robot.subsystems.ShooterSubsystem;
 /** An example command that uses an example subsystem. */
 public class shootSpeakerCommand extends Command {
     //    private final HeadSubsystem headSubsystem;
-    private final ShooterSubsystem shooterSubsystem;
-    private  final CollectorSubsystem collectorSubsystem;
+    private final ShooterSubsystem shooter;
+    private  final CollectorSubsystem collector;
     /**
      * Creates a new ExampleCommand.
      *
@@ -20,14 +20,14 @@ public class shootSpeakerCommand extends Command {
      * @param collectorSubsystem The collector subsystem used by this command
      */
     public shootSpeakerCommand(ShooterSubsystem shooterSubsystem,CollectorSubsystem collectorSubsystem) {
-        this.shooterSubsystem = shooterSubsystem;
-        this.collectorSubsystem = collectorSubsystem;
+        this.shooter = shooterSubsystem;
+        this.collector = collectorSubsystem;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(shooterSubsystem,collectorSubsystem);
     }
     //TODO: Calculate shooter speeds based on odometry.
     public double speedCalc(){
-        return 6000.0;
+        return 3000.0;
     }//placeholder value
 
     // Called when the command is initially scheduled.
@@ -38,19 +38,23 @@ public class shootSpeakerCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        shooterSubsystem.setShooterTopSpeed(speedCalc());
-        shooterSubsystem.setShooterBottomSpeed(speedCalc());
+        shooter.setShooterTopSpeed(speedCalc());
+        shooter.setShooterBottomSpeed(speedCalc());
+        if(shooter.shooterAtSpeed()){
+            collector.setCollectorSpeed(1);
+        }
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        collectorSubsystem.stopCollector();
+        shooter.stopShooter();
+        collector.stopCollector();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return false;
+        return !collector.isCollected();
     }
 }
