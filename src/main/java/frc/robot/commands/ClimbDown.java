@@ -40,7 +40,22 @@ public class ClimbDown extends Command {
     }
 
     // Called every time the scheduler runs while the command is scheduled.
+
+
+
     public void execute() {
+
+
+        if(climber.canGoUpRight()){
+            climber.driveRight(0.3);
+        }
+
+        if(climber.canGoUpLeft()){
+            climber.driveRight(0.3);
+        }
+
+
+        /*
         double roll = rollSupplier.get() - initialRoll;
         double finalSpeed;
         if (climber.canGoDownLeft() && climber.canGoDownRight()) {
@@ -74,6 +89,9 @@ public class ClimbDown extends Command {
             climber.stopLeft();
             climber.stopRight();
         }
+
+     */
+
 
     }
     // Called once the command ends or is interrupted.

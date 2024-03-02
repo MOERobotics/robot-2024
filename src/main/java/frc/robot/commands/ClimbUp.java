@@ -5,6 +5,7 @@ package frc.robot.commands;
 // the WPILib BSD license file in the root directory of this project.
 
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Climber;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -24,8 +25,10 @@ public class ClimbUp extends Command {
 
     private final Supplier<Double> rollSupplier;
 
+    private final Supplier<Boolean> activiateBtn;
 
-    public ClimbUp(Climber climber, double speed, Supplier<Double> rollSupplier) {
+    public ClimbUp(Climber climber, double speed, Supplier<Double> rollSupplier, Supplier<Boolean> activateBtn) {
+        this.activiateBtn =activateBtn;
         this.rollSupplier = rollSupplier;
         this.climber = climber;
         this.speed=speed;
@@ -39,10 +42,13 @@ public class ClimbUp extends Command {
 
     // Called every time the scheduler runs while the command is scheduled.
     public void execute() {
+
+        SmartDashboard.putNumber("Pigeon roll", rollSupplier.get());
+
         double roll = rollSupplier.get() - initialRoll;
         double finalSpeed;
 
-        if (climber.canGoUpLeft() && climber.canGoUpRight()) {
+        if (climber.canGoDownLeft() && climber.canGoDownRight()) {
 
             if (roll < -tolerance) {
                 climber.stopLeft();
@@ -57,7 +63,7 @@ public class ClimbUp extends Command {
                 climber.driveLeft(finalSpeed);
                 climber.driveRight(finalSpeed);
             }
-        } else if (climber.canGoUpLeft() || climber.canGoUpRight()) {
+        } else if (climber.canGoDownLeft() || climber.canGoDownRight()) {
             if (roll < -tolerance) {
                 climber.driveLeft(speed);
                 climber.stopRight();
@@ -76,8 +82,6 @@ public class ClimbUp extends Command {
     }
 
     // Called once the command ends or is interrupted.
-
-    public void end(boolean interrupted) {}
 
     // Returns true when the command should end.
     public boolean isFinished() {

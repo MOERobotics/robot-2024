@@ -7,7 +7,7 @@ package frc.robot;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.I2C;
-import frc.robot.commands.TestClimber;
+import frc.robot.commands.*;
 import frc.robot.commands.autos.doubleNoteAutos;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,9 +15,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.CollectorControllerCommand;
-import frc.robot.commands.ShooterControllerCommand;
-import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
 
@@ -115,6 +112,8 @@ public class FortissiMOEContainer{
 	private final Joystick functionJoystick = new Joystick(0);
 
 
+
+    // button box
     private  final Joystick testJoystick = new Joystick(2);
 
 
@@ -146,12 +145,18 @@ public class FortissiMOEContainer{
             climber,
             () -> testJoystick.getRawButton(3),
             () -> testJoystick.getRawButton(6),
-            () -> testJoystick.getRawButton(4),
-            () -> testJoystick.getRawButton(1)
+            () -> testJoystick.getRawButton(1),
+            () -> testJoystick.getRawButton(4)
 
     );
 
 
+    private final Command climbUp= new ClimbUp(
+            climber,
+            0.3,
+            ()-> pigeon.getRoll(),
+            ()-> testJoystick.getRawButton(7)
+    );
 
     ////////////////////////////////////////////////////////////////////////////commands end
 

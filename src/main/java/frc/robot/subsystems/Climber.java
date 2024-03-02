@@ -19,9 +19,6 @@ public class Climber extends SubsystemBase {
     private final ClimberArm climberArmRight;
     private final ClimberArm climberArmLeft;
 
-
-    private AHRS navx;
-
     public Climber(int climberIDRight, int climberIDLeft, int stringPotIDRight, int stringPotIDLeft) {
 
 
@@ -39,10 +36,9 @@ public class Climber extends SubsystemBase {
         climberArmLeft.drive(speed);
     }
 
-    public void stop(){
+    public void stopArms(){
         climberArmRight.stop();
         climberArmLeft.stop();
-
     }
     public void stopRight(){
         climberArmRight.stop();
@@ -70,7 +66,7 @@ public class Climber extends SubsystemBase {
     }
 
     public boolean canGoUpLeft(){
-        return climberArmRight.canGoUp();
+        return climberArmLeft.canGoUp();
     }
 
 
@@ -79,9 +75,7 @@ public class Climber extends SubsystemBase {
         return  climberArmRight.canGoDown();
     }
 
-    public boolean canGoDownLeft(){
-        return  climberArmLeft.canGoDown();
-    }
+    public boolean canGoDownLeft(){return  climberArmLeft.canGoDown();}
 
     public double getPositionVoltageRight(){
         return climberArmRight.getPositionVoltage();
@@ -94,7 +88,7 @@ public class Climber extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         SmartDashboard.putBoolean("Go up left?" , canGoUpLeft());
-        SmartDashboard.putBoolean("Go down left?" , canGoDownRight());
+        SmartDashboard.putBoolean("Go down left?" , canGoDownLeft());
         SmartDashboard.putBoolean("Go up right?" , canGoUpRight());
         SmartDashboard.putBoolean("Go down right?" , canGoDownRight());
         SmartDashboard.putNumber("String pot Voltage left:", getPositionVoltageLeft());
