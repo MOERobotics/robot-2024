@@ -5,17 +5,22 @@
 package frc.robot.subsystems;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,7 +33,9 @@ import frc.robot.vision.Vision;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.DoubleStream;
 
 public class SwerveDrive extends SubsystemBase {
     /** Creates a new ExampleSubsystem. */
@@ -37,7 +44,7 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModule FRModule;
     SwerveModule BRModule;
     WPI_Pigeon2 pigeon;
-    private final SwerveDriveOdometry odometer;
+//    private final SwerveDriveOdometry odometer;
     private final double maxMetersPerSec;
     private final double maxMetersPerSecSquared;
     public SwerveDriveKinematics kDriveKinematics;
@@ -50,6 +57,7 @@ public class SwerveDrive extends SubsystemBase {
     private final ProfiledPIDController thetaController;
     private final PIDController xController,yController;
     Field2d field = new Field2d();
+    SwerveDrivePoseEstimator swerveDrivePoseEstimator;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
                        WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD,
                        double xykP, double xykI, double xykD) {
@@ -74,9 +82,10 @@ public class SwerveDrive extends SubsystemBase {
         yController = new PIDController(xykP,xykI,xykD);
         kDriveKinematics = new SwerveDriveKinematics(FRModule.moduleTranslation(), FLModule.moduleTranslation(),
                 BRModule.moduleTranslation(), BLModule.moduleTranslation());
-        odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0), getModulePositions());
+//        odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0), getModulePositions());
         align = false;
         SmartDashboard.putData("odometry", field);
+        swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(kDriveKinematics, new Rotation2d(0), getModulePositions(), new Pose2d());
     }
 
     public double getDesiredYaw(){
@@ -85,7 +94,8 @@ public class SwerveDrive extends SubsystemBase {
 
     public Command setInitPosition(Pose2d initPose){
         return Commands.sequence(Commands.runOnce(()->setPigeon(AllianceFlip.apply(initPose).getRotation().getDegrees())),
-		        Commands.runOnce(()->odometer.update(getRotation2d(),getModulePositions())),
+//		        Commands.runOnce(()->odometer.update(getRotation2d(),getModulePositions())),
+                Commands.runOnce(() -> {}), //wait a cycle to reset the pigeon or everything breaks
 		        Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose)))
         );
     }
@@ -112,12 +122,16 @@ public class SwerveDrive extends SubsystemBase {
         return Rotation2d.fromDegrees(MathUtil.inputModulus(getYaw(),-180,180));
     }
 
-    public Pose2d getPose() {
-        return odometer.getPoseMeters();
+//    public Pose2d getPose() {
+//        return odometer.getPoseMeters();
+//    }
+    public Pose2d getEstimatedPose(){
+        return swerveDrivePoseEstimator.getEstimatedPosition();
     }
 
     public void resetOdometry(Pose2d pose) {
-        odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
+//        odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
+        swerveDrivePoseEstimator.resetPosition(getRotation2d(), getModulePositions(), pose);
     }
 
     public double getAngleBetweenSpeaker(Translation2d pos) {
@@ -126,18 +140,35 @@ public class SwerveDrive extends SubsystemBase {
         return (MathUtil.angleModulus((Math.atan2(diff.getY(),diff.getX()))));
     }
 
+    public List<Pose2d> getObjectPos(){
+        ArrayList<Pose2d> desRobotPos = new ArrayList<>();
+        var objectVal = vision.detections();
+        for (int i = 0; i < objectVal.size(); i++){
+            desRobotPos.add(getEstimatedPose().plus(new Transform2d(AllianceFlip.apply(objectVal.get(i)), new Rotation2d(0))));
+        }
+        return desRobotPos;
+    }
+
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("yaw", getYaw());
 		SmartDashboard.putNumber("Yaw2d",getRotation2d().getDegrees());
         SmartDashboard.putNumber("desired yaw", getDesiredYaw());
-        odometer.update(getRotation2d(), getModulePositions());
-        field.setRobotPose(odometer.getPoseMeters());
+//        odometer.update(getRotation2d(), getModulePositions());
+//        field.getObject("odom").setPose(odometer.getPoseMeters());
 //        vision.setOdometryPosition(odometer.getPoseMeters());
-        SmartDashboard.putNumber("Posex",getPose().getX());
-        SmartDashboard.putNumber("Posey",getPose().getY());
-        SmartDashboard.putNumber("Rotation",getPose().getRotation().getDegrees());
+//        SmartDashboard.putNumber("Rotation",getPose().getRotation().getDegrees());
+        swerveDrivePoseEstimator.update(getRotation2d(), getModulePositions());
+        var aprilTagVal = vision.getAprilTagPose();
+        if (aprilTagVal.isPresent()) {
+            SmartDashboard.putNumber("timeStamp", aprilTagVal.get().timestamp);
+            var dist = getEstimatedPose().getTranslation().getDistance(aprilTagVal.get().pose.getTranslation());
+            swerveDrivePoseEstimator.addVisionMeasurement(aprilTagVal.get().pose, aprilTagVal.get().timestamp,
+                    VecBuilder.fill(5e-2,5e-2,10));
+        }
+        SmartDashboard.putNumberArray("detections", getObjectPos().stream().flatMapToDouble(pos -> DoubleStream.of(pos.getX(), pos.getX(), pos.getRotation().getDegrees())).toArray());
+        field.setRobotPose(swerveDrivePoseEstimator.getEstimatedPosition());
     }
 
     public void stopModules() {
@@ -166,7 +197,7 @@ public class SwerveDrive extends SubsystemBase {
         SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                 trajectory,
 //                vision::getRobotPosition,
-		        this::getPose,
+		        this::getEstimatedPose,
                 kDriveKinematics,
                 xController,
                 yController,

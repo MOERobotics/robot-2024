@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.pathfinding.LocalADStar;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,18 +19,24 @@ public class Robot extends TimedRobot {
 //  private FortissiMOEContainer m_robotContainer;
   private SwerveBotContainer m_robotContainer;
 
-
+  private void initRobotContainer(boolean force) {
+    if (m_robotContainer != null)
+      return;
+    if (force || DriverStation.getAlliance().isPresent())
+      m_robotContainer = new SwerveBotContainer();
+  }
 
   @Override
   public void robotInit() {
 //    m_robotContainer = new FortissiMOEContainer();
-     m_robotContainer = new SwerveBotContainer();
+    initRobotContainer(false);
+    SmartDashboard.putData("running command", CommandScheduler.getInstance());
   }
 
 
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putData("running command", CommandScheduler.getInstance());
+    initRobotContainer(false);
     CommandScheduler.getInstance().run();
   }
 
@@ -41,6 +48,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    initRobotContainer(true);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -55,7 +63,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-
+    initRobotContainer(true);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

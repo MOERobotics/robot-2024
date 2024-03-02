@@ -11,7 +11,12 @@ import java.util.List;
 public class AllianceFlip {
 	public static double fieldWidth = 16.541052;//field width in meters
 	public static boolean shouldFlip(){
-		return DriverStation.getAlliance().get()==DriverStation.Alliance.Red;
+		var alliance = DriverStation.getAlliance();
+		if (alliance.isEmpty()) {
+			DriverStation.reportError("No alliance color", false);
+			return false;
+		}
+		return alliance.get()==DriverStation.Alliance.Red;
 	}
 	public static Translation2d apply(Translation2d init){
 		if(shouldFlip()){
