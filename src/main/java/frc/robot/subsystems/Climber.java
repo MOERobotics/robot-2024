@@ -19,11 +19,15 @@ public class Climber extends SubsystemBase {
     private final ClimberArm climberArmRight;
     private final ClimberArm climberArmLeft;
 
-    public Climber(int climberIDRight, int climberIDLeft, int stringPotIDRight, int stringPotIDLeft) {
 
 
-        climberArmRight = new ClimberArm(climberIDRight, stringPotIDRight);
-        climberArmLeft = new ClimberArm(climberIDLeft, stringPotIDLeft);
+
+    public Climber(int climberIDRight, int climberIDLeft, int stringPotIDRight, int stringPotIDLeft, boolean rightInverted, boolean leftInverted, double min_Inches_Right,
+                   double min_Inches_Left, double max_Inches_Right, double max_Inches_Left, double start_Inches_Left, double start_Inches_Right  ) {
+
+
+        climberArmRight = new ClimberArm(climberIDRight, stringPotIDRight, rightInverted, min_Inches_Right,max_Inches_Right,start_Inches_Right );
+        climberArmLeft = new ClimberArm(climberIDLeft, stringPotIDLeft, leftInverted, min_Inches_Left, max_Inches_Left,start_Inches_Left );
 
     }
 

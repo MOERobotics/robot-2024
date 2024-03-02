@@ -26,7 +26,20 @@ import frc.robot.subsystems.*;
  */
 public class FortissiMOEContainer{
 
-    public Climber climber = new Climber(12,7,0,1);
+    public Climber climber = new Climber(
+            7,
+            12,
+            1,
+            0,
+            false,
+            true,
+            0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            0.42 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            3.86 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            3.67 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            0.65 * ClimberArm.CONVERSION_FACTOR_INCHES
+    );
     public AHRS navx = new AHRS(I2C.Port.kMXP, (byte)50);
 
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
@@ -143,10 +156,10 @@ public class FortissiMOEContainer{
 
     private final Command moveArms= new TestClimber(
             climber,
-            () -> testJoystick.getRawButton(3),
-            () -> testJoystick.getRawButton(6),
             () -> testJoystick.getRawButton(1),
-            () -> testJoystick.getRawButton(4)
+            () -> testJoystick.getRawButton(4),
+            () -> testJoystick.getRawButton(3),
+            () -> testJoystick.getRawButton(6)
 
     );
 

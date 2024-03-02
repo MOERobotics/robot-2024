@@ -35,17 +35,17 @@ public class TestClimber extends Command{
     @Override
     public void execute() {
        if(upRightBtn.get()){
-            climber.driveRight(0.3);
+            climber.driveRight(0.8);
        } else if(downRightBtn.get()){
-           climber.driveRight(-0.3);
+           climber.driveRight(-0.8);
        } else {
            climber.stopRight();
        }
 
        if(upLeftBtn.get()){
-           climber.driveLeft(0.3);
+           climber.driveLeft(0.8);
        }else if(downLeftBtn.get()){
-           climber.driveLeft(-0.3);
+           climber.driveLeft(-0.8);
        }else {
            climber.stopLeft();
        }
