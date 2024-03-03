@@ -26,14 +26,13 @@ public class setHeading extends Command {
         yspdFunction = yspeed;
         this.swerveDrive = swerveDrive;
         this.desiredYaw = desiredYaw;
-
         addRequirements(swerveDrive);
-
     }
 
 
     @Override
     public void initialize() {
+
     }
 
 
@@ -43,6 +42,14 @@ public class setHeading extends Command {
     public void execute() {
         swerveDrive.setDesiredYaw(desiredYaw.get().getDegrees());
         double turnSpd = swerveDrive.getYawCorrection();
+        double xspd = xspdFunction.get();
+        double yspd = yspdFunction.get();
+        if (Math.abs(xspd) <= .3){
+            xspd = 0;
+        }
+        if (Math.abs(yspd) <= .3){
+            yspd = 0;
+        }
         swerveDrive.driveAtSpeed(xspdFunction.get(), yspdFunction.get(), turnSpd,true);
     }
 

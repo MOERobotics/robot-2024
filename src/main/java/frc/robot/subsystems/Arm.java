@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.AllianceFlip;
 import frc.robot.UsefulPoints;
 import frc.robot.commands.ArmPathFollow;
 
@@ -136,7 +137,7 @@ public class Arm extends SubsystemBase {
     }
 
     public Translation2d autoAim(Supplier<Pose2d> robotPos){
-        double dist = UsefulPoints.Points.middleOfSpeaker.getDistance(robotPos.get().getTranslation());
+        double dist = AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker).getDistance(robotPos.get().getTranslation());
         return new Translation2d(0.466*dist + 112, 5.56*dist - 69.1);
     }
 
