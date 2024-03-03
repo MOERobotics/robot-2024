@@ -71,16 +71,18 @@ public class doubleNoteAutos {
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
         Command shootNote = new shootSpeakerCommand(shooter,collector);
         Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
-        Command collectNote = new Collect(collector,1,false);
+        Command collectNote = new Collect(collector,.4,false);
+        Command headingCorrect = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()->endRotation);
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(85), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
-                shootNote,
-		        Commands.parallel(trajCommand, collectNote),
+                Commands.race(shootNote, Commands.run(()->armSubsystem.holdPos(85, -41))),
+                Commands.race(Commands.parallel(trajCommand, collectNote), Commands.run(()->armSubsystem.holdPos(85, -41))),
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(113.5), Rotation2d.fromDegrees(-51.19)), Set.of(armSubsystem)),
 //                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getX()),
 //                        Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getY())), Set.of(armSubsystem)),
-                shootAnotherNote
+                headingCorrect,
+                Commands.race(shootAnotherNote, Commands.run(()->armSubsystem.holdPos(113.5, -51.19)))
 		        //collect and shoot
         );
     }
@@ -106,9 +108,9 @@ public class doubleNoteAutos {
         Command collectNote = new Collect(collector,1,false);
         return Commands.sequence(
                 swerveDrive.setInitPosition(initPose),
-                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(79), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
+                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(85), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
                 //shootNote,
-                Commands.parallel(trajCommand, collectNote),
+                Commands.race(Commands.parallel(trajCommand, collectNote), Commands.run(()->armSubsystem.holdPos(85, -41))),
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getX()),
                         Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getY())), Set.of(armSubsystem))
 
