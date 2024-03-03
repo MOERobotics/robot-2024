@@ -172,25 +172,25 @@ public class FortissiMOEContainer{
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
         new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.1)));
-        //new JoystickButton(functionJoystick, 1).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
+        new JoystickButton(functionJoystick, 3).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
         new JoystickButton(functionJoystick, 7).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.1)));
-        //new JoystickButton(functionJoystick, 2).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
-        new JoystickButton(functionJoystick, 1).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(79), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem))
+        new JoystickButton(functionJoystick, 4).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
+        new JoystickButton(functionJoystick, 1).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(83), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(9))));
+                        functionJoystick.getRawButton(9))));//collect
         new JoystickButton(functionJoystick, 2).onTrue(Commands.defer(() -> armSubsystem.goToPoint(Rotation2d.fromDegrees(113.5), Rotation2d.fromDegrees(-51.19)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(1) ||
                         functionJoystick.getRawButton(8)))); //podium shot
-        new JoystickButton(functionJoystick, 4).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(109), Rotation2d.fromDegrees(-35)), Set.of(armSubsystem))
+        /*new JoystickButton(functionJoystick, 4).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(109), Rotation2d.fromDegrees(-35)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1)))); //wing shot
         new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(117.3), Rotation2d.fromDegrees(-45.86)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)))); //mid shot
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)))); //mid shot*/
         //104,-41
 
     }
