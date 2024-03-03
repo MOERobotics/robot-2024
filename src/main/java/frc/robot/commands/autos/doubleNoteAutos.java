@@ -74,7 +74,7 @@ public class doubleNoteAutos {
         Command collectNote = new Collect(collector,1,false);
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
-                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(79), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
+                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(85), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
                 shootNote,
 		        Commands.parallel(trajCommand, collectNote),
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(113.5), Rotation2d.fromDegrees(-51.19)), Set.of(armSubsystem)),
@@ -107,12 +107,12 @@ public class doubleNoteAutos {
         return Commands.sequence(
                 swerveDrive.setInitPosition(initPose),
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(79), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
-                shootNote,
+                //shootNote,
                 Commands.parallel(trajCommand, collectNote),
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getX()),
-                        Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getY())), Set.of(armSubsystem)),
+                        Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getY())), Set.of(armSubsystem))
 
-                shootAnotherNote
+               // shootAnotherNote
 
         );
     }
