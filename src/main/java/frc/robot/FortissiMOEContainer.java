@@ -132,7 +132,7 @@ public class FortissiMOEContainer{
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
     Command collectorCommand = new CollectorControllerCommand(
-            0.4,
+            0.5,
             ()->functionJoystick.getRawAxis(2)>=0.5,
             ()->functionJoystick.getRawAxis(3)>=0.5,
             ()->functionJoystick.getRawButton(6),
@@ -177,8 +177,6 @@ public class FortissiMOEContainer{
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
-
-
         new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.1)));
         new JoystickButton(buttonBox, 1).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
         new JoystickButton(functionJoystick, 7).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.1)));
