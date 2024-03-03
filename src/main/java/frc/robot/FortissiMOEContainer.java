@@ -98,7 +98,7 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
-            2.5e-2, 2.5e-3, 2.5e-4, 6.0e-2, 6.0e-3, 6.0e-4, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(103),
+            2.0e-2, 2.0e-3, 2.0e-4, 6.0e-2, 6.0e-3, 6.0e-4, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(103),
             Rotation2d.fromDegrees(-53), 30,30);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
@@ -179,23 +179,23 @@ public class FortissiMOEContainer{
         new JoystickButton(functionJoystick, 1).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(85), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(9))));
+                        functionJoystick.getRawButton(9)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2))));//collect
         new JoystickButton(functionJoystick, 2).onTrue(Commands.defer(() -> armSubsystem.goToPoint(Rotation2d.fromDegrees(113.5), Rotation2d.fromDegrees(-51.19)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(1) ||
-                        functionJoystick.getRawButton(8)))); //podium shot
+                        functionJoystick.getRawButton(8)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)))); //podium shot
         new JoystickButton(functionJoystick, 4).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(109), Rotation2d.fromDegrees(-35)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1)))); //wing shot
-        new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(117.3), Rotation2d.fromDegrees(-45.86)), Set.of(armSubsystem))
+                        functionJoystick.getRawButton(1)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)))); //wing shot
+        /*new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(117.3), Rotation2d.fromDegrees(-45.86)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)))); //mid shot
-        new JoystickButton(buttonBox, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-135)), Set.of(armSubsystem))
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)))); //mid shot*/
+        new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-135)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4))));//start position
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2))));//start position
 
     }
 
