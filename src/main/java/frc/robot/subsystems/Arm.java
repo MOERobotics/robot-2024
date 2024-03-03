@@ -40,7 +40,7 @@ public class Arm extends SubsystemBase {
     private Rotation2d interShoulder, interWrist;
     private double currShoulder, currWrist;
     private double maxSpeed, maxAccel, shoulderLength, wristLength;
-    private double wristOffset = 76.376953125-128+7-60+20+15;
+    private double wristOffset = 0;
     private double shoulderOffset = 90;
 
     public Arm(int rightShoulderMotorID, int leftShoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,

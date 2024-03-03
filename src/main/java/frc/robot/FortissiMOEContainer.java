@@ -113,6 +113,7 @@ public class FortissiMOEContainer{
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
 	private final Joystick functionJoystick = new Joystick(0);
+    private final Joystick buttonBox = new Joystick(2);
 
 
     ////////////////////////////////////////////////////////////////////////////commands
@@ -146,10 +147,10 @@ public class FortissiMOEContainer{
     public FortissiMOEContainer() {
         shooterSubsystem.setShooterRPMTolerance(500);
         swerveSubsystem.setDefaultCommand(drive);
-        //collectorSubsystem.setDefaultCommand(collectorCommand);
+//        collectorSubsystem.setDefaultCommand(collectorCommand);
         armSubsystem.setDefaultCommand(Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(),
                 armSubsystem.getWristDesState()), armSubsystem));
-        //armSubsystem.setDefaultCommand(Commands.run(()->armSubsystem.stopMotors(), armSubsystem));
+//        armSubsystem.setDefaultCommand(Commands.run(()->armSubsystem.stopMotors(), armSubsystem));
         // Configure the trigger bindings
         configureBindings();
 //        var headDownThenCollect = CollectorCommands.headDownThenCollect(headSubsystem, armSubsystem);
@@ -172,10 +173,10 @@ public class FortissiMOEContainer{
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
         new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.1)));
-        //new JoystickButton(functionJoystick, 1).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
+        new JoystickButton(buttonBox, 1).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
         new JoystickButton(functionJoystick, 7).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.1)));
-        //new JoystickButton(functionJoystick, 2).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
-        new JoystickButton(functionJoystick, 1).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(79), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem))
+        new JoystickButton(buttonBox, 2).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
+        new JoystickButton(functionJoystick, 1).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(85), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(9))));
@@ -191,6 +192,10 @@ public class FortissiMOEContainer{
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)))); //mid shot
+        new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(117.3), Rotation2d.fromDegrees(-90)), Set.of(armSubsystem))
+                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
+                        functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4))));//start position
         //104,-41
 
     }
