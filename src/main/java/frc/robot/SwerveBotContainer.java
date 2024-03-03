@@ -132,12 +132,12 @@ public class SwerveBotContainer {
         var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
         button8.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),AllianceFlip.apply(Rotation2d.fromDegrees(60))));
+                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(60))));
 
         var button7 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
         button7.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),AllianceFlip.apply(Rotation2d.fromDegrees(90))));
+                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(90))));
     }
 
     private void configureBindings() {

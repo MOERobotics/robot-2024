@@ -139,12 +139,17 @@ public class SwerveDrive extends SubsystemBase {
         Translation2d diff = pos.minus(speaker);
         return (MathUtil.angleModulus((Math.atan2(diff.getY(),diff.getX()))));
     }
+    public double getAngleBetweenSpeaker(Supplier<Translation2d> pos){
+        return getAngleBetweenSpeaker(pos.get());
+    }
 
     public List<Pose2d> getObjectPos(){
         ArrayList<Pose2d> desRobotPos = new ArrayList<>();
         var objectVal = vision.detections();
         for (int i = 0; i < objectVal.size(); i++){
-            desRobotPos.add(getEstimatedPose().plus(new Transform2d(AllianceFlip.apply(objectVal.get(i)), new Rotation2d(0))));
+            Translation2d fieldObjPos = objectVal.get(i).rotateBy(getRotation2d());
+            Rotation2d desObjRot = Rotation2d.fromRadians(Math.atan2(fieldObjPos.getY(), fieldObjPos.getX()));
+            desRobotPos.add(getEstimatedPose().plus(new Transform2d(fieldObjPos, desObjRot)));
         }
         return desRobotPos;
     }
@@ -167,7 +172,8 @@ public class SwerveDrive extends SubsystemBase {
             swerveDrivePoseEstimator.addVisionMeasurement(aprilTagVal.get().pose, aprilTagVal.get().timestamp,
                     VecBuilder.fill(5e-2,5e-2,10));
         }
-        SmartDashboard.putNumberArray("detections", getObjectPos().stream().flatMapToDouble(pos -> DoubleStream.of(pos.getX(), pos.getX(), pos.getRotation().getDegrees())).toArray());
+        SmartDashboard.putNumberArray("detections", getObjectPos().stream().flatMapToDouble(
+                pos -> DoubleStream.of(pos.getX(), pos.getX(), pos.getRotation().getDegrees())).toArray());
         field.setRobotPose(swerveDrivePoseEstimator.getEstimatedPosition());
     }
 

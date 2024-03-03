@@ -20,6 +20,7 @@ import frc.robot.commands.ShooterControllerCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.SwerveController;
 import frc.robot.commands.autos.tripleNoteAutos;
+import frc.robot.commands.setHeading;
 import frc.robot.subsystems.*;
 
 import java.util.Set;
@@ -129,7 +130,7 @@ public class FortissiMOEContainer{
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
     Command collectorCommand = new CollectorControllerCommand(
-            0.6,
+            0.8,
             ()->functionJoystick.getRawAxis(2)>=0.5,
             ()->functionJoystick.getRawAxis(3)>=0.5,
             ()->functionJoystick.getRawButton(6),
@@ -139,6 +140,9 @@ public class FortissiMOEContainer{
 
     Command shooterControl = new ShooterControllerCommand(shooterSubsystem, armSubsystem::getShoulderDesState,
             ()->functionJoystick.getRawButtonPressed(5));
+    Command setHeading = new setHeading(swerveSubsystem, () -> -driverJoystick.getRawAxis(1),
+            () -> -driverJoystick.getRawAxis(0), ()->Rotation2d.fromDegrees(swerveSubsystem.getAngleBetweenSpeaker(
+                    ()->swerveSubsystem.getEstimatedPose().getTranslation())));
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
@@ -171,6 +175,8 @@ public class FortissiMOEContainer{
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
+
+
         new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.1)));
         //new JoystickButton(functionJoystick, 1).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
         new JoystickButton(functionJoystick, 7).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.1)));
@@ -187,10 +193,16 @@ public class FortissiMOEContainer{
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1)))); //wing shot
-        new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(117.3), Rotation2d.fromDegrees(-45.86)), Set.of(armSubsystem))
-                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
+
+        new JoystickButton(functionJoystick, 3).onTrue(
+                Commands.parallel(
+                Commands.defer(()->armSubsystem.goToPoint(
+                Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getX()),
+                Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getY())), Set.of(armSubsystem))
+                        .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)))); //mid shot
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4))),
+                        setHeading.until(()->driverJoystick.getRawAxis(2)>.1))); //auto aim shot
         //104,-41
 
     }

@@ -68,10 +68,14 @@ public class doubleNoteAutos {
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
 //        internalPoints.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
-
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+        Command collectNote = new Collect(collector,1,false);
         return Commands.sequence(
 				swerveDrive.setInitPosition(startPose),
-		        trajCommand
+                shootNote,
+		        Commands.parallel(trajCommand, collectNote),
+                shootAnotherNote
 		        //collect and shoot
         );
     }
@@ -92,7 +96,6 @@ public class doubleNoteAutos {
         internalPoints.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(initPose,endPose,internalPoints, 0, 0);
 
-        Command aimSpeaker = new setHeading(swerveDrive, ()->0.0,()->0.0,Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(endPose.getTranslation())));
         Command shootNote = new shootSpeakerCommand(shooter,collector);
         Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
         Command collectNote = new Collect(collector,1,false);
@@ -123,10 +126,14 @@ public class doubleNoteAutos {
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
 //        internalPoints.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
-
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+        Command collectNote = new Collect(collector,1,false);
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
-                trajCommand
+                shootNote,
+                Commands.parallel(trajCommand, collectNote),
+                shootAnotherNote
         );
     }
 
@@ -144,11 +151,15 @@ public class doubleNoteAutos {
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
 //        internalPoints1.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
-
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+        Command collectNote = new Collect(collector,1,false);
         return Commands.sequence(
 				swerveDrive.setInitPosition(startPose),
+                shootNote,
 		        //shoot
-		        trajCommand
+		        Commands.parallel(trajCommand, collectNote),
+                shootAnotherNote
 	            //collect and shoot
         );
     }

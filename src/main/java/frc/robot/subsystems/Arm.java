@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.UsefulPoints;
 import frc.robot.commands.ArmPathFollow;
 
 import java.util.function.Supplier;
@@ -40,7 +41,7 @@ public class Arm extends SubsystemBase {
     private Rotation2d interShoulder, interWrist;
     private double currShoulder, currWrist;
     private double maxSpeed, maxAccel, shoulderLength, wristLength;
-    private double wristOffset = 76.376953125-128+7-60+20+15;
+    private double wristOffset = 0;
     private double shoulderOffset = 90;
 
     public Arm(int rightShoulderMotorID, int leftShoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
@@ -132,6 +133,11 @@ public class Arm extends SubsystemBase {
                 new ArmPathFollow(this, safeShoulder, safeWrist, maxSpeed, maxAccel).withName("Arm to safe"),
                 new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel).withName("Arm safe -> dest")
         );
+    }
+
+    public Translation2d autoAim(Supplier<Pose2d> robotPos){
+        double dist = UsefulPoints.Points.middleOfSpeaker.getDistance(robotPos.get().getTranslation());
+        return new Translation2d(0.466*dist + 112, 5.56*dist - 69.1);
     }
 
 
