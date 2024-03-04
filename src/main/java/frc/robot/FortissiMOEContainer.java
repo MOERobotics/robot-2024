@@ -71,7 +71,7 @@ public class FortissiMOEContainer{
     double maxRPS = Math.PI;
     double maxRPS2 = Math.PI;
 
-    double maxMPSSquared = 2;
+    double maxMPSSquared = 4;
     private final SwerveModule frontRightModule = new SwerveModule(
             3,
             2,
@@ -121,14 +121,14 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
-            2.0e-2, 2.0e-3, 2.0e-4, 6.0e-2, 6.0e-3, 6.0e-4, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(103),
+            1.0e-2, 1.0e-3, 1.0e-4, 6.0e-2, 6.0e-3, 6.0e-4, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(103),
             Rotation2d.fromDegrees(-53), 30,30);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(5,
-            13,1e-4, 0,0,driveFF);
+            13,0, 0,0,driveFF);
     private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem(6,
             0.01,0,0,0,7);
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
@@ -148,12 +148,12 @@ public class FortissiMOEContainer{
             () -> -driverJoystick.getRawAxis(0),
             () -> driverJoystick.getRawAxis(2),
             () -> driverJoystick.getRawButton(5),
-            () -> driverJoystick.getRawButton(3), 2,1, maxMPS, maxRPS
+            () -> driverJoystick.getRawButton(3), 4,1, maxMPS, maxRPS
     );
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
     Command collectorCommand = new CollectorControllerCommand(
-            0.5,
+            0.45,
             ()->functionJoystick.getRawAxis(2)>=0.5,
             ()->functionJoystick.getRawAxis(3)>=0.5,
             ()->functionJoystick.getRawButton(6),
