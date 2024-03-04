@@ -49,6 +49,7 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("shooterBotSpeed", getShooterSpeedBottom());
     }
     public void setShooterTopSpeed(double speed){
+
         setDesShooterSpeedTop(speed);
         shooterSpeedTop=speed;
         SmartDashboard.putNumber("shooterTopDesired", speed);
@@ -56,6 +57,7 @@ public class ShooterSubsystem extends SubsystemBase {
         //shooterTop.set(speed);
     }
     public void setShooterBottomSpeed(double speed){
+
         setDesShooterSpeedBot(speed);
         shooterSpeedBottom=speed;
         SmartDashboard.putNumber("shooterBottomDesired", speed);

@@ -55,12 +55,15 @@ public class SwerveDrive extends SubsystemBase {
     Vision vision = new Vision();
 
     private final ProfiledPIDController thetaController;
+    private final ProfiledPIDController driveThetaController;
     private final PIDController xController,yController;
     Field2d field = new Field2d();
     SwerveDrivePoseEstimator swerveDrivePoseEstimator;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
-                       WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double kP, double kI, double kD,
-                       double xykP, double xykI, double xykD) {
+                       WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
+                       double kP, double kI, double kD,
+                       double xykP, double xykI, double xykD,
+                       double thetaP, double thetaI, double thetaD) {
 
         this.pigeon = pigeon;
         this.maxMetersPerSec = maxMetersPerSec;
@@ -76,8 +79,10 @@ public class SwerveDrive extends SubsystemBase {
         this.xykP = xykP; this.xykI = xykI; this.xykD = xykD;
 
         this.BRModule = BRModule;
-        thetaController = new ProfiledPIDController(kP, kI, kD, new TrapezoidProfile.Constraints(3*Math.PI,10*Math.PI));
+        driveThetaController = new ProfiledPIDController(thetaP, thetaI, thetaD, new TrapezoidProfile.Constraints(maxRPS, maxRPS2));
+        thetaController = new ProfiledPIDController(kP, kI, kD, new TrapezoidProfile.Constraints(maxRPS,maxRPS2));
         thetaController.enableContinuousInput(-180,180);
+        driveThetaController.enableContinuousInput(-180,180);
         xController = new PIDController(xykP,xykI,xykD);
         yController = new PIDController(xykP,xykI,xykD);
         kDriveKinematics = new SwerveDriveKinematics(FRModule.moduleTranslation(), FLModule.moduleTranslation(),
@@ -107,7 +112,7 @@ public class SwerveDrive extends SubsystemBase {
         align = correct;
     }
     public double getYawCorrection(){
-        return thetaController.calculate(getYaw()-desiredYaw);
+        return driveThetaController.calculate(getYaw()-desiredYaw);
     }
 
     public double getYaw(){
@@ -134,17 +139,24 @@ public class SwerveDrive extends SubsystemBase {
         swerveDrivePoseEstimator.resetPosition(getRotation2d(), getModulePositions(), pose);
     }
 
-    public double getAngleBetweenSpeaker(Translation2d pos) {
-        Translation2d speaker = UsefulPoints.Points.middleOfSpeaker;
+    public Rotation2d getAngleBetweenSpeaker(Translation2d pos, Translation2d speaker) {
         Translation2d diff = pos.minus(speaker);
-        return (MathUtil.angleModulus((Math.atan2(diff.getY(),diff.getX()))));
+        return Rotation2d.fromRadians(MathUtil.angleModulus((Math.atan2(diff.getY(),diff.getX()))));
+    }
+    public Rotation2d getAngleBetweenSpeaker(Translation2d pos){
+        return getAngleBetweenSpeaker(pos, UsefulPoints.Points.middleOfSpeaker);
+    }
+    public Rotation2d getAngleBetweenSpeaker(Supplier<Translation2d> pos){
+        return getAngleBetweenSpeaker(pos.get(), AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker));
     }
 
     public List<Pose2d> getObjectPos(){
         ArrayList<Pose2d> desRobotPos = new ArrayList<>();
         var objectVal = vision.detections();
         for (int i = 0; i < objectVal.size(); i++){
-            desRobotPos.add(getEstimatedPose().plus(new Transform2d(AllianceFlip.apply(objectVal.get(i)), new Rotation2d(0))));
+            Translation2d fieldObjPos = objectVal.get(i).rotateBy(getRotation2d());
+            Rotation2d desObjRot = Rotation2d.fromRadians(Math.atan2(fieldObjPos.getY(), fieldObjPos.getX()));
+            desRobotPos.add(getEstimatedPose().plus(new Transform2d(fieldObjPos, desObjRot)));
         }
         return desRobotPos;
     }
@@ -167,7 +179,8 @@ public class SwerveDrive extends SubsystemBase {
             swerveDrivePoseEstimator.addVisionMeasurement(aprilTagVal.get().pose, aprilTagVal.get().timestamp,
                     VecBuilder.fill(5e-2,5e-2,10));
         }
-        SmartDashboard.putNumberArray("detections", getObjectPos().stream().flatMapToDouble(pos -> DoubleStream.of(pos.getX(), pos.getX(), pos.getRotation().getDegrees())).toArray());
+        SmartDashboard.putNumberArray("detections", getObjectPos().stream().flatMapToDouble(
+                pos -> DoubleStream.of(pos.getX(), pos.getX(), pos.getRotation().getDegrees())).toArray());
         field.setRobotPose(swerveDrivePoseEstimator.getEstimatedPosition());
     }
 

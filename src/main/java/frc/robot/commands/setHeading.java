@@ -13,27 +13,26 @@ import java.util.function.Supplier;
 
 public class setHeading extends Command {
 
-    private Rotation2d desiredYaw;
+    private Supplier<Rotation2d> desiredYaw;
 
     private SwerveDrive swerveDrive;
     private final Supplier<Double> xspdFunction, yspdFunction;
 
     private PIDController PID;
 
-    public setHeading(SwerveDrive swerveDrive, Supplier<Double> xspeed, Supplier<Double> yspeed, Rotation2d desiredYaw){
+    public setHeading(SwerveDrive swerveDrive, Supplier<Double> xspeed, Supplier<Double> yspeed, Supplier<Rotation2d> desiredYaw){
 
         xspdFunction = xspeed;
         yspdFunction = yspeed;
         this.swerveDrive = swerveDrive;
         this.desiredYaw = desiredYaw;
-
         addRequirements(swerveDrive);
-
     }
 
 
     @Override
     public void initialize() {
+
     }
 
 
@@ -41,8 +40,16 @@ public class setHeading extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        swerveDrive.setDesiredYaw(desiredYaw.getDegrees());
+        swerveDrive.setDesiredYaw(desiredYaw.get().getDegrees());
         double turnSpd = swerveDrive.getYawCorrection();
+        double xspd = xspdFunction.get();
+        double yspd = yspdFunction.get();
+        if (Math.abs(xspd) <= .3){
+            xspd = 0;
+        }
+        if (Math.abs(yspd) <= .3){
+            yspd = 0;
+        }
         swerveDrive.driveAtSpeed(xspdFunction.get(), yspdFunction.get(), turnSpd,true);
     }
 
@@ -53,7 +60,7 @@ public class setHeading extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return  Math.abs(MathUtil.inputModulus(swerveDrive.getYaw()-desiredYaw.getDegrees(),-180,180))<=0.5;//2 Degree Tolerance
+        return  Math.abs(MathUtil.inputModulus(swerveDrive.getYaw()-desiredYaw.get().getDegrees(),-180,180))<=0.5;//2 Degree Tolerance
     }
 
 

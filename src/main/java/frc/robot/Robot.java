@@ -23,7 +23,7 @@ public class Robot extends TimedRobot {
     if (m_robotContainer != null)
       return;
     if (force || DriverStation.getAlliance().isPresent())
-      //m_robotContainer = new SwerveBotContainer();
+//      m_robotContainer = new SwerveBotContainer();
       m_robotContainer = new FortissiMOEContainer();
   }
 
@@ -50,6 +50,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     initRobotContainer(true);
+    m_robotContainer.resetArmPos().schedule();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -68,7 +69,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-//    m_robotContainer.resetArmPos().schedule();
+    m_robotContainer.resetArmPos().schedule();
   }
 
   @Override

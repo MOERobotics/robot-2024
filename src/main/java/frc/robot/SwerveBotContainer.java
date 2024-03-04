@@ -75,6 +75,7 @@ public class SwerveBotContainer {
     double maxMPS = 100/39.3701;
     double maxMPSSquared = 5;
     double maxRPS = Math.PI*2;
+    double maxRPSSquared = Math.PI*2;
     private final SwerveModule backLeftModule = new SwerveModule(
             19,
             18,
@@ -120,7 +121,8 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS,maxMPSSquared,2.0,0,0, 1.0, 0, 0);
+            pigeon, maxMPS,maxMPSSquared, maxRPS, maxRPSSquared,1,0,0, 1.0, 0, 0,
+            .04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -136,6 +138,9 @@ public class SwerveBotContainer {
             () -> driverJoystick.getRawButton(1), 6,6, maxMPS, maxRPS
     );
 
+    Command setHeading = new setHeading(swerveSubsystem, () -> -driverJoystick.getRawAxis(1),
+            () -> -driverJoystick.getRawAxis(0), ()->(swerveSubsystem.getAngleBetweenSpeaker(
+            ()->swerveSubsystem.getEstimatedPose().getTranslation())));
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
@@ -154,12 +159,12 @@ public class SwerveBotContainer {
         var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
         button8.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),AllianceFlip.apply(Rotation2d.fromDegrees(60))));
+                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(60))));
 
         var button7 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
         button7.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),AllianceFlip.apply(Rotation2d.fromDegrees(90))));
+                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(90))));
     }
 
 
@@ -168,6 +173,8 @@ public class SwerveBotContainer {
         var loop = CommandScheduler.getInstance().getDefaultButtonLoop();
             new Trigger(funcOpJoystick.axisGreaterThan(3, 0.8, loop))
                     .whileTrue(Commands.runOnce(() -> shooter.set(true))).whileFalse(Commands.runOnce(()->shooter.set(false)));
+
+        new JoystickButton(funcOpJoystick, 3).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
     }
 
     private void shooterOn(Solenoid shooter) {

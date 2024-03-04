@@ -23,6 +23,7 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveDrive;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 public class doubleNoteAutos {
     private static Translation2d midPose;
@@ -61,17 +62,27 @@ public class doubleNoteAutos {
 
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointC, startRotation);
         Translation2d endTranslation = UsefulPoints.Points.WingedNote2;
-        Rotation2d endRotation = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(endTranslation));
+        Rotation2d endRotation = (swerveDrive.getAngleBetweenSpeaker(endTranslation));
         Pose2d endPose = new Pose2d(endTranslation, endRotation);
 
 //        midPose = new Translation2d(endTranslation.getX()-Units.inchesToMeters(0),endTranslation.getY());
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
 //        internalPoints.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
-
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+        Command collectNote = new Collect(collector,.4,false);
+        Command headingCorrect = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()->endRotation);
         return Commands.sequence(
-				swerveDrive.setInitPosition(startPose),
-		        trajCommand
+                swerveDrive.setInitPosition(startPose),
+                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(85), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
+                Commands.race(shootNote, Commands.run(()->armSubsystem.holdPos(85, -41))),
+                Commands.race(Commands.parallel(trajCommand, collectNote), Commands.run(()->armSubsystem.holdPos(85, -41))),
+                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(113.5), Rotation2d.fromDegrees(-51.19)), Set.of(armSubsystem)),
+//                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getX()),
+//                        Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getY())), Set.of(armSubsystem)),
+                headingCorrect,
+                Commands.race(shootAnotherNote, Commands.run(()->armSubsystem.holdPos(113.5, -51.19)))
 		        //collect and shoot
         );
     }
@@ -84,7 +95,7 @@ public class doubleNoteAutos {
         Pose2d initPose = new Pose2d(UsefulPoints.Points.StartingPointB, UsefulPoints.Points.RotationOfStartingPointB);
         //Pose2d startPose = new Pose2d(initPose.getTranslation(),Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(initPose.getTranslation())));
         Translation2d endTranslation = UsefulPoints.Points.WingedNote1;
-        Rotation2d endRotation = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(endTranslation));
+        Rotation2d endRotation = (swerveDrive.getAngleBetweenSpeaker(endTranslation));
         Pose2d endPose = new Pose2d(endTranslation,endRotation);
 
         midPose = new Translation2d(Units.inchesToMeters(75), Units.inchesToMeters(250));
@@ -92,20 +103,19 @@ public class doubleNoteAutos {
         internalPoints.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(initPose,endPose,internalPoints, 0, 0);
 
-        Command aimSpeaker = new setHeading(swerveDrive, ()->0.0,()->0.0,Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(endPose.getTranslation())));
         Command shootNote = new shootSpeakerCommand(shooter,collector);
         Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
         Command collectNote = new Collect(collector,1,false);
         return Commands.sequence(
                 swerveDrive.setInitPosition(initPose),
-                //collectorPosition,
-                shootNote,
-                Commands.parallel(trajCommand, collectNote),
-//                collectorPosition,
-                shootAnotherNote
+                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(85), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
+                //shootNote,
+                Commands.race(Commands.parallel(trajCommand, collectNote), Commands.run(()->armSubsystem.holdPos(85, -41))),
+                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getX()),
+                        Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getY())), Set.of(armSubsystem))
 
-                //shootPosition
-		        //shootNote
+               // shootAnotherNote
+
         );
     }
 
@@ -116,17 +126,22 @@ public class doubleNoteAutos {
 
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointC, startRotation);
         Translation2d endTranslation = UsefulPoints.Points.WingedNote1;
-        Rotation2d endRotation = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(endTranslation));
+        Rotation2d endRotation = (swerveDrive.getAngleBetweenSpeaker(endTranslation));
         Pose2d endPose = new Pose2d(endTranslation, endRotation);
 
 //        midPose = new Translation2d(endTranslation.getX()-Units.inchesToMeters(6),endTranslation.getY()-Units.inchesToMeters(10));
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
 //        internalPoints.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
-
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+        Command collectNote = new Collect(collector,1,false);
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
-                trajCommand
+                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(79), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
+                shootNote,
+                Commands.parallel(trajCommand, collectNote),
+                shootAnotherNote
         );
     }
 
@@ -137,18 +152,22 @@ public class doubleNoteAutos {
 
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointD, startRotation);
         Translation2d endTranslation = UsefulPoints.Points.WingedNote3;
-        Rotation2d endRotation = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(endTranslation));
+        Rotation2d endRotation = (swerveDrive.getAngleBetweenSpeaker(endTranslation));
         Pose2d endPose = new Pose2d(endTranslation, endRotation);
 
 //        midPose = new Translation2d(2,1);
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
 //        internalPoints1.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints, 0, 0);
-
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+        Command collectNote = new Collect(collector,1,false);
         return Commands.sequence(
 				swerveDrive.setInitPosition(startPose),
+                shootNote,
 		        //shoot
-		        trajCommand
+		        Commands.parallel(trajCommand, collectNote),
+                shootAnotherNote
 	            //collect and shoot
         );
     }
@@ -160,12 +179,12 @@ public class doubleNoteAutos {
 
         Pose2d startPose1 = new Pose2d(UsefulPoints.Points.StartingPointB, startRotation);
         Translation2d endTranslation1 = UsefulPoints.Points.WingedNote1;
-        Rotation2d endRotation1 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(endTranslation1));
+        Rotation2d endRotation1 = (swerveDrive.getAngleBetweenSpeaker(endTranslation1));
         Pose2d endPose1 = new Pose2d(endTranslation1, endRotation1);
 
         Pose2d startPose2 = new Pose2d(UsefulPoints.Points.WingedNote1, startRotation);
         Translation2d endTranslation2 = UsefulPoints.Points.CenterNote1;
-        Rotation2d endRotation2 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(endTranslation2));
+        Rotation2d endRotation2 = (swerveDrive.getAngleBetweenSpeaker(endTranslation2));
         Pose2d endPose2 = new Pose2d(endTranslation2, endRotation2);
 
 

@@ -11,6 +11,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.UsefulPoints;
+import frc.robot.commands.Collect;
+import frc.robot.commands.shootSpeakerCommand;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.CollectorSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveDrive;
 
 import java.util.ArrayList;
@@ -23,8 +28,20 @@ public class tripleNoteAutos {
 
     private final double startVelocity; //Velocities are in meters/second.
     private final double endVelocity;
+    private ShooterSubsystem shooter;
+    private CollectorSubsystem collector;
+    private Arm armSubsystem;
 
     /** Example static factory for an autonomous command. */
+    public tripleNoteAutos(SwerveDrive subsystem, Arm armSubsystem, ShooterSubsystem shooter, CollectorSubsystem collector, double startVelocity, double endVelocity) {
+        swerveDrive=subsystem;
+        this.armSubsystem = armSubsystem;
+        this.startVelocity = startVelocity;
+        this.endVelocity = endVelocity;
+        this.shooter = shooter;
+        this.collector = collector;
+    }
+
     public tripleNoteAutos(SwerveDrive subsystem, double startVelocity, double endVelocity) {
         swerveDrive=subsystem;
         this.startVelocity = startVelocity;
@@ -37,47 +54,63 @@ public class tripleNoteAutos {
         Rotation2d startRotation1 = new Rotation2d(0);
         Pose2d startPose1 = new Pose2d(UsefulPoints.Points.StartingPointA, startRotation1);
         Translation2d wingedNote1 = UsefulPoints.Points.WingedNote1;
-        Rotation2d endRotation1 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(wingedNote1));
+        Rotation2d endRotation1 = (swerveDrive.getAngleBetweenSpeaker(wingedNote1));
         Pose2d endPose1 = new Pose2d(UsefulPoints.Points.WingedNote1, endRotation1);
         //shoot beginning note; collect winged 1 note
         //start traj 2
         Rotation2d startRotation2 = new Rotation2d(swerveDrive.getYaw());
         Pose2d startPose2 = new Pose2d(UsefulPoints.Points.WingedNote1, startRotation2);
 
-        Rotation2d endRotation2 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote2));
+        Rotation2d endRotation2 = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote2));
         Pose2d endPose2 = new Pose2d(UsefulPoints.Points.WingedNote2, endRotation2);
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
 
 
         Command traj1 = swerveDrive.generateTrajectory(startPose1,endPose1,internalPoints,0,0);
         Command traj2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints,0,0);
-
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+        Command shootLastNote = new shootSpeakerCommand(shooter, collector);
+        Command collectNote = new Collect(collector,1,false);
+        Command collectNoteAgain = new Collect(collector,1,false);
         return Commands.sequence(
 				swerveDrive.setInitPosition(startPose1),
-		        traj1,
-		        traj2);
+                shootNote,
+		        Commands.parallel(traj1, collectNote),
+                shootAnotherNote,
+		        Commands.parallel(traj2, collectNoteAgain),
+                shootLastNote
+                );
     }
 
     public Command EW3W2(){
         Rotation2d startRotation1 = Rotation2d.fromDegrees(0);
         Pose2d startPose1 = new Pose2d(UsefulPoints.Points.StartingPointE, startRotation1);
-        Rotation2d endRotation1 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote3));
+        Rotation2d endRotation1 = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote3));
         Pose2d endPose1 = new Pose2d(UsefulPoints.Points.WingedNote3, endRotation1);
 
         Rotation2d startRotation2 = new Rotation2d(swerveDrive.getYaw());
         Pose2d startPose2 = new Pose2d(UsefulPoints.Points.WingedNote3, startRotation2);
 
-        Rotation2d endRotation2 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote2));
+        Rotation2d endRotation2 = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote2));
         Pose2d endPose2 = new Pose2d(UsefulPoints.Points.WingedNote2, endRotation2);
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
 
         Command traj1 = swerveDrive.generateTrajectory(startPose1,endPose1,internalPoints,0,0);
         Command traj2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints,0,0);
-
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+        Command shootLastNote = new shootSpeakerCommand(shooter, collector);
+        Command collectNote = new Collect(collector,1,false);
+        Command collectNoteAgain = new Collect(collector,1,false);
         return Commands.sequence(
 		        swerveDrive.setInitPosition(startPose1),
-				traj1,
-		        traj2);
+                shootNote,
+				Commands.parallel(traj1, collectNote),
+                shootAnotherNote,
+		        Commands.parallel(traj2, collectNoteAgain),
+                shootLastNote
+        );
     }
 
     public Command BW1W2(){ //0 red collector; shoot blue
@@ -85,12 +118,12 @@ public class tripleNoteAutos {
         //rotate to orientation w/ shooter head towards the winged note 2
         //collect W2; rotate to speaker; shoot W2
         Pose2d startPose1 = new Pose2d(UsefulPoints.Points.StartingPointB, UsefulPoints.Points.RotationOfStartingPointB);
-        Rotation2d endRotation1 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote1));
+        Rotation2d endRotation1 = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote1));
         Pose2d endPose1 = new Pose2d(UsefulPoints.Points.WingedNote1, endRotation1);
 
         Rotation2d startRotation2 = endRotation1;
         Pose2d startPose2 = new Pose2d(UsefulPoints.Points.WingedNote1, startRotation2);
-        Rotation2d endRotation2 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote2));
+        Rotation2d endRotation2 = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote2));
 
         Pose2d endPose2 = new Pose2d(UsefulPoints.Points.WingedNote2, endRotation2);
 
@@ -104,13 +137,18 @@ public class tripleNoteAutos {
 
         Command traj1 = swerveDrive.generateTrajectory(startPose1, endPose1, internalPoints1,0,0);
         Command traj2 = swerveDrive.generateTrajectory(startPose2, endPose2, internalPoints2,0,0);
-
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+        Command shootLastNote = new shootSpeakerCommand(shooter, collector);
+        Command collectNote = new Collect(collector,1,false);
+        Command collectNoteAgain = new Collect(collector,1,false);
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose1),
-                //shoot
-                traj1,
-                //collect and shoot
-                traj2
+                shootNote,
+                Commands.parallel(traj1, collectNote),
+                shootAnotherNote,
+                Commands.parallel(traj2, collectNoteAgain),
+                shootLastNote
                 //collect and shoot
         );
     }
@@ -120,12 +158,12 @@ public class tripleNoteAutos {
         //rotate to orientation w/ shooter head towards the winged note 2
         //collect W2; rotate to speaker; shoot W2
         Pose2d startPose1 = new Pose2d(UsefulPoints.Points.StartingPointD, UsefulPoints.Points.RotationOfStartingPointD);
-        Rotation2d endRotation1 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote3));
+        Rotation2d endRotation1 = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote3));
         Pose2d endPose1 = new Pose2d(UsefulPoints.Points.WingedNote3, endRotation1);
 
         Rotation2d startRotation2 = new Rotation2d(swerveDrive.getYaw());
         Pose2d startPose2 = new Pose2d(UsefulPoints.Points.WingedNote3, startRotation2);
-        Rotation2d endRotation2 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote2));
+        Rotation2d endRotation2 = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote2));
 
         Pose2d endPose2 = new Pose2d(UsefulPoints.Points.WingedNote2, endRotation2);
 
@@ -134,13 +172,20 @@ public class tripleNoteAutos {
 
         Command traj1 = swerveDrive.generateTrajectory(startPose1, endPose1, internalPoints,0,0);
         Command traj2 = swerveDrive.generateTrajectory(startPose2, endPose2, internalPoints,0,0);
-
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+        Command shootLastNote = new shootSpeakerCommand(shooter, collector);
+        Command collectNote = new Collect(collector,1,false);
+        Command collectNoteAgain = new Collect(collector,1,false);
         return Commands.sequence(
 		        swerveDrive.setInitPosition(startPose1),
+                shootNote,
                 //shoot
-                traj1,
+                Commands.parallel(traj1, collectNote),
+                shootAnotherNote,
                 //collect and shoot
-                traj2
+                Commands.parallel(traj2, collectNoteAgain),
+                shootLastNote
                 //collect and shoot
         );
     }
@@ -150,7 +195,7 @@ public class tripleNoteAutos {
         Rotation2d endRotation1 = new Rotation2d(0);
         Pose2d endPose1 = new Pose2d(UsefulPoints.Points.CenterNote5, endRotation1);
 
-        Rotation2d endRotation2 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.DetourPointBottom));
+        Rotation2d endRotation2 = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.DetourPointBottom));
         Pose2d startPose2 = new Pose2d(UsefulPoints.Points.CenterNote5, new Rotation2d(0));
         Pose2d endPose2 = new Pose2d(UsefulPoints.Points.DetourPointBottom, endRotation2);
 
@@ -169,13 +214,20 @@ public class tripleNoteAutos {
         Command traj2 = swerveDrive.generateTrajectory(startPose2,endPose2, internalPoints2, 0,0);
         Command traj3 = swerveDrive.generateTrajectory(startPose3,endPose3, internalPoints3, 0,0);
         Command traj4 = swerveDrive.generateTrajectory(startPose4,endPose4, internalPoints3, 0,0);
-
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+        Command shootLastNote = new shootSpeakerCommand(shooter, collector);
+        Command collectNote = new Collect(collector,1,false);
+        Command collectNoteAgain = new Collect(collector,1,false);
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose1),
+                shootNote,
                 traj1,
-                traj2,
-                traj3,
-                traj4
+                Commands.parallel(traj2, collectNote),
+                shootAnotherNote,
+                Commands.parallel(traj3, collectNoteAgain),
+                traj4,
+                shootLastNote
         );
     }
 
@@ -184,7 +236,7 @@ public class tripleNoteAutos {
         Rotation2d endRotation1 = new Rotation2d(0);
         Pose2d endPose1 = new Pose2d(UsefulPoints.Points.CenterNote1, endRotation1);
 
-        Rotation2d endRotation2 = Rotation2d.fromRadians(swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.DetourPointTop));
+        Rotation2d endRotation2 = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.DetourPointTop));
         Pose2d startPose2 = new Pose2d(UsefulPoints.Points.CenterNote1, new Rotation2d(0));
         Pose2d endPose2 = new Pose2d(UsefulPoints.Points.DetourPointTop, endRotation2);
 
