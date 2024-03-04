@@ -164,10 +164,10 @@ public class FortissiMOEContainer{
 
     private final Command moveArms= new TestClimber(
             climber,
-            () -> testJoystick.getRawButton(1),
-            () -> testJoystick.getRawButton(4),
-            () -> testJoystick.getRawButton(3),
-            () -> testJoystick.getRawButton(6)
+            () -> buttonBox.getRawButton(1),
+            () -> buttonBox.getRawButton(4),
+            () -> buttonBox.getRawButton(3),
+            () -> buttonBox.getRawButton(6)
 
     );
 
@@ -176,7 +176,7 @@ public class FortissiMOEContainer{
             climber,
             0.3,
             ()-> pigeon.getRoll(),
-            ()-> testJoystick.getRawButton(7)
+            ()-> buttonBox.getRawButton(7)
     );
 
     ////////////////////////////////////////////////////////////////////////////commands end
