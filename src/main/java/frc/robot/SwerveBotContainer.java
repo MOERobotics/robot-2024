@@ -19,9 +19,12 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.TestClimber;
 import frc.robot.commands.autos.doubleNoteAutos;
 import frc.robot.commands.autos.tripleNoteAutos;
 import frc.robot.commands.setHeading;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.ClimberArm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
 
@@ -39,6 +42,21 @@ public class SwerveBotContainer {
 
 
     public DigitalOutput shooter;
+
+    public Climber climber = new Climber(
+            7,
+            12,
+            1,
+            0,
+            false,
+            true,
+            0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            0.42 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            3.76 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            3.57 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            0.65 * ClimberArm.CONVERSION_FACTOR_INCHES
+    );
 
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
 
@@ -119,6 +137,8 @@ public class SwerveBotContainer {
     );
 
     ////////////////////////////////////////////////////////////////////////////commands end
+
+
 
 
 

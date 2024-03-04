@@ -45,8 +45,8 @@ public class FortissiMOEContainer{
             true,
             0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
             0.42 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            3.86 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            3.67 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            3.76 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            3.57 * ClimberArm.CONVERSION_FACTOR_INCHES,
             0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
             0.65 * ClimberArm.CONVERSION_FACTOR_INCHES
     );
@@ -118,7 +118,8 @@ public class FortissiMOEContainer{
             pigeon, maxMPS, maxMPSSquared,1.0, 0, 0, 1.0, 0, 0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
-    private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
+    private final Arm armSubsystem = new Arm(
+            4, 15,14, 35, 36,
             1.0e-2, 1.0e-3, 0, 3.0e-2, 3.0e-3, 0, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(103),
             Rotation2d.fromDegrees(-53), 30,30);
 
@@ -222,9 +223,9 @@ public class FortissiMOEContainer{
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
         new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.1)));
-        //new JoystickButton(functionJoystick, 1).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
+        new JoystickButton(testJoystick, 2).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
         new JoystickButton(functionJoystick, 7).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.1)));
-        //new JoystickButton(functionJoystick, 2).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
+        new JoystickButton(testJoystick, 5).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
         new JoystickButton(functionJoystick, 1).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(79), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
