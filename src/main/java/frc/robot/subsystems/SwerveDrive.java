@@ -106,13 +106,10 @@ public class SwerveDrive extends SubsystemBase {
     }
     public void setDesiredYaw(double yaw){
         desiredYaw = yaw;
-        headingCorrect(true);
     }
-    public void headingCorrect(boolean correct){
-        align = correct;
-    }
+
     public double getYawCorrection(){
-        return driveThetaController.calculate(getYaw()-desiredYaw);
+        return -1*driveThetaController.calculate(getYaw()-desiredYaw);
     }
 
     public double getYaw(){
@@ -207,6 +204,8 @@ public class SwerveDrive extends SubsystemBase {
                 config
         );
         SmartDashboard.putNumber("Time",trajectory.getTotalTimeSeconds());
+        SmartDashboard.putNumber("trajEndRot", trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getRotation().getDegrees());
+        SmartDashboard.putNumber("desiredEndRot", end.getRotation().getDegrees());
         SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                 trajectory,
 //                vision::getRobotPosition,
@@ -219,6 +218,7 @@ public class SwerveDrive extends SubsystemBase {
                 this
         );
         return Commands.parallel(
+
                 Commands.runOnce(() -> field.getObject("traj").setTrajectory(trajectory)),
                 trajCommand
         );

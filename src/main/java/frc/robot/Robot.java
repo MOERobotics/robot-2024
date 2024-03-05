@@ -31,13 +31,14 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_robotContainer = new FortissiMOEContainer();
     initRobotContainer(false);
-    SmartDashboard.putData("running command", CommandScheduler.getInstance());
+
   }
 
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    SmartDashboard.putData("running command", CommandScheduler.getInstance());
   }
 
   @Override

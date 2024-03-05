@@ -59,7 +59,7 @@ public class SwerveController extends Command{
         if (Math.abs(yspd) <= .3){
             yspd = 0;
         }
-        if (Math.abs(turnspd) <= .1){
+        if (Math.abs(turnspd) <= .25){
             turnspd = 0;
         }
         xspd = xLimiter.calculate(xspd)*maxMPS;
@@ -74,7 +74,6 @@ public class SwerveController extends Command{
             m_subsystem.stopModules();
         }
         else {
-            if (turnspd != 0) m_subsystem.headingCorrect(false);
             m_subsystem.driveAtSpeed(xspd, yspd, turnspd, !relativeDrive.get());
         }
     }

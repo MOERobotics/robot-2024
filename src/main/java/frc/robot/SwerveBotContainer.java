@@ -72,7 +72,7 @@ public class SwerveBotContainer {
     double driveFF = 1.76182e-4;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
-    double maxMPS = 100/39.3701;
+    double maxMPS = 176/39.3701;
     double maxMPSSquared = 5;
     double maxRPS = Math.PI*2;
     double maxRPSSquared = Math.PI*2;
@@ -135,7 +135,7 @@ public class SwerveBotContainer {
             () -> -driverJoystick.getRawAxis(0),
             () -> -driverJoystick.getRawAxis(2),
             () -> driverJoystick.getRawButton(6),
-            () -> driverJoystick.getRawButton(1), 6,6, maxMPS, maxRPS
+            () -> driverJoystick.getRawButton(1), 2,2, maxMPS, maxRPS
     );
 
     Command setHeading = new setHeading(swerveSubsystem, () -> -driverJoystick.getRawAxis(1),
@@ -159,7 +159,7 @@ public class SwerveBotContainer {
         var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
         button8.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(60))));
+                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(-60))));
 
         var button7 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
         button7.whileTrue(new setHeading(swerveSubsystem,
@@ -182,7 +182,7 @@ public class SwerveBotContainer {
     }
 
     public Command getAutonomousCommand() {
-      return new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto2();
+      return new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto1();
 //        return new tripleNoteAutos(swerveSubsystem, 0,0).BDetourTopC1C2();
        // return Autos.exampleAuto(m_drive);
     }

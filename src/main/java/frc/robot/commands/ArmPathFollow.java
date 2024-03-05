@@ -45,7 +45,7 @@ public class ArmPathFollow extends Command {
         //SmartDashboard.putNumber("made it", timer.get());
         //s = LineHelpers.getS(targetDist, speed, accel, timer.get());
         //SmartDashboard.putNumber("ArmPathFollow s", s);
-        s = Math.min(timer.get()*60, startPoint.getDistance(desiredPoint));
+        s = Math.min(timer.get()*speed, startPoint.getDistance(desiredPoint));
         //var interPos = startPoint.getDistance(desiredPoint)
         //var interPos = startPoint.interpolate(desiredPoint, s / startPoint.getDistance(desiredPoint));
 //        double shoulderPos = LineHelpers.getPositionX(startPoint, desiredPoint, s);
