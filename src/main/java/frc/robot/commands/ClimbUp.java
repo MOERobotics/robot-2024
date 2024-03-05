@@ -18,7 +18,7 @@ public class ClimbUp extends Command {
 
 
     // TODO set tolerance to a value
-    private int tolerance;
+    private int tolerance = 2;
 
     private final double speed;
 

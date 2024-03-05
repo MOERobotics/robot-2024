@@ -16,20 +16,20 @@ import frc.robot.subsystems.SwerveDrive;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  private FortissiMOEContainer m_robotContainer;
+  private FortissiMOEContainer m_robotContainer; //= new FortissiMOEContainer();;
 //  private SwerveBotContainer m_robotContainer;
 
   private void initRobotContainer(boolean force) {
-    if (m_robotContainer != null)
-      return;
-    if (force || DriverStation.getAlliance().isPresent())
+//    if (m_robotContainer != null)
+//      return;
+//    if (force || DriverStation.getAlliance().isPresent())
 //      m_robotContainer = new SwerveBotContainer();
-      m_robotContainer = new FortissiMOEContainer();
+//      m_robotContainer =
   }
 
   @Override
   public void robotInit() {
-//    m_robotContainer = new FortissiMOEContainer();
+    m_robotContainer = new FortissiMOEContainer();
     initRobotContainer(false);
     SmartDashboard.putData("running command", CommandScheduler.getInstance());
   }
@@ -37,7 +37,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    initRobotContainer(false);
     CommandScheduler.getInstance().run();
   }
 
@@ -70,6 +69,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     m_robotContainer.resetArmPos().schedule();
+    m_robotContainer.buttonsCommand.schedule();
   }
 
   @Override

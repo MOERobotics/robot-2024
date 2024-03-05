@@ -174,15 +174,51 @@ public class FortissiMOEContainer{
 
     private final Command climbUp= new ClimbUp(
             climber,
-            0.3,
-            ()-> pigeon.getRoll()
+            0.7,
+            ()-> -pigeon.getPitch()
     );
 
 
     private final Command climbDown= new ClimbDown(
             climber,
-            0.3
+            0.8
     );
+
+
+    boolean climbingUp;
+
+    boolean climbingDown;
+
+
+    public final Command buttonsCommand = Commands.run(() -> {
+        SmartDashboard.putData("lmao", climbUp);
+        if (buttonBox.getRawButtonPressed(7)) {
+            if (climbingUp) {
+                CommandScheduler.getInstance().cancel(climbUp);
+                this.climbingUp = false;
+            } else {
+                climbUp.schedule();
+                this.climbingUp = true;
+                SmartDashboard.putBoolean("ClimbingUp", climbingUp);
+            }
+        }
+        if (buttonBox.getRawButtonPressed(8)) {
+            if (climbingDown) {
+                CommandScheduler.getInstance().cancel(climbDown);
+                this.climbingDown = false;
+                SmartDashboard.putBoolean("ClimbingDown", climbingDown);
+            } else {
+                climbDown.schedule();
+                this.climbingDown = true;
+            }
+        }
+        SmartDashboard.putBoolean("ClimbingDown", climbingDown);
+        SmartDashboard.putBoolean("ClimbingUp", climbingUp);
+
+        SmartDashboard.putNumber("Roll", pigeon.getRoll());
+        SmartDashboard.putNumber("Pitch", pigeon.getPitch());
+
+    });
 
     ////////////////////////////////////////////////////////////////////////////commands end
 
@@ -218,18 +254,13 @@ public class FortissiMOEContainer{
 	    // Configure the trigger bindings
 	    configureBindings();
 
+
         SmartDashboard.putData("Scheduler", CommandScheduler.getInstance());
 //
-        Commands.run(() -> {
-            SmartDashboard.putData("lmao", climbUp);
-        }).schedule();
+        SmartDashboard.putString("hi","hi");
 
     }
 
-
-boolean climbingUp;
-
-    boolean climbingDown;
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
@@ -258,31 +289,7 @@ boolean climbingUp;
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2))));//start position
 
-        Commands.run(() -> {
-            if (buttonBox.getRawButtonPressed(7)) {
-                if (climbingUp) {
-                    CommandScheduler.getInstance().cancel(climbUp);
-                    climbingUp = false;
-                    SmartDashboard.putBoolean("ClimbingUp", climbingUp);
-                } else {
-                    climbUp.schedule();
-                    climbingUp = true;
-                    SmartDashboard.putBoolean("ClimbingUp", climbingUp);
-                }
-            }
-            if (buttonBox.getRawButtonPressed(8)) {
-                if (climbingDown) {
-                    CommandScheduler.getInstance().cancel(climbDown);
-                    climbingDown = false;
-                    SmartDashboard.putBoolean("ClimbingDown", climbingDown);
-                } else {
-                    climbDown.schedule();
-                    climbingDown = true;
-                    SmartDashboard.putBoolean("ClimbingDown", climbingDown);
-                }
-            }
 
-        }).schedule();
 
 //        new JoystickButton(functionJoystick, 3).onTrue(
 //                Commands.parallel(
