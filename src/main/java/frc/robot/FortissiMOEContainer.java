@@ -175,7 +175,7 @@ public class FortissiMOEContainer{
     private final Command climbUp= new ClimbUp(
             climber,
             0.3,
-            ()-> (double)navx.getRoll()
+            ()-> pigeon.getRoll()
     );
 
 

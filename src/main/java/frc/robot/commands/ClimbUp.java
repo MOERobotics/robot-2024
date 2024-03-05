@@ -16,6 +16,8 @@ public class ClimbUp extends Command {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Climber climber;
 
+
+    // TODO set tolerance to a value
     private int tolerance;
 
     private final double speed;

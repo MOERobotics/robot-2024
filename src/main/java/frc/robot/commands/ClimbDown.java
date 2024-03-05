@@ -53,45 +53,6 @@ public class ClimbDown extends Command {
             climber.driveLeft(0);
         }
 
-
-        /*
-        double roll = rollSupplier.get() - initialRoll;
-        double finalSpeed;
-        if (climber.canGoDownLeft() && climber.canGoDownRight()) {
-            if (roll < -tolerance) {
-                finalSpeed = speed;
-                climber.driveLeft(finalSpeed);
-                climber.stopRight();
-            } else if (roll > tolerance) {
-                finalSpeed = speed;
-                climber.stopLeft();
-                climber.driveRight(finalSpeed);
-            } else {
-                finalSpeed = speed;
-                climber.driveLeft(finalSpeed);
-                climber.driveRight(finalSpeed);
-            }
-        } else if (climber.canGoDownLeft() || climber.canGoDownRight()) {
-            if (roll < -tolerance) {
-                climber.stopLeft();
-                finalSpeed = -speed;
-                climber.driveRight(finalSpeed);
-            } else if (roll > tolerance) {
-                finalSpeed = -speed;
-                climber.driveLeft(finalSpeed);
-                climber.stopRight();
-            } else {
-                climber.stopLeft();
-                climber.stopRight();
-            }
-        } else {
-            climber.stopLeft();
-            climber.stopRight();
-        }
-
-     */
-
-
     }
     // Called once the command ends or is interrupted.
     @Override
