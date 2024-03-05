@@ -121,8 +121,8 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
-            1.0e-2, 1.0e-3, 1.0e-4, 6.0e-2, 6.0e-3, 6.0e-4, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(102),
-            Rotation2d.fromDegrees(-53), 60,20);
+            1.0e-2, 1.0e-3, 1.0e-4, 5.0e-2, 5.0e-3, 5.0e-4, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(102),
+            Rotation2d.fromDegrees(-53), 40,30);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -191,7 +191,7 @@ public class FortissiMOEContainer{
 
 
     public FortissiMOEContainer() {
-        shooterSubsystem.setShooterRPMTolerance(500);
+        shooterSubsystem.setShooterRPMTolerance(1000);
         swerveSubsystem.setDefaultCommand(drive);
 //        collectorSubsystem.setDefaultCommand(collectorCommand);
 

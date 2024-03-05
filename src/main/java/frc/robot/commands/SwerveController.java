@@ -74,7 +74,6 @@ public class SwerveController extends Command{
             m_subsystem.stopModules();
         }
         else {
-            if (turnspd != 0) m_subsystem.headingCorrect(false);
             m_subsystem.driveAtSpeed(xspd, yspd, turnspd, !relativeDrive.get());
         }
     }

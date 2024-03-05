@@ -5,6 +5,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.internal.DriverStationModeThread;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.SwerveDrive;
@@ -40,6 +41,8 @@ public class setHeading extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        SmartDashboard.putNumber("ended", 0);
+
         swerveDrive.setDesiredYaw(desiredYaw.get().getDegrees());
         double turnSpd = swerveDrive.getYawCorrection();
         double xspd = xspdFunction.get();
@@ -50,17 +53,21 @@ public class setHeading extends Command {
         if (Math.abs(yspd) <= .3){
             yspd = 0;
         }
+        SmartDashboard.putNumber("turnspeedAuto", turnSpd);
         swerveDrive.driveAtSpeed(xspdFunction.get(), yspdFunction.get(), turnSpd,true);
     }
 
     // Called once the command ends or is interrupted.
     @Override
-    public void end(boolean interrupted) {}
+    public void end(boolean interrupted) {
+        SmartDashboard.putNumber("ended", 1);
+        swerveDrive.stopModules();
+    }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return  Math.abs(MathUtil.inputModulus(swerveDrive.getYaw()-desiredYaw.get().getDegrees(),-180,180))<=0.5;//2 Degree Tolerance
+        return  Math.abs(MathUtil.inputModulus(swerveDrive.getYaw()-desiredYaw.get().getDegrees(),-180,180))<=2;//2 Degree Tolerance
     }
 
 
