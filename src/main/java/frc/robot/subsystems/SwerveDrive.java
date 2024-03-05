@@ -167,7 +167,7 @@ public class SwerveDrive extends SubsystemBase {
 //        odometer.update(getRotation2d(), getModulePositions());
 //        field.getObject("odom").setPose(odometer.getPoseMeters());
 //        vision.setOdometryPosition(odometer.getPoseMeters());
-//        SmartDashboard.putNumber("Rotation",getPose().getRotation().getDegrees());
+        SmartDashboard.putNumber("Rotation",getEstimatedPose().getRotation().getDegrees());
         swerveDrivePoseEstimator.update(getRotation2d(), getModulePositions());
         var aprilTagVal = vision.getAprilTagPose();
         if (aprilTagVal.isPresent()) {

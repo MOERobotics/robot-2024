@@ -117,18 +117,18 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS, maxMPSSquared, maxRPS, maxRPS2,1.0, 0, 0, 1.0, 0, 0, .04, 0,0);
+            pigeon, maxMPS, maxMPSSquared, maxRPS, maxRPS2,1.0, 0, 0, 1.0, 0, 0, 1e-2, 0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
             1.0e-2, 1.0e-3, 1.0e-4, 5.0e-2, 5.0e-3, 5.0e-4, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(102),
-            Rotation2d.fromDegrees(-53), 40,30);
+            Rotation2d.fromDegrees(-53), 50,30);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(5,
-            13,0, 0,0,driveFF);
+            13,1.0e-4, 0,0,driveFF);
     private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem(6,
             0.01,0,0,0,7);
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
@@ -165,8 +165,8 @@ public class FortissiMOEContainer{
     private final Command moveArms= new TestClimber(
             climber,
             () -> buttonBox.getRawButton(7),
-            () -> buttonBox.getRawButton(4),
             () -> buttonBox.getRawButton(8),
+            () -> buttonBox.getRawButton(4),
             () -> buttonBox.getRawButton(5)
 
     );
@@ -192,7 +192,7 @@ public class FortissiMOEContainer{
 
     public final Command buttonsCommand = Commands.run(() -> {
         SmartDashboard.putData("lmao", climbUp);
-        if (buttonBox.getRawButtonPressed(7)) {
+        if (buttonBox.getRawButtonPressed(9)) {
             if (climbingUp) {
                 CommandScheduler.getInstance().cancel(climbUp);
                 this.climbingUp = false;
@@ -202,7 +202,7 @@ public class FortissiMOEContainer{
                 SmartDashboard.putBoolean("ClimbingUp", climbingUp);
             }
         }
-        if (buttonBox.getRawButtonPressed(8)) {
+        if (buttonBox.getRawButtonPressed(6)) {
             if (climbingDown) {
                 CommandScheduler.getInstance().cancel(climbDown);
                 this.climbingDown = false;
@@ -232,7 +232,7 @@ public class FortissiMOEContainer{
 
 
     public FortissiMOEContainer() {
-        shooterSubsystem.setShooterRPMTolerance(1000);
+        shooterSubsystem.setShooterRPMTolerance(500);
         swerveSubsystem.setDefaultCommand(drive);
 //        collectorSubsystem.setDefaultCommand(collectorCommand);
 
@@ -271,23 +271,32 @@ public class FortissiMOEContainer{
         new JoystickButton(functionJoystick, 1).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(85), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(2)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2))));//collect
+                        functionJoystick.getRawButton(2)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2))));
+        //collect
+
         new JoystickButton(functionJoystick, 2).onTrue(Commands.defer(() -> armSubsystem.goToPoint(Rotation2d.fromDegrees(113.5), Rotation2d.fromDegrees(-51.19)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(1) ||
-                        functionJoystick.getRawButton(8)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)))); //podium shot
+                        functionJoystick.getRawButton(8)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2))));
+        //podium shot
+
         new JoystickButton(functionJoystick, 4).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(109), Rotation2d.fromDegrees(-35)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)))); //wing shot
+                        functionJoystick.getRawButton(1)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2))));
+        //wing shot
+
         new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(114), Rotation2d.fromDegrees(-102.5)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)))); //mid shot
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2))));
+        //mid shot
+
         new JoystickButton(buttonBox, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-135)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2))));//start position
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2))));
+        //start position
 
 
 
@@ -305,7 +314,7 @@ public class FortissiMOEContainer{
     }
 
     public Command getAutonomousCommand() {
-        return new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DoubleNoteAuto1();
+        return new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DoubleNoteAuto2();
         // return Autos.exampleAuto(m_drive);
     }
     public Command resetArmPos(){
