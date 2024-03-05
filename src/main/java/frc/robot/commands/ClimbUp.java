@@ -25,10 +25,8 @@ public class ClimbUp extends Command {
 
     private final Supplier<Double> rollSupplier;
 
-    private final Supplier<Boolean> activiateBtn;
 
-    public ClimbUp(Climber climber, double speed, Supplier<Double> rollSupplier, Supplier<Boolean> activateBtn) {
-        this.activiateBtn =activateBtn;
+    public ClimbUp(Climber climber, double speed, Supplier<Double> rollSupplier) {
         this.rollSupplier = rollSupplier;
         this.climber = climber;
         this.speed=speed;
@@ -48,38 +46,22 @@ public class ClimbUp extends Command {
         double roll = rollSupplier.get() - initialRoll;
         double finalSpeed;
 
-        if (climber.canGoDownLeft() && climber.canGoDownRight()) {
-
-            if (roll < -tolerance) {
-                climber.stopLeft();
-                finalSpeed =-speed;
-                climber.driveRight(finalSpeed);
-            } else if (roll > tolerance) {
-                finalSpeed =-speed;
-                climber.driveLeft(finalSpeed);
-                climber.stopRight();
-            } else {
-                finalSpeed =-speed;
-                climber.driveLeft(finalSpeed);
-                climber.driveRight(finalSpeed);
-            }
-        } else if (climber.canGoDownLeft() || climber.canGoDownRight()) {
-            if (roll < -tolerance) {
-                climber.driveLeft(speed);
-                climber.stopRight();
-            } else if (roll > tolerance) {
-                climber.stopLeft();
-                climber.driveRight(speed);
-            } else {
-                climber.stopLeft();
-                climber.stopRight();
-            }
-        } else {
+        if (roll < -tolerance) {
             climber.stopLeft();
+            finalSpeed =-speed;
+            climber.driveRight(finalSpeed);
+        } else if (roll > tolerance) {
+            finalSpeed =-speed;
+            climber.driveLeft(finalSpeed);
             climber.stopRight();
+        } else {
+            finalSpeed =-speed;
+            climber.driveLeft(finalSpeed);
+            climber.driveRight(finalSpeed);
         }
 
     }
+
 
     // Called once the command ends or is interrupted.
 

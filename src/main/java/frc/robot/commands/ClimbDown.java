@@ -18,17 +18,12 @@ public class ClimbDown extends Command {
 
     private final Climber climber;
 
-    private int tolerance;
-
     private final double speed;
 
-    private double initialRoll;
 
 
-    private final Supplier<Double> rollSupplier;
 
-    public ClimbDown(Climber climber, double speed, Supplier<Double> rollSupplier) {
-        this.rollSupplier = rollSupplier;
+    public ClimbDown(Climber climber, double speed) {
         this.climber = climber;
         this.speed=speed;
         addRequirements(climber);
@@ -36,7 +31,7 @@ public class ClimbDown extends Command {
 
     // Called when the command is initially scheduled.
     public void initialize() {
-        initialRoll = rollSupplier.get();
+
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -47,11 +42,15 @@ public class ClimbDown extends Command {
 
 
         if(climber.canGoUpRight()){
-            climber.driveRight(0.3);
+            climber.driveRight(speed);
+        } else {
+            climber.driveRight(0);
         }
 
         if(climber.canGoUpLeft()){
-            climber.driveRight(0.3);
+            climber.driveLeft(speed);
+        } else {
+            climber.driveLeft(0);
         }
 
 

@@ -175,8 +175,13 @@ public class FortissiMOEContainer{
     private final Command climbUp= new ClimbUp(
             climber,
             0.3,
-            ()-> pigeon.getRoll(),
-            ()-> buttonBox.getRawButton(7)
+            ()-> (double)navx.getRoll()
+    );
+
+
+    private final Command climbDown= new ClimbDown(
+            climber,
+            0.3
     );
 
     ////////////////////////////////////////////////////////////////////////////commands end
@@ -215,10 +220,16 @@ public class FortissiMOEContainer{
 
         SmartDashboard.putData("Scheduler", CommandScheduler.getInstance());
 //
+        Commands.run(() -> {
+            SmartDashboard.putData("lmao", climbUp);
+        }).schedule();
 
     }
 
 
+boolean climbingUp;
+
+    boolean climbingDown;
 
     private void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
@@ -246,6 +257,32 @@ public class FortissiMOEContainer{
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2))));//start position
+
+        Commands.run(() -> {
+            if (buttonBox.getRawButtonPressed(7)) {
+                if (climbingUp) {
+                    CommandScheduler.getInstance().cancel(climbUp);
+                    climbingUp = false;
+                    SmartDashboard.putBoolean("ClimbingUp", climbingUp);
+                } else {
+                    climbUp.schedule();
+                    climbingUp = true;
+                    SmartDashboard.putBoolean("ClimbingUp", climbingUp);
+                }
+            }
+            if (buttonBox.getRawButtonPressed(8)) {
+                if (climbingDown) {
+                    CommandScheduler.getInstance().cancel(climbDown);
+                    climbingDown = false;
+                    SmartDashboard.putBoolean("ClimbingDown", climbingDown);
+                } else {
+                    climbDown.schedule();
+                    climbingDown = true;
+                    SmartDashboard.putBoolean("ClimbingDown", climbingDown);
+                }
+            }
+
+        }).schedule();
 
 //        new JoystickButton(functionJoystick, 3).onTrue(
 //                Commands.parallel(
