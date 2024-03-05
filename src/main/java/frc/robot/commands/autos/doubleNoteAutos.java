@@ -72,7 +72,7 @@ public class doubleNoteAutos {
         Command shootNote = new shootSpeakerCommand(shooter,collector);
         Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
         Command collectNote = new Collect(collector,.4,false);
-        Command headingCorrect = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()->endRotation);
+        Command headingCorrect = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()->AllianceFlip.apply(endRotation));
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(85), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),

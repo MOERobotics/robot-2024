@@ -68,10 +68,10 @@ public class FortissiMOEContainer{
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
-    double maxRPS = Math.PI;
+    double maxRPS = 2* Math.PI;
     double maxRPS2 = Math.PI;
 
-    double maxMPSSquared = 4;
+    double maxMPSSquared = 2.5;
     private final SwerveModule frontRightModule = new SwerveModule(
             3,
             2,
@@ -121,8 +121,8 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
-            1.0e-2, 1.0e-3, 1.0e-4, 6.0e-2, 6.0e-3, 6.0e-4, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(103),
-            Rotation2d.fromDegrees(-53), 30,30);
+            1.0e-2, 1.0e-3, 1.0e-4, 6.0e-2, 6.0e-3, 6.0e-4, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(102),
+            Rotation2d.fromDegrees(-53), 60,20);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -148,7 +148,7 @@ public class FortissiMOEContainer{
             () -> -driverJoystick.getRawAxis(0),
             () -> driverJoystick.getRawAxis(2),
             () -> driverJoystick.getRawButton(5),
-            () -> driverJoystick.getRawButton(3), 4,1, maxMPS, maxRPS
+            () -> driverJoystick.getRawButton(3), 2.5,1, maxMPS, maxRPS
     );
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
@@ -164,10 +164,10 @@ public class FortissiMOEContainer{
 
     private final Command moveArms= new TestClimber(
             climber,
-            () -> buttonBox.getRawButton(1),
+            () -> buttonBox.getRawButton(7),
             () -> buttonBox.getRawButton(4),
-            () -> buttonBox.getRawButton(3),
-            () -> buttonBox.getRawButton(6)
+            () -> buttonBox.getRawButton(8),
+            () -> buttonBox.getRawButton(5)
 
     );
 
@@ -238,11 +238,11 @@ public class FortissiMOEContainer{
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)))); //wing shot
-        /*new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(117.3), Rotation2d.fromDegrees(-45.86)), Set.of(armSubsystem))
+        new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(114), Rotation2d.fromDegrees(-102.5)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)))); //mid shot*/
-        new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-135)), Set.of(armSubsystem))
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)))); //mid shot
+        new JoystickButton(buttonBox, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-135)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2))));//start position

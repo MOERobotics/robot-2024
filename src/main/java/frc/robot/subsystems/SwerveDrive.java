@@ -207,6 +207,8 @@ public class SwerveDrive extends SubsystemBase {
                 config
         );
         SmartDashboard.putNumber("Time",trajectory.getTotalTimeSeconds());
+        SmartDashboard.putNumber("traj end", trajectory.sample(trajectory.getTotalTimeSeconds()));
+        SmartDashboard.putNumber("endRot", end.getRotation().getDegrees());
         SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                 trajectory,
 //                vision::getRobotPosition,
@@ -219,6 +221,7 @@ public class SwerveDrive extends SubsystemBase {
                 this
         );
         return Commands.parallel(
+
                 Commands.runOnce(() -> field.getObject("traj").setTrajectory(trajectory)),
                 trajCommand
         );
