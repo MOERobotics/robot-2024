@@ -117,7 +117,7 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS, maxMPSSquared, maxRPS, maxRPS2,1.0, 0, 0, 1.0, 0, 0, 1e-2, 0,0);
+            pigeon, maxMPS, maxMPSSquared, maxRPS, maxRPS2,1.0, 0, 0, 1.0, 0, 0, 4e-2, 0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
@@ -314,7 +314,7 @@ public class FortissiMOEContainer{
     }
 
     public Command getAutonomousCommand() {
-        return new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DoubleNoteAuto2();
+        return new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DoubleNoteAuto4();
         // return Autos.exampleAuto(m_drive);
     }
     public Command resetArmPos(){
