@@ -17,6 +17,7 @@ public class ClimbUp extends Command {
     private final Climber climber;
 
 
+
     // TODO set tolerance to a value
     private int tolerance = 2;
 
