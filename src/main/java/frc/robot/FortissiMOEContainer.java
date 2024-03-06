@@ -72,25 +72,14 @@ public class FortissiMOEContainer{
     double maxRPS2 = Math.PI;
 
     double maxMPSSquared = 2.5;
-    private final SwerveModule frontRightModule = new SwerveModule(
-            3,
-            2,
-            33,
+    private final SwerveModule backLeftModule = new SwerveModule(
+            19,
+            18,
+            31,
             false,
             true,
-            -45,
+            135,
             new Translation2d(-width, length),
-            encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
-            driveP, driveI, driveD, driveFF
-    );
-    private final SwerveModule frontLeftModule = new SwerveModule(
-            17,
-            16,
-            34,
-            false,
-            true,
-            45,
-            new Translation2d(-width, -length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
@@ -101,17 +90,28 @@ public class FortissiMOEContainer{
             false,
             true,
             -135,
+            new Translation2d(-width, -length),
+            encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
+            driveP, driveI, driveD, driveFF
+    );
+    private final SwerveModule frontLeftModule = new SwerveModule(
+            17,
+            16,
+            34,
+            false,
+            true,
+            45,
             new Translation2d(width, length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule backLeftModule = new SwerveModule(
-            19,
-            18,
-            31,
+    private final SwerveModule frontRightModule = new SwerveModule(
+            3,
+            2,
+            33,
             false,
             true,
-            135,
+            -45,
             new Translation2d(width, -length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
@@ -146,7 +146,7 @@ public class FortissiMOEContainer{
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
-            () -> driverJoystick.getRawAxis(2),
+            () -> -driverJoystick.getRawAxis(2),
             () -> driverJoystick.getRawButton(5),
             () -> driverJoystick.getRawButton(3), 2.5,1, maxMPS, maxRPS
     );
@@ -314,7 +314,7 @@ public class FortissiMOEContainer{
     }
 
     public Command getAutonomousCommand() {
-        return new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DoubleNoteAuto4();
+        return new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DoubleNoteAuto3();
         // return Autos.exampleAuto(m_drive);
     }
     public Command resetArmPos(){

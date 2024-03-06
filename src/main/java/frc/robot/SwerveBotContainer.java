@@ -182,7 +182,7 @@ public class SwerveBotContainer {
     }
 
     public Command getAutonomousCommand() {
-      return new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto1();
+      return new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto4();
 //        return new tripleNoteAutos(swerveSubsystem, 0,0).BDetourTopC1C2();
        // return Autos.exampleAuto(m_drive);
     }

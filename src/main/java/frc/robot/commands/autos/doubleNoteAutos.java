@@ -134,6 +134,7 @@ public class doubleNoteAutos {
 
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointC, startRotation);
         Translation2d endTranslation = UsefulPoints.Points.WingedNote1;
+        endTranslation = new Translation2d(endTranslation.getX() - Units.inchesToMeters(20), endTranslation.getY());
         Rotation2d endRotation = (swerveDrive.getAngleBetweenSpeaker(endTranslation));
         Pose2d endPose = new Pose2d(endTranslation, endRotation);
 
@@ -164,8 +165,9 @@ public class doubleNoteAutos {
         //x = dist center of robot when robot is pushed against the wall.
 
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointD, UsefulPoints.Points.RotationOfStartingPointD);
-        Translation2d endTranslation = new Translation2d(UsefulPoints.Points.WingedNote3.getX()-Units.inchesToMeters(30),UsefulPoints.Points.WingedNote3.getY());
+        Translation2d endTranslation = new Translation2d(UsefulPoints.Points.WingedNote3.getX()-Units.inchesToMeters(25),UsefulPoints.Points.WingedNote3.getY());
         Rotation2d endRotation = (swerveDrive.getAngleBetweenSpeaker(endTranslation));
+        SmartDashboard.putNumber("endRotationDub4", endRotation.getDegrees());
         Pose2d endPose = new Pose2d(endTranslation, Rotation2d.fromDegrees(0));
 
         midPose = new Translation2d(Units.inchesToMeters(30),Units.inchesToMeters(165));
@@ -182,10 +184,10 @@ public class doubleNoteAutos {
                 Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(85,-41))),
                 Commands.race(Commands.parallel(trajCommand.andThen(()->swerveDrive.stopModules()), collectNote), Commands.run(()->armSubsystem.holdPos(85, -41))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
-                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getX()),
-                        Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getY())), Set.of(armSubsystem)),
+//                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getX()),
+//                        Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getY())), Set.of(armSubsystem)),
                 Commands.race(headingCorrect.withTimeout(1), Commands.run(()->armSubsystem.holdPos(113.5, -42.19))),
-                Commands.runOnce(()->swerveDrive.stopModules()),
+//                Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.parallel(shootAnotherNote, Commands.run(()->armSubsystem.holdPos(113.5, -42.19)))
 
         );

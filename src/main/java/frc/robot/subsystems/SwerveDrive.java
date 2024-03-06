@@ -101,7 +101,9 @@ public class SwerveDrive extends SubsystemBase {
         return Commands.sequence(Commands.runOnce(()->setPigeon(AllianceFlip.apply(initPose).getRotation().getDegrees())),
 //		        Commands.runOnce(()->odometer.update(getRotation2d(),getModulePositions())),
                 Commands.runOnce(() -> {}), //wait a cycle to reset the pigeon or everything breaks
-		        Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose)))
+                Commands.runOnce(() -> {}),
+                Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose))),
+                Commands.runOnce(()->{})
         );
     }
     public void setDesiredYaw(double yaw){
@@ -109,7 +111,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public double getYawCorrection(){
-        return -1*driveThetaController.calculate(getYaw()-desiredYaw);
+        return driveThetaController.calculate(getYaw()-desiredYaw);
     }
 
     public double getYaw(){
@@ -204,7 +206,7 @@ public class SwerveDrive extends SubsystemBase {
                 config
         );
         SmartDashboard.putNumber("Time",trajectory.getTotalTimeSeconds());
-        SmartDashboard.putNumber("trajEndRot", trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getRotation().getDegrees());
+        SmartDashboard.putNumber("trajEndRotation", trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getRotation().getDegrees());
         SmartDashboard.putNumber("desiredEndRot", end.getRotation().getDegrees());
         SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                 trajectory,
