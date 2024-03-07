@@ -61,14 +61,14 @@ public class FortissiMOEContainer{
     double pivotP = 8.0e-3*60;
     double pivotI = 0.0;
     double pivotD = 0.0;
-    double driveP = 7.0e-5;
+    double driveP = 5.0e-5;
     double driveI = 0.0;
-    double driveD = 1.0e-4;
+    double driveD = 2.0e-4;
     double driveFF = 1.76182e-4;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
-    double maxRPS = 2* Math.PI;
+    double maxRPS =  Math.PI;
     double maxRPS2 = Math.PI;
 
     double maxMPSSquared = 2.5;
@@ -122,7 +122,7 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
             1.0e-2, 1.0e-3, 1.0e-4, 5.0e-2, 5.0e-3, 5.0e-4, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(102),
-            Rotation2d.fromDegrees(-53), 50,30);
+            Rotation2d.fromDegrees(-53), 100,30);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -148,8 +148,17 @@ public class FortissiMOEContainer{
             () -> -driverJoystick.getRawAxis(0),
             () -> -driverJoystick.getRawAxis(2),
             () -> driverJoystick.getRawButton(5),
-            () -> driverJoystick.getRawButton(3), 2.5,1, maxMPS, maxRPS
+            () -> driverJoystick.getRawButton(3), 2,3, maxMPS, maxRPS
     );
+
+    Command turnToAmp = new setHeading( swerveSubsystem,
+            ()-> -driverJoystick.getRawAxis(1),
+            ()-> -driverJoystick.getRawAxis(0),
+            ()->AllianceFlip.apply(Rotation2d.fromDegrees(90)));
+    Command turnToSource = new setHeading(swerveSubsystem,
+            ()-> -driverJoystick.getRawAxis(1),
+            ()-> -driverJoystick.getRawAxis(0),
+            ()->AllianceFlip.apply(Rotation2d.fromDegrees(-60)));
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
     Command collectorCommand = new CollectorControllerCommand(
@@ -192,7 +201,7 @@ public class FortissiMOEContainer{
 
     public final Command buttonsCommand = Commands.run(() -> {
         SmartDashboard.putData("lmao", climbUp);
-        if (buttonBox.getRawButtonPressed(9)) {
+        if (driverJoystick.getRawButtonPressed(6)) {
             if (climbingUp) {
                 CommandScheduler.getInstance().cancel(climbUp);
                 this.climbingUp = false;
@@ -202,7 +211,7 @@ public class FortissiMOEContainer{
                 SmartDashboard.putBoolean("ClimbingUp", climbingUp);
             }
         }
-        if (buttonBox.getRawButtonPressed(6)) {
+        if (driverJoystick.getRawButtonPressed(5)) {
             if (climbingDown) {
                 CommandScheduler.getInstance().cancel(climbDown);
                 this.climbingDown = false;
@@ -298,7 +307,8 @@ public class FortissiMOEContainer{
                         functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2))));
         //start position
 
-
+//        new JoystickButton(driverJoystick, 7).onTrue(turnToAmp.until(()->(Math.abs(driverJoystick.getRawAxis(2)) >= .2)));
+//        new JoystickButton(driverJoystick, 8).onTrue(turnToSource.until(()->(Math.abs(driverJoystick.getRawAxis(2)) >= .2)));
 
 //        new JoystickButton(functionJoystick, 3).onTrue(
 //                Commands.parallel(

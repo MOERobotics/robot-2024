@@ -37,12 +37,11 @@ public class Arm extends SubsystemBase {
     private final PIDController shoulderController;
     private final PIDController wristController;
 
-    private final PIDController shoulderRelController, wristRelController;
 
     private Rotation2d interShoulder, interWrist;
     private double currShoulder, currWrist;
     private double maxSpeed, maxAccel, shoulderLength, wristLength;
-    private double wristOffset = 68;
+    private double wristOffset = 0;
     private double shoulderOffset = 90;
 
     public Arm(int rightShoulderMotorID, int leftShoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
@@ -78,8 +77,6 @@ public class Arm extends SubsystemBase {
 
         shoulderController = new PIDController(kPShoulder, kIShoulder, kDShoulder);
         wristController = new PIDController(kPWrist, kIWrist, kDWrist);
-        shoulderRelController = new PIDController(kP, kI, kD);
-        wristRelController = new PIDController(kP, kI, kD);
         interShoulder = criticalShoulderAngle; interWrist = criticalWristAngle;
 		setShoulderDesState(shoulderState().getDegrees());
 		setWristDestState(wristState().getDegrees());

@@ -59,6 +59,6 @@ public class shootSpeakerCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return (!collector.isCollected() && timer.get() > 1);
+        return (!collector.isCollected() && timer.get() >= .5);
     }
 }
