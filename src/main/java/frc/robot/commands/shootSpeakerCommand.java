@@ -15,6 +15,7 @@ public class shootSpeakerCommand extends Command {
     private final ShooterSubsystem shooter;
     private  final CollectorSubsystem collector;
     private final Timer timer;
+    private boolean shot = false;
     /**
      * Creates a new ExampleCommand.
      *
@@ -27,6 +28,7 @@ public class shootSpeakerCommand extends Command {
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(shooterSubsystem,collectorSubsystem);
         timer = new Timer();
+        shot = false;
     }
     //TODO: Calculate shooter speeds based on odometry.
     public double speedCalc(){
@@ -44,6 +46,7 @@ public class shootSpeakerCommand extends Command {
         shooter.setShooterTopSpeed(speedCalc());
         shooter.setShooterBottomSpeed(speedCalc());
         if(shooter.shooterAtSpeed()){
+            shot = true;
             collector.setCollectorSpeed(1);
             timer.restart();
         }
@@ -59,6 +62,6 @@ public class shootSpeakerCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return (!collector.isCollected() && timer.get() >= .5);
+        return (shot && timer.get() >= .5);
     }
 }

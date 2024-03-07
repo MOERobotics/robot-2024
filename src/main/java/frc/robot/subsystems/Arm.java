@@ -80,6 +80,8 @@ public class Arm extends SubsystemBase {
         interShoulder = criticalShoulderAngle; interWrist = criticalWristAngle;
 		setShoulderDesState(shoulderState().getDegrees());
 		setWristDestState(wristState().getDegrees());
+        shoulderController.reset();
+        wristController.reset();
 
     }
 

@@ -127,8 +127,8 @@ public class tripleNoteAutos {
         Translation2d mid = new Translation2d(UsefulPoints.Points.WingedNote1.getX()-Units.inchesToMeters(50),
                 UsefulPoints.Points.WingedNote1.getY()-Units.inchesToMeters(20));
 
-        Translation2d mid2 = new Translation2d(UsefulPoints.Points.WingedNote2.getX()-Units.inchesToMeters(60),
-                UsefulPoints.Points.WingedNote2.getY()+Units.inchesToMeters(40));
+        Translation2d mid2 = new Translation2d(UsefulPoints.Points.WingedNote2.getX()-Units.inchesToMeters(70),
+                UsefulPoints.Points.WingedNote2.getY()+Units.inchesToMeters(10));
 
         //Translation2d mid = new Translation2d(60, 282.6);
         ArrayList<Translation2d> internalPoints1 = new ArrayList<Translation2d>();
@@ -156,7 +156,7 @@ public class tripleNoteAutos {
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getX()),
                         Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getY())), Set.of(armSubsystem)),
 
-                Commands.race(shootNote2, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(shootNote2.withTimeout(4), Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(Commands.parallel(traj2.andThen(()->swerveDrive.stopModules()), collectNote2), Commands.run(()->armSubsystem.holdPos(85, -41))),
                 Commands.runOnce(() -> swerveDrive.stopModules()),
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveDrive.getEstimatedPose()).getX()),
