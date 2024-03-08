@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.commands.*;
 import frc.robot.commands.autos.doubleNoteAutos;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -72,6 +73,8 @@ public class FortissiMOEContainer{
     double maxRPS2 = Math.PI;
 
     double maxMPSSquared = 2.5;
+    private final SendableChooser<Command> m_chooser = new SendableChooser<>();
+
     private final SwerveModule backLeftModule = new SwerveModule(
             19,
             18,
@@ -268,6 +271,12 @@ public class FortissiMOEContainer{
         SmartDashboard.putData("Scheduler", CommandScheduler.getInstance());
 //
         SmartDashboard.putString("hi","hi");
+        m_chooser.setDefaultOption("Double Note Auto 1 (CW2)", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem, collectorSubsystem,0,0).DoubleNoteAuto1());
+        m_chooser.addOption("Double Note Auto 2 (BW1)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto2());
+        m_chooser.addOption("Double Note Auto 3 (CW1)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto3());
+        m_chooser.addOption("Double Note Auto 4 (DW3)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto4());
+        m_chooser.addOption("Triple Note Auto (BW1W2)", new tripleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).BW1W2());
+        SmartDashboard.putData("chooser", m_chooser);
 
     }
 
@@ -285,14 +294,14 @@ public class FortissiMOEContainer{
                         || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
         //collect
 
-        new JoystickButton(functionJoystick, 2).onTrue(Commands.defer(() -> armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-40.5)), Set.of(armSubsystem))
+        new JoystickButton(functionJoystick, 2).onTrue(Commands.defer(() -> armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-41.5)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(1) ||
                         functionJoystick.getRawButton(8)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
                         || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
         //podium shot
 
-        new JoystickButton(functionJoystick, 4).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-37.5)), Set.of(armSubsystem))
+        new JoystickButton(functionJoystick, 4).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
@@ -345,7 +354,7 @@ public class FortissiMOEContainer{
     }
 
     public Command getAutonomousCommand() {
-        return new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DoubleNoteAuto4();
+        return m_chooser.getSelected();
         // return Autos.exampleAuto(m_drive);
     }
     public Command resetArmPos(){

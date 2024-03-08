@@ -181,6 +181,8 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboard.putNumberArray("detections", getObjectPos().stream().flatMapToDouble(
                 pos -> DoubleStream.of(pos.getX(), pos.getX(), pos.getRotation().getDegrees())).toArray());
         field.setRobotPose(swerveDrivePoseEstimator.getEstimatedPosition());
+        SmartDashboard.putNumber("Posex", getEstimatedPose().getX());
+        SmartDashboard.putNumber("Posey", getEstimatedPose().getY());
     }
 
     public void stopModules() {
