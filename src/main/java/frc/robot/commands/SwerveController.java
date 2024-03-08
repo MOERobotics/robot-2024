@@ -70,6 +70,8 @@ public class SwerveController extends Command{
             yspd = (yspd-Math.signum(yspd)*D)/(1-D);
             yspd = (G*Math.pow(yspd, 3) + (1-G)*yspd)*maxMPS;
         }
+        G = 0;
+        D = .05;
         if (Math.abs(turnspd) < D){
             turnspd = 0;
         }

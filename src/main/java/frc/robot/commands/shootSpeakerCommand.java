@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CollectorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -14,7 +15,7 @@ public class shootSpeakerCommand extends Command {
     //    private final HeadSubsystem headSubsystem;
     private final ShooterSubsystem shooter;
     private  final CollectorSubsystem collector;
-    private final Timer timer;
+    private Timer timer;
     private boolean shot = false;
     /**
      * Creates a new ExampleCommand.
@@ -27,12 +28,13 @@ public class shootSpeakerCommand extends Command {
         this.collector = collectorSubsystem;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(shooterSubsystem,collectorSubsystem);
+
         timer = new Timer();
         shot = false;
     }
     //TODO: Calculate shooter speeds based on odometry.
     public double speedCalc(){
-        return 3000.0;
+        return 3000;
     }//placeholder value
 
     // Called when the command is initially scheduled.
@@ -45,11 +47,12 @@ public class shootSpeakerCommand extends Command {
     public void execute() {
         shooter.setShooterTopSpeed(speedCalc());
         shooter.setShooterBottomSpeed(speedCalc());
-        if(shooter.shooterAtSpeed()){
+        if(shooter.shooterAtSpeed() && !shot){
             shot = true;
             collector.setCollectorSpeed(1);
             timer.restart();
         }
+        SmartDashboard.putNumber("auto Time", timer.get());
     }
 
     // Called once the command ends or is interrupted.
@@ -62,6 +65,6 @@ public class shootSpeakerCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return (shot && timer.get() >= .5);
+        return (shot && timer.get() >= .75);
     }
 }

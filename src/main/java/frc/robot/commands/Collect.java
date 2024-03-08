@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CollectorSubsystem;
@@ -14,11 +15,15 @@ import frc.robot.subsystems.ShooterSubsystem;
 public class Collect extends Command {
     private final double speed;
     private boolean index;
+    private boolean shouldStop = false;
     private CollectorSubsystem collector;
+    private Timer timer;
     public Collect(CollectorSubsystem collector, double speed, boolean index){
         this.collector=collector;
         this.speed=speed;
         this.index=index;
+        timer = new Timer();
+        shouldStop = false;
     }
 
 
@@ -34,8 +39,13 @@ public class Collect extends Command {
         if(speed<0){
             finalSpeed=speed;
         }
-        if (speed>0 && ((index&&collector.isCollected())||!collector.isCollected())) { //collector in no note
+        if (!shouldStop && speed>0 && ((index&&collector.isCollected())||!collector.isCollected())) { //collector in no note
             finalSpeed = speed;
+            timer.restart();
+        }
+        if (collector.isCollected() && timer.get() <= .1 && speed > 0){
+            shouldStop = true;
+            finalSpeed = -speed;
         }
         collector.updateCollectorSpeed(finalSpeed);
         SmartDashboard.putBoolean("started collector", collector.getCollectorState());
@@ -51,7 +61,7 @@ public class Collect extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if(!index&& collector.isCollected()){
+        if(shouldStop && timer.get() >= .1){
             return true;
         }else if(index&&!collector.isCollected()){
             return true;
