@@ -13,20 +13,19 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.ServoControllerCommand;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.TestClimber;
 import frc.robot.commands.autos.doubleNoteAutos;
 import frc.robot.commands.autos.tripleNoteAutos;
 import frc.robot.commands.setHeading;
-import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.ClimberArm;
-import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.*;
 
 import java.util.ArrayList;
 
@@ -124,7 +123,7 @@ public class SwerveBotContainer {
             pigeon, maxMPS,maxMPSSquared, maxRPS, maxRPSSquared,1,0,0, 1.0, 0, 0,
             .04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
-
+	private final CollectorFinger collectorFinger = new CollectorFinger(1);
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
     private final Joystick funcOpJoystick = new Joystick(0);
 
@@ -141,6 +140,8 @@ public class SwerveBotContainer {
     Command setHeading = new setHeading(swerveSubsystem, () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0), ()->(swerveSubsystem.getAngleBetweenSpeaker(
             ()->swerveSubsystem.getEstimatedPose().getTranslation())));
+	Command extendServo = Commands.runOnce(()->collectorFinger.setServoPos(1.0));
+	Command retractServo = Commands.runOnce(()->collectorFinger.setServoPos(0.0));
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
@@ -154,8 +155,13 @@ public class SwerveBotContainer {
         pigeon.reset();
 
         swerveSubsystem.setDefaultCommand(drive);
+//		collectorFinger.setDefaultCommand(extendServo);
         // Configure the trigger bindings
         configureBindings();
+		var button5 = new Trigger(()->funcOpJoystick.getRawButton(5));
+		button5.whileTrue(extendServo);
+	    var button6 = new Trigger(()->funcOpJoystick.getRawButton(6));
+	    button6.whileTrue(retractServo);
         var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
         button8.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
