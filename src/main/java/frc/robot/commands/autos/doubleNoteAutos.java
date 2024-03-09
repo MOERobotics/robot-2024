@@ -107,10 +107,12 @@ public class doubleNoteAutos {
 
         midPose = new Translation2d(Units.inchesToMeters(75), Units.inchesToMeters(260));
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
+        ArrayList<Translation2d> intP = new ArrayList<>();
         internalPoints.add(midPose);
         Command trajCommand = swerveDrive.generateTrajectory(initPose,endPose,internalPoints, 0, 0);
-        Pose2d finalPos = new Pose2d(UsefulPoints.Points.WingedNote1, endRotation);
-        Command crossLine = swerveDrive.generateTrajectory(endPose, finalPos, internalPoints, 0,0);
+        Pose2d finalPos = new Pose2d(UsefulPoints.Points.WingedNote1.getX()+Units.inchesToMeters(20),
+                UsefulPoints.Points.WingedNote1.getY(),endRotation);
+        Command crossLine = swerveDrive.generateTrajectory(endPose, finalPos, intP, 0,0);
         Command shootNote = new shootSpeakerCommand(shooter,collector);
         Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
         Command collectNote = new Collect(collector,.4,false);
@@ -124,7 +126,7 @@ public class doubleNoteAutos {
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(112),
-                        Rotation2d.fromDegrees(-41.5)), Set.of(armSubsystem)),
+                        Rotation2d.fromDegrees(-38.5)), Set.of(armSubsystem)),
                 Commands.race(Commands.waitSeconds(1), Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(shootAnotherNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(crossLine.andThen(Commands.runOnce(()->swerveDrive.stopModules())),
