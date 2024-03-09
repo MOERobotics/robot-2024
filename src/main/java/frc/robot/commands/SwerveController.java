@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveDrive;
@@ -88,7 +89,7 @@ public class SwerveController extends Command{
             m_subsystem.stopModules();
         }
         else {
-            m_subsystem.driveAtSpeed(xspd, yspd, turnspd, !relativeDrive.get());
+            m_subsystem.driveAtSpeed(xspd, yspd, turnspd, !relativeDrive.get(), DriverStation.getAlliance().get()==DriverStation.Alliance.Red);
         }
     }
 

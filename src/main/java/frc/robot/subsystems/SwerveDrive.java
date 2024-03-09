@@ -248,13 +248,15 @@ public class SwerveDrive extends SubsystemBase {
         BLModule.setDesiredState(desiredStates[3]);
     }
 
-    public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented){
+    public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented, boolean red){
 //        if (align){
 //            turnspd = thetaController.calculate(pigeon.getYaw(), desiredYaw);
 //        }
         ChassisSpeeds chassisSpeeds;
         if (fieldOriented){
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xspd, yspd, turnspd, getRotation2d());
+            Rotation2d currRot = getRotation2d();
+            if (red) currRot = getRotation2d().plus(Rotation2d.fromDegrees(180));
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xspd, yspd, turnspd, currRot);
         }
         else{
             chassisSpeeds = new ChassisSpeeds(xspd, yspd, turnspd);
@@ -265,6 +267,9 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboard.putString("module states", Arrays.toString(moduleStates));
 
         setModuleStates(moduleStates);
+    }
+    public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented){
+        driveAtSpeed(xspd, yspd, turnspd, fieldOriented, false);
     }
 
 }

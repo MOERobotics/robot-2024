@@ -47,6 +47,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public void periodic(){
         SmartDashboard.putNumber("shooterTopSpeed", getShooterSpeedTop());
         SmartDashboard.putNumber("shooterBotSpeed", getShooterSpeedBottom());
+        SmartDashboard.putBoolean("shooterOn", getDesShooterSpeedTop() != 0);
     }
     public void setShooterTopSpeed(double speed){
 

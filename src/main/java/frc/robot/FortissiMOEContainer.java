@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.commands.*;
 import frc.robot.commands.autos.doubleNoteAutos;
@@ -45,16 +46,17 @@ public class FortissiMOEContainer{
             0,
             false,
             true,
-            0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            0.7 * ClimberArm.CONVERSION_FACTOR_INCHES,
             0.42 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            3.76 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            3.94 * ClimberArm.CONVERSION_FACTOR_INCHES,
             3.57 * ClimberArm.CONVERSION_FACTOR_INCHES,
             0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            0.65 * ClimberArm.CONVERSION_FACTOR_INCHES
+            0.83 * ClimberArm.CONVERSION_FACTOR_INCHES
     );
     public AHRS navx = new AHRS(I2C.Port.kMXP, (byte)50);
 
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
+    PowerDistribution pdh = new PowerDistribution(21, PowerDistribution.ModuleType.kRev);
 
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
@@ -125,7 +127,7 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
             1.5e-2, 1.5e-3, 1.0e-4, 4.0e-2, 0, 4.0e-4, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(102),
-            Rotation2d.fromDegrees(-53), 150,30);
+            Rotation2d.fromDegrees(-67), 80,30);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -230,6 +232,7 @@ public class FortissiMOEContainer{
 
         SmartDashboard.putNumber("Roll", pigeon.getRoll());
         SmartDashboard.putNumber("Pitch", pigeon.getPitch());
+        pdh.setSwitchableChannel(collectorSubsystem.isCollected() && (System.currentTimeMillis()/100)%2 == 0);
 
     });
 
@@ -273,9 +276,9 @@ public class FortissiMOEContainer{
         SmartDashboard.putString("hi","hi");
         m_chooser.setDefaultOption("Double Note Auto 1 (CW2)", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem, collectorSubsystem,0,0).DoubleNoteAuto1());
         m_chooser.addOption("Double Note Auto 2 (BW1)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto2());
-        m_chooser.addOption("Double Note Auto 3 (CW1)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto3());
+       // m_chooser.addOption("Double Note Auto 3 (CW1)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto3());
         m_chooser.addOption("Double Note Auto 4 (DW3)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto4());
-        m_chooser.addOption("Triple Note Auto (BW1W2)", new tripleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).BW1W2());
+       // m_chooser.addOption("Triple Note Auto (BW1W2)", new tripleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).BW1W2());
         SmartDashboard.putData("chooser", m_chooser);
 
     }
@@ -308,7 +311,7 @@ public class FortissiMOEContainer{
                         || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
         //mid shot
 
-        new JoystickButton(functionJoystick, 9).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-33)), Set.of(armSubsystem))
+        new JoystickButton(functionJoystick, 9).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-36)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
