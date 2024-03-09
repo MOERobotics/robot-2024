@@ -55,8 +55,14 @@ public class ArmPathFollow extends Command {
 //        double wristPos = LineHelpers.getPositionY(startPoint, desiredPoint, s);
         var shoulderPos = (desiredPoint.getX()-startPoint.getX())/desiredPoint.getDistance(startPoint)*s+startPoint.getX();
 
-        var wristPos = (desiredPoint.getY()-startPoint.getY())/(desiredPoint.getX()-startPoint.getX())*(armSubsystem.shoulderState().getDegrees()
+        double wristPos = (desiredPoint.getY()-startPoint.getY())/(desiredPoint.getX()-startPoint.getX())*(armSubsystem.shoulderState().getDegrees()
                 - startPoint.getX()) + startPoint.getY();
+        if (Math.abs(desiredPoint.getX() - startPoint.getX()) <= 5){
+            wristPos = (desiredPoint.getY()-startPoint.getY())/(desiredPoint.getDistance(startPoint))*s+startPoint.getY();
+        }
+        if (desiredPoint.getDistance(startPoint) <= 5){
+            s = desiredPoint.getDistance(startPoint)+1;
+        }
         SmartDashboard.putNumber("ArmPathFollow writePos", wristPos);
         SmartDashboard.putNumber("ArmPathFollow desiredWrite", desiredPoint.getY());
         armSubsystem.pathFollow(Rotation2d.fromDegrees(shoulderPos), Rotation2d.fromDegrees(wristPos));
@@ -67,7 +73,10 @@ public class ArmPathFollow extends Command {
 
     // Called once the command ends or is interrupted.
     @Override
-    public void end(boolean interrupted) {}
+    public void end(boolean interrupted) {
+        armSubsystem.setWristDestState(desiredPoint.getY());
+        armSubsystem.setShoulderDesState(desiredPoint.getX());
+    }
 
     // Returns true when the command should end.
     @Override

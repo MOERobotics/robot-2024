@@ -100,12 +100,12 @@ public class Arm extends SubsystemBase {
         double shoulderPow = (shoulderController.calculate(shoulderState().getDegrees()));
         wristController.setSetpoint(wrist.getDegrees());
         double wristPow = (wristController.calculate(wristState().getDegrees()));
-        if (!boundChecker.inBounds(shoulder, wrist, shoulderLength, wristLength)){
-            if (boundChecker.negDerivShoulder(shoulderState(), shoulder, shoulderLength, wristLength)) shoulderPow = 0;
-            if (boundChecker.negDerivWrist(wristState(),wrist, wristLength)) wristPow = 0;
-        }
+//        if (!boundChecker.inBounds(shoulder, wrist, shoulderLength, wristLength)){
+//            if (boundChecker.negDerivShoulder(shoulderState(), shoulder, shoulderLength, wristLength)) shoulderPow = 0;
+//            if (boundChecker.negDerivWrist(wristState(),wrist, wristLength)) wristPow = 0;
+//        }
         shoulderPower(shoulderPow);
-        wristPower(wristPow);
+        wristPower(Math.min(wristPow, .5));
     }
 
     public void shoulderPower(double power){
