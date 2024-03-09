@@ -126,7 +126,7 @@ public class doubleNoteAutos {
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(112),
-                        Rotation2d.fromDegrees(-38.5)), Set.of(armSubsystem)),
+                        Rotation2d.fromDegrees(-37.5)), Set.of(armSubsystem)),
                 Commands.race(Commands.waitSeconds(1), Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(shootAnotherNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.parallel(crossLine.andThen(Commands.runOnce(()->swerveDrive.stopModules())),
