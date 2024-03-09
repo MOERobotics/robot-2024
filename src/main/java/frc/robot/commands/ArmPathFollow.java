@@ -12,6 +12,8 @@ import frc.robot.helpers.LineHelpers;
 import frc.robot.subsystems.Arm;
 import edu.wpi.first.wpilibj2.command.Command;
 
+import static java.lang.Math.abs;
+
 /** An example command that uses an example subsystem. */
 public class ArmPathFollow extends Command {
     private final Arm armSubsystem;
@@ -45,13 +47,16 @@ public class ArmPathFollow extends Command {
         //SmartDashboard.putNumber("made it", timer.get());
         //s = LineHelpers.getS(targetDist, speed, accel, timer.get());
         //SmartDashboard.putNumber("ArmPathFollow s", s);
-        s = Math.min(timer.get()*speed, startPoint.getDistance(desiredPoint));
+        //s = Math.min(timer.get()*speed, startPoint.getDistance(desiredPoint));
+        s = Math.min(timer.get()*speed, desiredPoint.getDistance(startPoint));
         //var interPos = startPoint.getDistance(desiredPoint)
         //var interPos = startPoint.interpolate(desiredPoint, s / startPoint.getDistance(desiredPoint));
 //        double shoulderPos = LineHelpers.getPositionX(startPoint, desiredPoint, s);
 //        double wristPos = LineHelpers.getPositionY(startPoint, desiredPoint, s);
-        var shoulderPos = (desiredPoint.getX()-startPoint.getX())/startPoint.getDistance(desiredPoint)*s+startPoint.getX();
-        var wristPos = (desiredPoint.getY()-startPoint.getY())/startPoint.getDistance(desiredPoint)*s+startPoint.getY();
+        var shoulderPos = (desiredPoint.getX()-startPoint.getX())/desiredPoint.getDistance(startPoint)*s+startPoint.getX();
+
+        var wristPos = (desiredPoint.getY()-startPoint.getY())/(desiredPoint.getX()-startPoint.getX())*(armSubsystem.shoulderState().getDegrees()
+                - startPoint.getX()) + startPoint.getY();
         SmartDashboard.putNumber("ArmPathFollow writePos", wristPos);
         SmartDashboard.putNumber("ArmPathFollow desiredWrite", desiredPoint.getY());
         armSubsystem.pathFollow(Rotation2d.fromDegrees(shoulderPos), Rotation2d.fromDegrees(wristPos));

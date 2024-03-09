@@ -47,7 +47,6 @@ public class Arm extends SubsystemBase {
     public Arm(int rightShoulderMotorID, int leftShoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
                double kPShoulder, double kIShoulder, double kDShoulder,
                double kPWrist, double kIWrist, double kDWrist,
-               double kP, double kI, double kD,
                double shoulderLength, double wristLength,
                Rotation2d criticalShoulderAngle, Rotation2d criticalWristAngle,
                double maxSpeed, double maxAccel) {
@@ -101,10 +100,10 @@ public class Arm extends SubsystemBase {
         double shoulderPow = (shoulderController.calculate(shoulderState().getDegrees()));
         wristController.setSetpoint(wrist.getDegrees());
         double wristPow = (wristController.calculate(wristState().getDegrees()));
-        /*if (!boundChecker.inBounds(shoulder, wrist, shoulderLength, wristLength)){
+        if (!boundChecker.inBounds(shoulder, wrist, shoulderLength, wristLength)){
             if (boundChecker.negDerivShoulder(shoulderState(), shoulder, shoulderLength, wristLength)) shoulderPow = 0;
             if (boundChecker.negDerivWrist(wristState(),wrist, wristLength)) wristPow = 0;
-        }*/
+        }
         shoulderPower(shoulderPow);
         wristPower(wristPow);
     }
