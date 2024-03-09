@@ -232,8 +232,7 @@ public class FortissiMOEContainer{
 
         SmartDashboard.putNumber("Roll", pigeon.getRoll());
         SmartDashboard.putNumber("Pitch", pigeon.getPitch());
-        pdh.setSwitchableChannel(collectorSubsystem.isCollected() && (System.currentTimeMillis()/100)%2 == 0);
-
+        pdh.setSwitchableChannel(collectorSubsystem.isCollected() && ((System.currentTimeMillis()/100)%2 == 0) ||  shooterSubsystem.shooterAtSpeed());
     });
 
     ////////////////////////////////////////////////////////////////////////////commands end
