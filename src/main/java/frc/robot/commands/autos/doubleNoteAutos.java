@@ -169,6 +169,18 @@ public class doubleNoteAutos {
         );
     }
 
+    public Command AMoveAuto(){//Roll straight past strating line
+        Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointA,Rotation2d.fromDegrees(0));
+        Pose2d endPose = new Pose2d(new Translation2d(150,UsefulPoints.Points.StartingPointA.getY()),Rotation2d.fromDegrees(0));
+        ArrayList<Translation2d> internalPoints = new ArrayList<>();
+        Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints,0,0);
+        return Commands.sequence(
+                swerveDrive.setInitPosition(startPose),
+                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-35)), Set.of(armSubsystem)),
+                Commands.race(trajCommand.andThen(()-> swerveDrive.stopModules()),Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState())))
+        );
+    }
+
     public Command DoubleNoteAuto4(){//TODO: Fix coordinates, create actual shoot and collect commands
         //x = dist center of robot when robot is pushed against the wall.
 
@@ -177,7 +189,12 @@ public class doubleNoteAutos {
         Rotation2d endRotation = (swerveDrive.getAngleBetweenSpeaker(endTranslation));
         SmartDashboard.putNumber("endRotationDub4", endRotation.getDegrees());
         Pose2d endPose = new Pose2d(endTranslation, Rotation2d.fromDegrees(0));
-
+        Pose2d startPose2 = new Pose2d(endPose.getTranslation(),endRotation);
+        Pose2d endPose2 = new Pose2d(UsefulPoints.Points.DetourPointBottom,Rotation2d.fromDegrees(0));
+        ArrayList<Translation2d> internalPoints2 = new ArrayList<Translation2d>();
+        Translation2d midPose2 = endTranslation.minus(new Translation2d(30,60));
+        internalPoints2.add(midPose2);
+        Command trajCommand2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints2,0,0);
         midPose = new Translation2d(Units.inchesToMeters(65),Units.inchesToMeters(175));
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
         internalPoints.add(midPose);
@@ -198,8 +215,9 @@ public class doubleNoteAutos {
                         Rotation2d.fromDegrees(-46.5)), Set.of(armSubsystem)),
                 Commands.race(Commands.waitSeconds(1), Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
 //                Commands.runOnce(()->swerveDrive.stopModules()),
-                Commands.parallel(shootAnotherNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState())))
-
+                Commands.race(shootAnotherNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(trajCommand2.andThen(()->swerveDrive.stopModules()),Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.runOnce(()->swerveDrive.stopModules())
         );
     }
 
