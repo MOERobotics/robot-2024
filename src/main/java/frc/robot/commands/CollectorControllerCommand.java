@@ -60,7 +60,7 @@ public class CollectorControllerCommand extends Command {
             timer.restart();
         }
         if (subsystem.isCollected() && timer.get() <= .05){
-            finalSpeed = -speed;
+            finalSpeed = -speed/4;
         }
         if(index.get()){
             finalSpeed = 1;
