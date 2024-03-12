@@ -280,6 +280,7 @@ public class FortissiMOEContainer{
         m_chooser.addOption("Double Note Auto 4 (DW3)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto4());
        // m_chooser.addOption("Triple Note Auto (BW1W2)", new tripleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).BW1W2());
         m_chooser.addOption("A Move Auto", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).AMoveAuto());
+
         SmartDashboard.putData("chooser", m_chooser);
 
     }

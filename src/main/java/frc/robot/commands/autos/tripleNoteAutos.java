@@ -10,8 +10,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.AllianceFlip;
 import frc.robot.UsefulPoints;
 import frc.robot.commands.Collect;
+import frc.robot.commands.setHeading;
 import frc.robot.commands.shootSpeakerCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.CollectorSubsystem;
@@ -49,39 +51,84 @@ public class tripleNoteAutos {
         this.endVelocity = endVelocity;
     }
 
-    public Command AW1W2(){//TODO: Fix coordinates, create actual shoot and collect commands
+    public Command CW1W2(){//TODO: Fix coordinates, create actual shoot and collect commands
 //go to W1 collect; go to B; shoot; W2 collect; go to D; shoot
         //traj 1
-        Rotation2d startRotation1 = new Rotation2d(0);
-        Pose2d startPose1 = new Pose2d(UsefulPoints.Points.StartingPointA, startRotation1);
-        Translation2d wingedNote1 = UsefulPoints.Points.WingedNote1;
-        Rotation2d endRotation1 = (swerveDrive.getAngleBetweenSpeaker(wingedNote1));
-        Pose2d endPose1 = new Pose2d(UsefulPoints.Points.WingedNote1, endRotation1);
-        //shoot beginning note; collect winged 1 note
-        //start traj 2
-        Rotation2d startRotation2 = new Rotation2d(swerveDrive.getYaw());
-        Pose2d startPose2 = new Pose2d(UsefulPoints.Points.WingedNote1, startRotation2);
+        Rotation2d startRotation = new Rotation2d(0);
+        Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointC, startRotation);
+        Rotation2d endRotation = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote2));
+        Translation2d endTranslation = new Translation2d(UsefulPoints.Points.WingedNote2.getX()-Units.inchesToMeters(8),
+                UsefulPoints.Points.WingedNote2.getY());
+        Pose2d endPose = new Pose2d(endTranslation, endRotation); //goes from start c to point w2
 
-        Rotation2d endRotation2 = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote2));
-        Pose2d endPose2 = new Pose2d(UsefulPoints.Points.WingedNote2, endRotation2);
+        Translation2d endTranslation2 = UsefulPoints.Points.StartingPointC.minus(
+                new Translation2d(Units.inchesToMeters(7), 0));
+//        Rotation2d startRotation2 = new Rotation2d(swerveDrive.getYaw());
+        Pose2d startPose2 = new Pose2d(endTranslation, endRotation);
+        Rotation2d endRotation2= Rotation2d.fromDegrees(0);
+        Pose2d endPose2 = new Pose2d(endTranslation2, endRotation2); //goes from point w2 to start c
+
+        Translation2d endTranslation3 = new Translation2d(UsefulPoints.Points.WingedNote1.getX(),
+                UsefulPoints.Points.WingedNote1.getY() + Units.inchesToMeters(6));
+        Rotation2d startRotation3 = endRotation2;
+        Pose2d startPose3 = new Pose2d(endTranslation2, startRotation3);
+        Rotation2d endRotation3 = (swerveDrive.getAngleBetweenSpeaker(endTranslation3).plus(Rotation2d.fromDegrees(-5)));
+        Pose2d endPose3 = new Pose2d(endTranslation3,endRotation3); //startC to W1
+
+        Translation2d endTranslation4 = endTranslation2;
+        Rotation2d startRotation4 = endRotation3;
+        Pose2d startPose4 = new Pose2d(endPose3.getTranslation(), startRotation4);
+        Rotation2d endRotation4= endRotation2;
+        Pose2d endPose4 = new Pose2d(endTranslation4, endRotation4); //W1 to start C
+
+        Translation2d endTranslation5 = new Translation2d(UsefulPoints.Points.WingedNote3.getX()-Units.inchesToMeters(19),UsefulPoints.Points.WingedNote3.getY()-Units.inchesToMeters(3));
+        Rotation2d endRotation5 = (swerveDrive.getAngleBetweenSpeaker(endTranslation));
+        Rotation2d startRotation5 = endRotation4;
+        Pose2d startPose5 = new Pose2d(endPose4.getTranslation(), startRotation5);
+        Pose2d endPose5 = new Pose2d(endTranslation5, endRotation5);// start C to W3
+
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
+        ArrayList<Translation2d> internalPoints2 = new ArrayList<>();
+        ArrayList<Translation2d> internalPoints3 = new ArrayList<>();
+        ArrayList<Translation2d> internalPoints4 = new ArrayList<>();
+        ArrayList<Translation2d> internalPoints5 = new ArrayList<>();
 
 
-        Command traj1 = swerveDrive.generateTrajectory(startPose1,endPose1,internalPoints,0,0);
-        Command traj2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints,0,0);
+        Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints,0,0);
+        Command trajCommand2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints2,0,0);
+        Command trajCommand3 = swerveDrive.generateTrajectory(startPose3,endPose3,internalPoints3,0,0);
+        Command trajCommand4 = swerveDrive.generateTrajectory(startPose4,endPose4,internalPoints4,0,0);
+        Command trajCommand5 = swerveDrive.generateTrajectory(startPose5,endPose5,internalPoints5,0,0);
+
         Command shootNote = new shootSpeakerCommand(shooter,collector);
         Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
         Command shootLastNote = new shootSpeakerCommand(shooter, collector);
-        Command collectNote = new Collect(collector,1,false);
-        Command collectNoteAgain = new Collect(collector,1,false);
+
+        Command collectNote = new Collect(collector,0.4,false);
+        Command collectNote2 = new Collect(collector,0.4,false);
+        Command collectNote3 = new Collect(collector,0.4,false);
+        Command collectNote4 = new Collect(collector,0.4,false);
+        Command collectNote5 = new Collect(collector,0.4,false);
+
+        Command headingCorrect = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation));
+        Command headingCorrect2 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation3));
+        Command headingCorrect4 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation4));
         return Commands.sequence(
-				swerveDrive.setInitPosition(startPose1),
-                shootNote,
-		        Commands.parallel(traj1, collectNote),
-                shootAnotherNote,
-		        Commands.parallel(traj2, collectNoteAgain),
-                shootLastNote
-                );
+                swerveDrive.setInitPosition(startPose),
+                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-35)), Set.of(armSubsystem)),
+                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(83), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)).andThen(Commands.waitSeconds(.5)),
+                Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(Commands.parallel(trajCommand.andThen(()->swerveDrive.stopModules()), collectNote), Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.runOnce(()->swerveDrive.stopModules()),
+                Commands.race(Commands.parallel(trajCommand2.andThen(headingCorrect2.withTimeout(1)).andThen(()->swerveDrive.stopModules()),Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),collectNote2),
+                Commands.runOnce(()->swerveDrive.stopModules()),
+                Commands.race(shootAnotherNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(Commands.parallel(trajCommand3.andThen(()->swerveDrive.stopModules()),Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),collectNote3),
+                Commands.runOnce(()->swerveDrive.stopModules()),
+                Commands.race(Commands.parallel(trajCommand4.andThen(headingCorrect4.withTimeout(1)).andThen(()->swerveDrive.stopModules()),Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),collectNote4),
+                Commands.runOnce(()->swerveDrive.stopModules()),
+                Commands.parallel(shootLastNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState())))
+        );
     }
 
     public Command EW3W2(){
