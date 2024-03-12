@@ -5,16 +5,15 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.HeadSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
 import java.util.function.Supplier;
 
 /** An example command that uses an example subsystem. */
 public class ShooterControllerCommand extends Command {
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final ShooterSubsystem subsystem;
     Supplier<Boolean> onoff;
+    Supplier<Double> desShoulder;
     boolean finished;
     double shooterSpeedTop;
     double shooterSpeedBottom;
@@ -25,10 +24,11 @@ public class ShooterControllerCommand extends Command {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public ShooterControllerCommand(ShooterSubsystem subsystem, double shooterSpeedTop, double shooterSpeedBottom, Supplier<Boolean> on) {
+    public ShooterControllerCommand(ShooterSubsystem subsystem, Supplier <Double> desShoulder, Supplier<Boolean> on) {
         this.subsystem = subsystem;
-        this.shooterSpeedTop = shooterSpeedTop;
-        this.shooterSpeedBottom = shooterSpeedBottom;
+        this.shooterSpeedTop = 5000;
+        this.shooterSpeedBottom = 5000;
+        this.desShoulder = desShoulder;
         onoff = on;
         onState = 0;
         addRequirements(subsystem);
@@ -47,14 +47,20 @@ public class ShooterControllerCommand extends Command {
             onState %= 2;
         }
         if (onState%2 == 1){
+            shooterSpeedTop = 4000; shooterSpeedBottom = 4000;
+            if (desShoulder.get() <= 85) {shooterSpeedTop = 3000; shooterSpeedBottom = 3000;}
             subsystem.setShooterSpeeds(shooterSpeedTop, shooterSpeedBottom);
         } else{
-            subsystem.stopShooter();
+            shooterSpeedTop = 0;
+            shooterSpeedBottom = 0;
+            subsystem.setShooterSpeeds(shooterSpeedTop, shooterSpeedBottom);
+            //subsystem.stopShooter();
         }
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {}
+
 
 }

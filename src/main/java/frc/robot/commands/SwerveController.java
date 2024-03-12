@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveDrive;
@@ -53,18 +54,32 @@ public class SwerveController extends Command{
         double yspd = yspdFunction.get()/div;
         double turnspd = turnspdFunction.get()/div;
 
-        if (Math.abs(xspd) <= .3){
+        double D = .1;
+        double G = .5;
+
+        if (Math.abs(xspd) <= D){
             xspd = 0;
         }
-        if (Math.abs(yspd) <= .3){
+        else{
+            xspd = (xspd-Math.signum(yspd)*D)/(1-D);
+            xspd = (G*Math.pow(xspd, 3) + (1-G)*xspd)*maxMPS;
+        }
+        if (Math.abs(yspd) <= D){
             yspd = 0;
         }
-        if (Math.abs(turnspd) <= .3){
+        else{
+            yspd = (yspd-Math.signum(yspd)*D)/(1-D);
+            yspd = (G*Math.pow(yspd, 3) + (1-G)*yspd)*maxMPS;
+        }
+        G = 0;
+        D = .05;
+        if (Math.abs(turnspd) < D){
             turnspd = 0;
         }
-        xspd = xLimiter.calculate(xspd)*maxMPS;
-        yspd = yLimiter.calculate(yspd)*maxMPS;
-        turnspd = turnLimiter.calculate(turnspd)*maxRPS * 2.0;
+        else{
+            turnspd = (turnspd-Math.signum(yspd)*D)/(1-D);
+            turnspd = (G*Math.pow(turnspd, 3) + (1-G)*turnspd)*maxMPS;
+        }
 
 
         SmartDashboard.putNumber("xspd", xspd);
@@ -74,8 +89,7 @@ public class SwerveController extends Command{
             m_subsystem.stopModules();
         }
         else {
-            if (turnspd != 0) m_subsystem.headingCorrect(false);
-            m_subsystem.driveAtSpeed(xspd, yspd, turnspd, !relativeDrive.get());
+            m_subsystem.driveAtSpeed(xspd, yspd, turnspd, !relativeDrive.get(), DriverStation.getAlliance().get()==DriverStation.Alliance.Red);
         }
     }
 

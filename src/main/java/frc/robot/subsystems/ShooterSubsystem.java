@@ -16,6 +16,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private final RelativeEncoder shooterTopEncoder;
     private final RelativeEncoder shooterBottomEncoder;
+    private double shooterSpeedTop=0;//Store desired speeds
+    private double shooterSpeedBottom=0;
+    private double shooterRPMTolerance=0;
+    private double desTopSpeed, desBotSpeed;
     public ShooterSubsystem(int shooterTopID, int shooterBottomID, double shooterP,
                             double shooterI, double shooterD, double shooterFF) {
         shooterTop = new CANSparkMax(shooterTopID, CANSparkLowLevel.MotorType.kBrushless);
@@ -36,14 +40,30 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterBottomController.setP(shooterP); shooterBottomController.setI(shooterI);
         shooterBottomController.setD(shooterD); shooterBottomController.setFF(shooterFF);
         shooterTopController.setOutputRange(0, 1);
+        shooterRPMTolerance=5;
+        desBotSpeed = 0; desTopSpeed = 0;
+    }
+    @Override
+    public void periodic(){
+        SmartDashboard.putNumber("shooterTopSpeed", getShooterSpeedTop());
+        SmartDashboard.putNumber("shooterBotSpeed", getShooterSpeedBottom());
+        SmartDashboard.putBoolean("shooterOn", getDesShooterSpeedTop() != 0);
     }
     public void setShooterTopSpeed(double speed){
+
+        setDesShooterSpeedTop(speed);
+        shooterSpeedTop=speed;
         SmartDashboard.putNumber("shooterTopDesired", speed);
         shooterTopController.setReference(speed, CANSparkBase.ControlType.kVelocity);
+        //shooterTop.set(speed);
     }
     public void setShooterBottomSpeed(double speed){
+
+        setDesShooterSpeedBot(speed);
+        shooterSpeedBottom=speed;
         SmartDashboard.putNumber("shooterBottomDesired", speed);
         shooterBottomController.setReference(speed, CANSparkBase.ControlType.kVelocity);
+        //shooterBottom.set(speed);
     }
     public void setShooterSpeeds(double topSpeed, double bottomSpeed){
         setShooterTopSpeed(topSpeed); setShooterBottomSpeed(bottomSpeed);
@@ -57,5 +77,33 @@ public class ShooterSubsystem extends SubsystemBase {
     }
     public double getShooterSpeedBottom(){
         return shooterBottomEncoder.getVelocity();
+    }
+
+    public double getDesShooterSpeedTop(){
+        return desTopSpeed;
+    }
+    public double getDesShooterSpeedBot(){
+        return desBotSpeed;
+    }
+
+    public void setDesShooterSpeedTop(double speed){
+        desTopSpeed = speed;
+    }
+    public void setDesShooterSpeedBot(double speed){
+        desBotSpeed = speed;
+    }
+
+    public void setShooterRPMTolerance(double Tolerance){
+        shooterRPMTolerance=Tolerance;
+        SmartDashboard.putNumber("Shooter RPM Tolerance", Tolerance);
+    }
+
+    public double getShooterRPMTolerance(){
+        return shooterRPMTolerance;
+    }
+
+    public boolean shooterAtSpeed(){
+        return ((Math.abs(getDesShooterSpeedTop() - getShooterSpeedTop()) <= getShooterRPMTolerance()) &&
+                (Math.abs(getDesShooterSpeedBot() - getShooterSpeedBottom()) <= getShooterRPMTolerance()));
     }
 }
