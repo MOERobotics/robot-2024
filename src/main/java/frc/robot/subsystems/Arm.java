@@ -105,7 +105,7 @@ public class Arm extends SubsystemBase {
 //            if (boundChecker.negDerivWrist(wristState(),wrist, wristLength)) wristPow = 0;
 //        }
         shoulderPower(shoulderPow);
-        wristPower(Math.min(wristPow, .5));
+        wristPower(Math.min(wristPow, .6));
     }
 
     public void shoulderPower(double power){
