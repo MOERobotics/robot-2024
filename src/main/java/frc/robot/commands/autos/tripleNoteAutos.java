@@ -171,7 +171,7 @@ public class tripleNoteAutos {
         Rotation2d endRotation6 = (swerveDrive.getAngleBetweenSpeaker(endTranslation6));
         Rotation2d startRotation6 = endRotation5;
         Pose2d startPose6 = new Pose2d(endPose5.getTranslation(), startRotation6);
-        Pose2d endPose6 = new Pose2d(endTranslation6, endRotation6);// start C to W3
+        Pose2d endPose6 = new Pose2d(endTranslation6, endRotation6);// W3 to start C
 
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
         ArrayList<Translation2d> internalPoints2 = new ArrayList<>();
