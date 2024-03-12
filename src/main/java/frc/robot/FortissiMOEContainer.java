@@ -243,12 +243,13 @@ public class FortissiMOEContainer{
     Command setHeading = new setHeading(swerveSubsystem, () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0), ()->(swerveSubsystem.getAngleBetweenSpeaker(
             ()->swerveSubsystem.getEstimatedPose().getTranslation())));
+	Command noteFeed = new NoteFeed(shooterSubsystem,collectorSubsystem,()->1300);
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
 
     public FortissiMOEContainer() {
-        shooterSubsystem.setShooterRPMTolerance(500);
+        shooterSubsystem.setShooterRPMTolerance(250);
         swerveSubsystem.setDefaultCommand(drive);
 //        collectorSubsystem.setDefaultCommand(collectorCommand);
 
@@ -273,7 +274,7 @@ public class FortissiMOEContainer{
 
         SmartDashboard.putData("Scheduler", CommandScheduler.getInstance());
 //
-        SmartDashboard.putString("hi","hi");
+//        SmartDashboard.putString("hi","hi");
         m_chooser.setDefaultOption("Double Note Auto 1 (CW2)", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem, collectorSubsystem,0,0).DoubleNoteAuto1());
         m_chooser.addOption("Double Note Auto 2 (BW1)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto2());
        // m_chooser.addOption("Double Note Auto 3 (CW1)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto3());
@@ -343,6 +344,9 @@ public class FortissiMOEContainer{
                         functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
                         || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
         //start position
+
+	    new JoystickButton(driverJoystick,14).onTrue(noteFeed);
+		//Note passing from center line, TODO: Remap button as needed
 
 //        new JoystickButton(driverJoystick, 7).onTrue(turnToAmp.until(()->(Math.abs(driverJoystick.getRawAxis(2)) >= .2)));
 //        new JoystickButton(driverJoystick, 8).onTrue(turnToSource.until(()->(Math.abs(driverJoystick.getRawAxis(2)) >= .2)));
