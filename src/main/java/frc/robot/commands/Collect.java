@@ -56,6 +56,7 @@ public class Collect extends Command {
     @Override
     public void end(boolean interrupted) {
         collector.stopCollector();
+        shouldStop = false;
     }
 
     // Returns true when the command should end.
