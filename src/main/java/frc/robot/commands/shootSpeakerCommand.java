@@ -59,7 +59,7 @@ public class shootSpeakerCommand extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        shooter.stopShooter();
+        //shooter.stopShooter();
         collector.stopCollector();
         shot = false;
     }
@@ -67,6 +67,6 @@ public class shootSpeakerCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return (shot && timer.get() >= .75);
+        return (shot && timer.get() >= .25);
     }
 }
