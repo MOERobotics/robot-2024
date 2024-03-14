@@ -133,7 +133,7 @@ public class FortissiMOEContainer{
 
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(5,
-            13,1.0e-4, 0,0,driveFF);
+            13,4.0e-4, 0,0,driveFF+2.4e-5);
     private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem(6,
             0.01,0,0,0,7);
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
@@ -243,13 +243,13 @@ public class FortissiMOEContainer{
     Command setHeading = new setHeading(swerveSubsystem, () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0), ()->(swerveSubsystem.getAngleBetweenSpeaker(
             ()->swerveSubsystem.getEstimatedPose().getTranslation())));
-	Command noteFeed = new NoteFeed(shooterSubsystem,collectorSubsystem,()->1300);
+	Command noteFeed = new NoteFeed(shooterSubsystem,collectorSubsystem,()->1300);//1300~14ft
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
 
     public FortissiMOEContainer() {
-        shooterSubsystem.setShooterRPMTolerance(250);
+        shooterSubsystem.setShooterRPMTolerance(150);
         swerveSubsystem.setDefaultCommand(drive);
 //        collectorSubsystem.setDefaultCommand(collectorCommand);
 
