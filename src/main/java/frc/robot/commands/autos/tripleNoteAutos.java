@@ -70,18 +70,18 @@ public class tripleNoteAutos {
         Command trajCommand2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints2);
         Command headingCorrect = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation));
 
-        Command shootNote = new shootSpeakerCommand(shooter,collector);
-        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+//        Command shootNote = new shootSpeakerCommand(shooter,collector);
+//        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
 
-        Command collectNote = new Collect(collector,0.4,false);
-        Command collectNote2 = new Collect(collector,0.4,false);
+//        Command collectNote = new Collect(collector,0.4,false);
+//        Command collectNote2 = new Collect(collector,0.4,false);
 
         return Commands.sequence(
-                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-65)), Set.of(armSubsystem)),
-                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(83), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
-                Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
-                Commands.race(Commands.parallel(trajCommand.andThen(()->swerveDrive.stopModules()), collectNote),
-                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+//                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-65)), Set.of(armSubsystem)),
+//                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(83), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
+//                Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(Commands.parallel(trajCommand.andThen(()->swerveDrive.stopModules())/*, collectNote*/)),
+                        /*Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),*/
                 trajCommand2.andThen(()->swerveDrive.stopModules()).andThen(headingCorrect.withTimeout(0.5))
                 );
     }
