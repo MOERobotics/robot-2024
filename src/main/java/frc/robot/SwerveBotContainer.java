@@ -43,7 +43,7 @@ public class SwerveBotContainer {
     // public Solenoid shooter;
 
 
-    public DigitalOutput shooter;
+//    public DigitalOutput shooter;
 
     WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
 
@@ -140,7 +140,7 @@ public class SwerveBotContainer {
 
     public SwerveBotContainer() {
 
-        shooter = new DigitalOutput(4);
+//        shooter = new DigitalOutput(4);
         pigeon.reset();
 
         swerveSubsystem.setDefaultCommand(drive);
