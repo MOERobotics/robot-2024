@@ -150,6 +150,7 @@ public class SwerveBotContainer {
         m_chooser.addOption("Double Note Auto 4", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto4());
         m_chooser.addOption("Center Line Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).CenterLineAuto1());
         m_chooser.addOption("FCenter Auto", new doubleNoteAutos(swerveSubsystem,0,0).FCenterAuto());
+        m_chooser.addOption("DC5D",new tripleNoteAutos(swerveSubsystem,0,0).DC5D());
         SmartDashboard.putData(m_chooser);
 
         // Configure the trigger bindings

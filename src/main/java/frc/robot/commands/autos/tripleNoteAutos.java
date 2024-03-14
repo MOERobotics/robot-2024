@@ -50,6 +50,41 @@ public class tripleNoteAutos {
         this.startVelocity = startVelocity;
         this.endVelocity = endVelocity;
     }
+
+    public Command DC5D(){
+        Rotation2d startRotation = new Rotation2d(0);
+        Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointD, UsefulPoints.Points.RotationOfStartingPointD);
+        Rotation2d endRotation = new Rotation2d().fromDegrees(0);
+        Translation2d endTranslation = UsefulPoints.Points.CenterNote4;
+        Translation2d midPose = UsefulPoints.Points.DetourPointBottom;
+        ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
+        Pose2d endPose = new Pose2d(endTranslation, endRotation); //goes from start D to point C5
+        Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints);
+        internalPoints.add(midPose);
+
+        Pose2d startPose2 = endPose;
+        Rotation2d endRotation2 = UsefulPoints.Points.RotationOfStartingPointD;
+        Translation2d endTranslation2 = UsefulPoints.Points.StartingPointD;
+        ArrayList<Translation2d> internalPoints2 = new ArrayList<Translation2d>();
+        Pose2d endPose2 = new Pose2d(endTranslation, endRotation); //goes from start D to point C5
+        Command trajCommand2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints2);
+        Command headingCorrect = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation));
+
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+
+        Command collectNote = new Collect(collector,0.4,false);
+        Command collectNote2 = new Collect(collector,0.4,false);
+
+        return Commands.sequence(
+                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-65)), Set.of(armSubsystem)),
+                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(83), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
+                Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(Commands.parallel(trajCommand.andThen(()->swerveDrive.stopModules()), collectNote),
+                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                trajCommand2.andThen(()->swerveDrive.stopModules()).andThen(headingCorrect.withTimeout(0.5))
+                );
+    }
     public Command CW1W2(){//TODO: Fix coordinates, create actual shoot and collect commands
 //go to W1 collect; go to B; shoot; W2 collect; go to D; shoot
         //traj 1
