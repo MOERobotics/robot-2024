@@ -167,7 +167,7 @@ public class tripleNoteAutos {
     }
 
     public Command CW1W2W3(){//TODO: Fix coordinates, create actual shoot and collect commands
-//go to W1 collect; go to B; shoot; W2 collect; go to D; shoot
+        //go to W1 collect; go to B; shoot; W2 collect; go to D; shoot
         //traj 1
         Rotation2d startRotation = new Rotation2d(0);
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointC, startRotation);
@@ -183,11 +183,11 @@ public class tripleNoteAutos {
         Rotation2d endRotation2 = Rotation2d.fromDegrees(0);
         Pose2d endPose2 = new Pose2d(endTranslation2, endRotation2); //goes from point w2 to start c
 
-        Translation2d endTranslation3 = new Translation2d(UsefulPoints.Points.WingedNote3.getX()-Units.inchesToMeters(12),
+        Translation2d endTranslation3 = new Translation2d(UsefulPoints.Points.WingedNote3.getX()-Units.inchesToMeters(14),
                 UsefulPoints.Points.WingedNote3.getY());
         Rotation2d startRotation3 = endRotation2;
         Pose2d startPose3 = new Pose2d(endTranslation2, startRotation3);
-        Rotation2d endRotation3 = endRotation2;//(swerveDrive.getAngleBetweenSpeaker(endTranslation3).plus(Rotation2d.fromDegrees(-5)));
+        Rotation2d endRotation3 = (swerveDrive.getAngleBetweenSpeaker(endTranslation3).plus(Rotation2d.fromDegrees(-5)));
         Pose2d endPose3 = new Pose2d(endTranslation3,endRotation3); //startC to W3
 
         Translation2d endTranslation4 = endTranslation2;
@@ -196,26 +196,24 @@ public class tripleNoteAutos {
         Rotation2d endRotation4= endRotation2;
         Pose2d endPose4 = new Pose2d(endTranslation4, endRotation4); //W3 to start C
 
-        Translation2d endTranslation5 = UsefulPoints.Points.WingedNote1;
-        Rotation2d endRotation5 = endRotation2;//(swerveDrive.getAngleBetweenSpeaker(endTranslation));
+        Translation2d endTranslation5 = new Translation2d(UsefulPoints.Points.WingedNote1.getX(),UsefulPoints.Points.WingedNote1.getY() + Units.inchesToMeters(6));
+        Rotation2d endRotation5 = (swerveDrive.getAngleBetweenSpeaker(endTranslation));
         Rotation2d startRotation5 = endRotation4;
         Pose2d startPose5 = new Pose2d(endPose4.getTranslation(), startRotation5);
         Pose2d endPose5 = new Pose2d(endTranslation5, endRotation5);// start C to W1
 
         Translation2d endTranslation6 = endTranslation4;
-        Rotation2d endRotation6 = endRotation2;//(swerveDrive.getAngleBetweenSpeaker(endTranslation6));
+        Rotation2d endRotation6 = (swerveDrive.getAngleBetweenSpeaker(endTranslation6));
         Rotation2d startRotation6 = endRotation5;
         Pose2d startPose6 = new Pose2d(endPose5.getTranslation(), startRotation6);
         Pose2d endPose6 = new Pose2d(endTranslation6, endRotation6);// W1 to start C
 
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
         ArrayList<Translation2d> internalPoints2 = new ArrayList<>();
-        ArrayList<Translation2d> internalPoints3 = new ArrayList<>(); //need an internal point
-        internalPoints3.add(endTranslation3.minus(new Translation2d(Units.inchesToMeters(24), Units.inchesToMeters(0))));
-
+        ArrayList<Translation2d> internalPoints3 = new ArrayList<>();
         ArrayList<Translation2d> internalPoints4 = new ArrayList<>();
-        ArrayList<Translation2d> internalPoints5 = new ArrayList<>(); //need an internal point here
-        internalPoints5.add(endTranslation5.minus(new Translation2d(Units.inchesToMeters(12), Units.inchesToMeters(0))));
+        ArrayList<Translation2d> internalPoints5 = new ArrayList<>();
+        internalPoints5.add(endTranslation5.plus(new Translation2d(Units.inchesToMeters(-24), 0)));
 
         ArrayList<Translation2d> internalPoints6 = new ArrayList<>();
 
@@ -236,11 +234,15 @@ public class tripleNoteAutos {
         Command collectNote2 = new Collect(collector,0.45,false);
         Command collectNote3 = new Collect(collector,0.45,false);
 
+        Command headingCorrect = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation));
+        Command headingCorrect2 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation3));
+        Command headingCorrect4 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation4));
+        Command headingCorrect6 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation4));
 
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
-                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(83), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)).andThen(Commands.waitSeconds(.25)),
+                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(83), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)).andThen(Commands.waitSeconds(.15)),
                 Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(Commands.parallel(trajCommand.andThen(()->swerveDrive.stopModules()), collectNote),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
@@ -252,18 +254,18 @@ public class tripleNoteAutos {
                 Commands.race(Commands.parallel(trajCommand3.andThen(()->swerveDrive.stopModules()), collectNote2),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
-                Commands.race(Commands.parallel(trajCommand4.andThen(()->swerveDrive.stopModules())),
+                Commands.race(Commands.parallel(trajCommand4.andThen(headingCorrect4.withTimeout(.15)).andThen(()->swerveDrive.stopModules())),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.race(shootLastNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(Commands.parallel(trajCommand5.andThen(()->swerveDrive.stopModules()), collectNote3),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
-                Commands.race(trajCommand6.andThen(()->swerveDrive.stopModules()),
+                Commands.race(trajCommand6.andThen(headingCorrect6.withTimeout(.15)).andThen(()->swerveDrive.stopModules()),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.parallel(shootAnotherLastNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState())))
-                );
+        );
     }
 
     public Command EW3W2(){
