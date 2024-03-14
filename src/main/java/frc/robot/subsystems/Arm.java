@@ -76,6 +76,8 @@ public class Arm extends SubsystemBase {
 
         shoulderController = new PIDController(kPShoulder, kIShoulder, kDShoulder);
         wristController = new PIDController(kPWrist, kIWrist, kDWrist);
+        //wristController.setIZone();
+
         interShoulder = criticalShoulderAngle; interWrist = criticalWristAngle;
 		setShoulderDesState(shoulderState().getDegrees());
 		setWristDestState(wristState().getDegrees());
@@ -104,8 +106,8 @@ public class Arm extends SubsystemBase {
 //            if (boundChecker.negDerivShoulder(shoulderState(), shoulder, shoulderLength, wristLength)) shoulderPow = 0;
 //            if (boundChecker.negDerivWrist(wristState(),wrist, wristLength)) wristPow = 0;
 //        }
-        shoulderPower(shoulderPow);
-        wristPower(Math.min(wristPow, .6));
+        shoulderPower(Math.min(shoulderPow, 1));
+        wristPower(Math.min(wristPow, .7));
     }
 
     public void shoulderPower(double power){
