@@ -127,7 +127,7 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
             2.0e-2, 2.0e-3, 4.0e-4, 8.0e-3, 0, 1.0e-4, 23.839, 14.231,
-            Rotation2d.fromDegrees(88), Rotation2d.fromDegrees(-32), 70,30);
+            Rotation2d.fromDegrees(88), Rotation2d.fromDegrees(-47), 70,30);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -307,12 +307,12 @@ public class FortissiMOEContainer{
                         || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
         //podium shot
 
-        /*new JoystickButton(functionJoystick, 4).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-38.5)), Set.of(armSubsystem))
+        new JoystickButton(functionJoystick, 4).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-47.5)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
-                        || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));*/
-        //mid shot
+                        || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
+        //all the shots smh until roshik chooses a new random button to be his favorite
 
         new JoystickButton(functionJoystick, 9).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-31)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
@@ -344,18 +344,20 @@ public class FortissiMOEContainer{
 
 //        new JoystickButton(driverJoystick, 7).onTrue(turnToAmp.until(()->(Math.abs(driverJoystick.getRawAxis(2)) >= .2)));
 //        new JoystickButton(driverJoystick, 8).onTrue(turnToSource.until(()->(Math.abs(driverJoystick.getRawAxis(2)) >= .2)));
-        new JoystickButton(functionJoystick, 4).onTrue(
+        /*new JoystickButton(functionJoystick, 4).onTrue(
                 Commands.parallel(
                 Commands.defer(()->armSubsystem.goToPoint(
                 Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getX()),
-                Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getY())), Set.of(armSubsystem))
+                Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getY())), Set.of(armSubsystem)).andThen(
+                        Commands.run(()-> armSubsystem.holdPos(armSubsystem.shoulderPosRel(), armSubsystem.wristPosRel()))
+                        )
                         .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1) || functionJoystick.getRawButton(3))),
                         Commands.run(()->swerveSubsystem.setDesiredYaw(swerveSubsystem.getAngleBetweenSpeaker(
                                 ()->swerveSubsystem.getEstimatedPose().getTranslation()).getDegrees())).until(
                                 ()->Math.abs(driverJoystick.getRawAxis(2)) >= .1
-                        ))); //auto aim shot
+                        ))); //auto aim shot*/
         //104,-41
       //  new JoystickButton(driverJoystick, 7).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
     }
