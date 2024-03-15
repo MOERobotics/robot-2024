@@ -47,7 +47,7 @@ public class ShooterControllerCommand extends Command {
             onState %= 2;
         }
         if (onState%2 == 1){
-            shooterSpeedTop = 4000; shooterSpeedBottom = 4000;
+            shooterSpeedTop = 3500; shooterSpeedBottom = 3500;
             if (desShoulder.get() <= 85) {shooterSpeedTop = 3000; shooterSpeedBottom = 3000;}
             subsystem.setShooterSpeeds(shooterSpeedTop, shooterSpeedBottom);
         } else{

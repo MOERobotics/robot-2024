@@ -107,6 +107,7 @@ public class SwerveDrive extends SubsystemBase {
         );
     }
     public void setDesiredYaw(double yaw){
+        align = true;
         desiredYaw = yaw;
     }
 
@@ -249,9 +250,12 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented, boolean red){
-//        if (align){
-//            turnspd = thetaController.calculate(pigeon.getYaw(), desiredYaw);
-//        }
+        if (turnspd != 0) {
+            align = false;
+        }
+        if (align){
+            turnspd = getYawCorrection();
+        }
         ChassisSpeeds chassisSpeeds;
         if (fieldOriented){
             Rotation2d currRot = getRotation2d();

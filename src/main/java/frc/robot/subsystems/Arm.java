@@ -76,6 +76,8 @@ public class Arm extends SubsystemBase {
 
         shoulderController = new PIDController(kPShoulder, kIShoulder, kDShoulder);
         wristController = new PIDController(kPWrist, kIWrist, kDWrist);
+        //wristController.setIZone();
+
         interShoulder = criticalShoulderAngle; interWrist = criticalWristAngle;
 		setShoulderDesState(shoulderState().getDegrees());
 		setWristDestState(wristState().getDegrees());
@@ -104,8 +106,8 @@ public class Arm extends SubsystemBase {
 //            if (boundChecker.negDerivShoulder(shoulderState(), shoulder, shoulderLength, wristLength)) shoulderPow = 0;
 //            if (boundChecker.negDerivWrist(wristState(),wrist, wristLength)) wristPow = 0;
 //        }
-        shoulderPower(shoulderPow);
-        wristPower(Math.min(wristPow, .5));
+        shoulderPower(Math.min(shoulderPow, 1));
+        wristPower(Math.min(wristPow, .7));
     }
 
     public void shoulderPower(double power){
@@ -136,7 +138,7 @@ public class Arm extends SubsystemBase {
 
     public Translation2d autoAim(Supplier<Pose2d> robotPos){
         double dist = AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker).getDistance(robotPos.get().getTranslation());
-        return new Translation2d(0.466*dist + 112, 5.56*dist - 69.1);
+        return new Translation2d(112, 3.8*dist-53.1);
     }
 
 
