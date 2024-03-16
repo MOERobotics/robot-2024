@@ -238,6 +238,9 @@ public class FortissiMOEContainer{
 
     public FortissiMOEContainer() {
         shooterSubsystem.setShooterRPMTolerance(500);
+        shooterSubsystem.setDesShooterSpeedBot(3000);
+        shooterSubsystem.setDesShooterSpeedTop(3000);
+
         swerveSubsystem.setDefaultCommand(drive);
 //        collectorSubsystem.setDefaultCommand(collectorCommand);
 
