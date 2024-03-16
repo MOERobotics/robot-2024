@@ -98,8 +98,6 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Shooter RPM Tolerance", Tolerance);
     }
 
-
-
     public double getShooterRPMTolerance(){
         return shooterRPMTolerance;
     }

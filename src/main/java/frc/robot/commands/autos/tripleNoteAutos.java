@@ -31,9 +31,6 @@ public class tripleNoteAutos {
 
     private final double startVelocity; //Velocities are in meters/second.
     private final double endVelocity;
-    private final double subShooterSpeed = 3000;
-    private final double podiumShooterSpeed = 4000;
-    private final double passShooterSpeed = 1300;
     private ShooterSubsystem shooter;
     private CollectorSubsystem collector;
     private Arm armSubsystem;
@@ -113,7 +110,6 @@ public class tripleNoteAutos {
         Command headingCorrect4 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation4));
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
-                Commands.runOnce(Commands.parallel(()->shooter.setDesShooterSpeedTop(3000),shooter.setDesShooterSpeedBot(3000)),shooter);
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-65)), Set.of(armSubsystem)),
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(83), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
                 Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
