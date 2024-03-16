@@ -238,8 +238,7 @@ public class FortissiMOEContainer{
 
     public FortissiMOEContainer() {
         shooterSubsystem.setShooterRPMTolerance(500);
-        shooterSubsystem.setDesShooterSpeedBot(3000);
-        shooterSubsystem.setDesShooterSpeedTop(3000);
+        shooterSubsystem.setDesShooterSpeeds(3500,3500);
 
         swerveSubsystem.setDefaultCommand(drive);
 //        collectorSubsystem.setDefaultCommand(collectorCommand);
@@ -355,6 +354,9 @@ public class FortissiMOEContainer{
                                 ()->swerveSubsystem.getEstimatedPose().getTranslation()).getDegrees())).until(
                                 ()->Math.abs(driverJoystick.getRawAxis(2)) >= .1
                         ))); //auto aim shot
+
+        new JoystickButton(buttonBox, 6).whileTrue(Commands.runOnce(()->shooterSubsystem.setDesShooterSpeeds(1800,1800))).
+                whileFalse(Commands.runOnce(()->shooterSubsystem.setDesShooterSpeeds(3500,3500)));
         //104,-41
       //  new JoystickButton(driverJoystick, 7).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
 

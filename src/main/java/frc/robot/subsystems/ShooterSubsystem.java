@@ -41,7 +41,7 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterBottomController.setD(shooterD); shooterBottomController.setFF(shooterFF);
         shooterTopController.setOutputRange(0, 1);
         shooterRPMTolerance=5;
-        desBotSpeed = 0; desTopSpeed = 0;
+        desBotSpeed = 3500; desTopSpeed = 3500;
     }
     @Override
     public void periodic(){
@@ -51,7 +51,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
     public void setShooterTopSpeed(double speed){
 
-        setDesShooterSpeedTop(speed);
+        //setDesShooterSpeedTop(speed);
         shooterSpeedTop=speed;
         SmartDashboard.putNumber("shooterTopDesired", speed);
         shooterTopController.setReference(speed, CANSparkBase.ControlType.kVelocity);
@@ -59,7 +59,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
     public void setShooterBottomSpeed(double speed){
 
-        setDesShooterSpeedBot(speed);
+        //setDesShooterSpeedBot(speed);
         shooterSpeedBottom=speed;
         SmartDashboard.putNumber("shooterBottomDesired", speed);
         shooterBottomController.setReference(speed, CANSparkBase.ControlType.kVelocity);
@@ -67,6 +67,10 @@ public class ShooterSubsystem extends SubsystemBase {
     }
     public void setShooterSpeeds(double topSpeed, double bottomSpeed){
         setShooterTopSpeed(topSpeed); setShooterBottomSpeed(bottomSpeed);
+    }
+    public void setDesShooterSpeeds(double topSpeed, double bottomSpeed){
+        setDesShooterSpeedTop(topSpeed);
+        setDesShooterSpeedBot(bottomSpeed);
     }
 
     public void stopShooter(){
