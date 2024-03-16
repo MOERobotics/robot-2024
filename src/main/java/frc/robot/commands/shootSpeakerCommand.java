@@ -46,8 +46,8 @@ public class shootSpeakerCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        shooter.setShooterTopSpeed(speedCalc());
-        shooter.setShooterBottomSpeed(speedCalc());
+        shooter.setShooterTopSpeed(shooter.getDesShooterSpeedTop());
+        shooter.setShooterBottomSpeed(shooter.getDesShooterSpeedBot());
         if(shooter.shooterAtSpeed() && !shot){
             shot = true;
             collector.setCollectorSpeed(1);

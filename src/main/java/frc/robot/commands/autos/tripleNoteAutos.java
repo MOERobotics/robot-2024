@@ -31,6 +31,9 @@ public class tripleNoteAutos {
 
     private final double startVelocity; //Velocities are in meters/second.
     private final double endVelocity;
+    private final double subShooterSpeed = 3000;
+    private final double podiumShooterSpeed = 4000;
+    private final double passShooterSpeed = ;
     private ShooterSubsystem shooter;
     private CollectorSubsystem collector;
     private Arm armSubsystem;
@@ -98,7 +101,7 @@ public class tripleNoteAutos {
         Command trajCommand3 = swerveDrive.generateTrajectory(startPose3,endPose3,internalPoints3,0,0);
         Command trajCommand4 = swerveDrive.generateTrajectory(startPose4,endPose4,internalPoints4,0,0);
         Command trajCommand5 = swerveDrive.generateTrajectory(startPose5,endPose5,internalPoints5,0,0);
-
+        Command setShooterSpeed = new Command(Commands.parallel(()->shooter.setDesShooterSpeedTop(3000),()->shooter.getDesShooterSpeedBot(3000));
         Command shootNote = new shootSpeakerCommand(shooter,collector);
         Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
         Command shootLastNote = new shootSpeakerCommand(shooter, collector);
