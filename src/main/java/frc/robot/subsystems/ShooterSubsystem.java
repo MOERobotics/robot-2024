@@ -27,6 +27,8 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterBottom.setInverted(true);
         shooterTop.setIdleMode(CANSparkBase.IdleMode.kCoast);
         shooterBottom.setIdleMode(CANSparkBase.IdleMode.kCoast);
+        shooterBottom.setSmartCurrentLimit(30);
+        shooterTop.setSmartCurrentLimit(30);
 
         shooterTopEncoder = shooterTop.getEncoder();
         shooterTopController = shooterTop.getPIDController();
