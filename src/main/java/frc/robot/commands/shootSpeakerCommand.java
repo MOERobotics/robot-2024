@@ -17,6 +17,7 @@ public class shootSpeakerCommand extends Command {
     private  final CollectorSubsystem collector;
     private Timer timer;
     private boolean shot = false;
+    private double desSpeed = 0;
     /**
      * Creates a new ExampleCommand.
      *
@@ -28,6 +29,16 @@ public class shootSpeakerCommand extends Command {
         this.collector = collectorSubsystem;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(shooterSubsystem,collectorSubsystem);
+
+        timer = new Timer();
+        shot = false;
+    }
+    public shootSpeakerCommand(ShooterSubsystem shooterSubsystem,CollectorSubsystem collectorSubsystem,double desSpeed) {
+        this.shooter = shooterSubsystem;
+        this.collector = collectorSubsystem;
+        this.desSpeed = desSpeed;
+                // Use addRequirements() here to declare subsystem dependencies.
+                        addRequirements(shooterSubsystem,collectorSubsystem);
 
         timer = new Timer();
         shot = false;
@@ -46,13 +57,18 @@ public class shootSpeakerCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        shooter.setShooterTopSpeed(shooter.getDesShooterSpeedTop());
-        shooter.setShooterBottomSpeed(shooter.getDesShooterSpeedBot());
-        if(shooter.shooterAtSpeed() && !shot){
-            shot = true;
-            collector.setCollectorSpeed(1);
-            timer.restart();
+        if(desSpeed ==0){
+            shooter.setShooterTopSpeed();
+            shooter.setShooterBottomSpeed();
+            if(shooter.shooterAtSpeed() && !shot){
+                shot = true;
+                collector.setCollectorSpeed(1);
+                timer.restart();
+            }
+        } else {
+
         }
+
         SmartDashboard.putNumber("auto Time", timer.get());
     }
 

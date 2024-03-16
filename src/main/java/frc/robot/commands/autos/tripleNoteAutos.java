@@ -33,7 +33,7 @@ public class tripleNoteAutos {
     private final double endVelocity;
     private final double subShooterSpeed = 3000;
     private final double podiumShooterSpeed = 4000;
-    private final double passShooterSpeed = ;
+    private final double passShooterSpeed = 1300;
     private ShooterSubsystem shooter;
     private CollectorSubsystem collector;
     private Arm armSubsystem;
@@ -101,7 +101,6 @@ public class tripleNoteAutos {
         Command trajCommand3 = swerveDrive.generateTrajectory(startPose3,endPose3,internalPoints3,0,0);
         Command trajCommand4 = swerveDrive.generateTrajectory(startPose4,endPose4,internalPoints4,0,0);
         Command trajCommand5 = swerveDrive.generateTrajectory(startPose5,endPose5,internalPoints5,0,0);
-        Command setShooterSpeed = new Command(Commands.parallel(()->shooter.setDesShooterSpeedTop(3000),()->shooter.getDesShooterSpeedBot(3000));
         Command shootNote = new shootSpeakerCommand(shooter,collector);
         Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
         Command shootLastNote = new shootSpeakerCommand(shooter, collector);
@@ -114,6 +113,7 @@ public class tripleNoteAutos {
         Command headingCorrect4 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation4));
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
+                Commands.runOnce(Commands.parallel(()->shooter.setDesShooterSpeedTop(3000),shooter.setDesShooterSpeedBot(3000)),shooter);
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-65)), Set.of(armSubsystem)),
                 Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(83), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem)),
                 Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
