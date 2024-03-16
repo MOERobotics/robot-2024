@@ -4,8 +4,6 @@ import com.revrobotics.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import java.util.function.Supplier;
-
 public class ShooterSubsystem extends SubsystemBase {
 
     private final CANSparkMax shooterTop;
@@ -19,7 +17,8 @@ public class ShooterSubsystem extends SubsystemBase {
     private double shooterSpeedTop=0;//Store desired speeds
     private double shooterSpeedBottom=0;
     private double shooterRPMTolerance=0;
-    private double desTopSpeed, desBotSpeed;
+    private double maxTopSpeed, maxBotSpeed;
+    private double desiredTopSpeed, desiredBotSpeed;
     public ShooterSubsystem(int shooterTopID, int shooterBottomID, double shooterP,
                             double shooterI, double shooterD, double shooterFF) {
         shooterTop = new CANSparkMax(shooterTopID, CANSparkLowLevel.MotorType.kBrushless);
@@ -41,17 +40,18 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterBottomController.setD(shooterD); shooterBottomController.setFF(shooterFF);
         shooterTopController.setOutputRange(0, 1);
         shooterRPMTolerance=5;
-        desBotSpeed = 3500; desTopSpeed = 3500;
+        maxBotSpeed = 3500; maxTopSpeed = 3500;
+        desiredBotSpeed = 0; desiredTopSpeed = 0;
     }
     @Override
     public void periodic(){
         SmartDashboard.putNumber("shooterTopSpeed", getShooterSpeedTop());
         SmartDashboard.putNumber("shooterBotSpeed", getShooterSpeedBottom());
-        SmartDashboard.putBoolean("shooterOn", getDesShooterSpeedTop() != 0);
+        SmartDashboard.putBoolean("shooterOn", getMaxShooterSpeedTop() != 0);
     }
     public void setShooterTopSpeed(double speed){
 
-        //setDesShooterSpeedTop(speed);
+        setDesiredTopSpeed(speed);
         shooterSpeedTop=speed;
         SmartDashboard.putNumber("shooterTopDesired", speed);
         shooterTopController.setReference(speed, CANSparkBase.ControlType.kVelocity);
@@ -59,7 +59,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
     public void setShooterBottomSpeed(double speed){
 
-        //setDesShooterSpeedBot(speed);
+        setDesiredBotSpeed(speed);
         shooterSpeedBottom=speed;
         SmartDashboard.putNumber("shooterBottomDesired", speed);
         shooterBottomController.setReference(speed, CANSparkBase.ControlType.kVelocity);
@@ -68,11 +68,23 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setShooterSpeeds(double topSpeed, double bottomSpeed){
         setShooterTopSpeed(topSpeed); setShooterBottomSpeed(bottomSpeed);
     }
-    public void setDesShooterSpeeds(double topSpeed, double bottomSpeed){
-        setDesShooterSpeedTop(topSpeed);
-        setDesShooterSpeedBot(bottomSpeed);
+    public void setMaxShooterSpeeds(double topSpeed, double bottomSpeed){
+        setMaxShooterSpeedTop(topSpeed);
+        setMaxShooterSpeedBot(bottomSpeed);
+    }
+    public void setDesiredTopSpeed(double speed){
+        desiredTopSpeed = speed;
+    }
+    public void setDesiredBotSpeed(double speed){
+        desiredBotSpeed = speed;
     }
 
+    public double getDesiredTopSpeed(){
+        return desiredTopSpeed;
+    }
+    public double getDesiredBotSpeed(){
+        return desiredBotSpeed;
+    }
     public void stopShooter(){
         setShooterSpeeds(0,0);
     }
@@ -83,18 +95,18 @@ public class ShooterSubsystem extends SubsystemBase {
         return shooterBottomEncoder.getVelocity();
     }
 
-    public double getDesShooterSpeedTop(){
-        return desTopSpeed;
+    public double getMaxShooterSpeedTop(){
+        return maxTopSpeed;
     }
-    public double getDesShooterSpeedBot(){
-        return desBotSpeed;
+    public double getMaxShooterSpeedBot(){
+        return maxBotSpeed;
     }
 
-    public void setDesShooterSpeedTop(double speed){
-        desTopSpeed = speed;
+    public void setMaxShooterSpeedTop(double speed){
+        maxTopSpeed = speed;
     }
-    public void setDesShooterSpeedBot(double speed){
-        desBotSpeed = speed;
+    public void setMaxShooterSpeedBot(double speed){
+        maxBotSpeed = speed;
     }
 
     public void setShooterRPMTolerance(double Tolerance){
@@ -107,7 +119,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean shooterAtSpeed(){
-        return ((Math.abs(getDesShooterSpeedTop() - getShooterSpeedTop()) <= getShooterRPMTolerance()) &&
-                (Math.abs(getDesShooterSpeedBot() - getShooterSpeedBottom()) <= getShooterRPMTolerance()));
+        return ((Math.abs(getDesiredTopSpeed() - getShooterSpeedTop()) <= getShooterRPMTolerance()) &&
+                (Math.abs(getDesiredBotSpeed() - getShooterSpeedBottom()) <= getShooterRPMTolerance()));
     }
 }

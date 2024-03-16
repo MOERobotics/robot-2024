@@ -18,14 +18,12 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.CollectorControllerCommand;
 import frc.robot.commands.ShooterControllerCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.SwerveController;
 import frc.robot.commands.autos.tripleNoteAutos;
-import frc.robot.commands.setHeading;
 import frc.robot.subsystems.*;
 
 import java.util.Set;
@@ -225,7 +223,7 @@ public class FortissiMOEContainer{
         SmartDashboard.putNumber("Roll", pigeon.getRoll());
         SmartDashboard.putNumber("Pitch", pigeon.getPitch());
         pdh.setSwitchableChannel((collectorSubsystem.isCollected() && ((System.currentTimeMillis()/100)%2 == 0))
-                ||  (shooterSubsystem.shooterAtSpeed() && shooterSubsystem.getDesShooterSpeedTop() != 0));
+                ||  (shooterSubsystem.shooterAtSpeed() && shooterSubsystem.getMaxShooterSpeedTop() != 0));
     });
 
     ////////////////////////////////////////////////////////////////////////////commands end
@@ -238,7 +236,7 @@ public class FortissiMOEContainer{
 
     public FortissiMOEContainer() {
         shooterSubsystem.setShooterRPMTolerance(500);
-        shooterSubsystem.setDesShooterSpeeds(3500,3500);
+        shooterSubsystem.setMaxShooterSpeeds(3500,3500);
 
         swerveSubsystem.setDefaultCommand(drive);
 //        collectorSubsystem.setDefaultCommand(collectorCommand);
@@ -277,6 +275,7 @@ public class FortissiMOEContainer{
         m_chooser.addOption("D Score Move", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DMoveAuto());
         m_chooser.addOption("D Score Collect (DC5)", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DC5Auto());
         m_chooser.addOption("4 Note Auto (CW2W1W3)", new tripleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).CW1W2W3());
+        m_chooser.addOption("centerLine Auto", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).DC5C4PassC3());
         SmartDashboard.putData("chooser", m_chooser);
     }
 
@@ -355,8 +354,8 @@ public class FortissiMOEContainer{
                                 ()->Math.abs(driverJoystick.getRawAxis(2)) >= .1
                         ))); //auto aim shot
 
-        new JoystickButton(buttonBox, 6).whileTrue(Commands.runOnce(()->shooterSubsystem.setDesShooterSpeeds(1800,1800))).
-                whileFalse(Commands.runOnce(()->shooterSubsystem.setDesShooterSpeeds(3500,3500)));
+        new JoystickButton(buttonBox, 6).whileTrue(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(2300,2300))).
+                whileFalse(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(3500,3500)));
         //104,-41
       //  new JoystickButton(driverJoystick, 7).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
 
