@@ -11,6 +11,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -138,7 +139,9 @@ public class Arm extends SubsystemBase {
 
     public Translation2d autoAim(Supplier<Pose2d> robotPos){
         double dist = AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker).getDistance(robotPos.get().getTranslation());
-        return new Translation2d(112, 3.8*dist-53.1);
+        dist = Units.metersToInches(dist);
+        return new Translation2d(112, Math.min(Math.max(-45, 4.63e-5*Math.pow(dist, 3)-1.7e-2*Math.pow(dist, 2)
+        +2.13*dist-131.8), -30));
     }
 
 
@@ -213,10 +216,6 @@ public class Arm extends SubsystemBase {
         shoulderPower(shoulderController.calculate(shoulderState().getDegrees()));
         //wristPower(0);
         //shoulderPower(0);
-    }
-    public Translation2d getAutoArmPosition(Supplier<Pose2d> currPose){
-        //return a math function that interpolates this
-        return new Translation2d(105, -31); //this is a placeholder
     }
 
 

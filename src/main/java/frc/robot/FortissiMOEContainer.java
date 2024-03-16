@@ -74,7 +74,7 @@ public class FortissiMOEContainer{
     double maxRPS =  1.5*2*Math.PI;
     double maxRPS2 = Math.PI;
 
-    double maxMPSSquared = 5;
+    double maxMPSSquared = 3;
     private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 
     private final SwerveModule backLeftModule = new SwerveModule(
@@ -292,7 +292,9 @@ public class FortissiMOEContainer{
                         || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
         //collect
 
-//        new JoystickButton(functionJoystick, 2).onTrue(Commands.defer(() -> armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-41.5)), Set.of(armSubsystem))
+//        new JoystickButton(functionJoystick, 2).onTrue(Commands.defer(() -> armSubsystem.goToPoint(
+//                        Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveSubsystem.getEstimatedPose()).getX()),
+//                        Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveSubsystem.getEstimatedPose()).getY())), Set.of(armSubsystem))
 //                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
 //                        functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(1) ||
 //                        functionJoystick.getRawButton(8)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
@@ -338,14 +340,14 @@ public class FortissiMOEContainer{
 //        new JoystickButton(driverJoystick, 8).onTrue(turnToSource.until(()->(Math.abs(driverJoystick.getRawAxis(2)) >= .2)));
         new JoystickButton(functionJoystick, 2).onTrue(
                 Commands.parallel(
-                /*Commands.defer(()->armSubsystem.goToPoint(
+                Commands.defer(()->armSubsystem.goToPoint(
                 Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getX()),
                 Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getY())), Set.of(armSubsystem)).andThen(
-                        Commands.run(()-> armSubsystem.holdPos(armSubsystem.shoulderPosRel(), armSubsystem.wristPosRel()))
-                        )
+                        Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState())
+                        ))
                         .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
-                        functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(3))),*/
+                        functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(3))),
                         Commands.run(()->swerveSubsystem.setDesiredYaw(swerveSubsystem.getAngleBetweenSpeaker(
                                 ()->swerveSubsystem.getEstimatedPose().getTranslation()).getDegrees())).until(
                                 ()->Math.abs(driverJoystick.getRawAxis(2)) >= .1
