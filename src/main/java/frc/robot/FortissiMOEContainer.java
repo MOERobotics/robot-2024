@@ -46,8 +46,8 @@ public class FortissiMOEContainer{
             0,
             false,
             true,
-            -1000,//0.7 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            -1000,//0.42 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            0 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            0 * ClimberArm.CONVERSION_FACTOR_INCHES,
             3.94 * ClimberArm.CONVERSION_FACTOR_INCHES,
             3.57 * ClimberArm.CONVERSION_FACTOR_INCHES,
             0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
@@ -206,26 +206,18 @@ public class FortissiMOEContainer{
 
 
     public final Command buttonsCommand = Commands.run(() -> {
-        SmartDashboard.putData("lmao", climbUp);
         if (driverJoystick.getRawButtonPressed(6)) {
-            if (climbingUp) {
-                CommandScheduler.getInstance().cancel(climbUp);
-                this.climbingUp = false;
-            } else {
-                climbUp.schedule();
-                this.climbingUp = true;
-                SmartDashboard.putBoolean("ClimbingUp", climbingUp);
-            }
+            CommandScheduler.getInstance().cancel(climbDown);
+            climbUp.schedule();
         }
         if (driverJoystick.getRawButtonPressed(5)) {
-            if (climbingDown) {
-                CommandScheduler.getInstance().cancel(climbDown);
-                this.climbingDown = false;
-                SmartDashboard.putBoolean("ClimbingDown", climbingDown);
-            } else {
-                climbDown.schedule();
-                this.climbingDown = true;
-            }
+            CommandScheduler.getInstance().cancel(climbUp);
+            climbDown.schedule();
+        }
+        if (!driverJoystick.getRawButton(5) && !driverJoystick.getRawButton(6)){
+            CommandScheduler.getInstance().cancel(climbDown);
+            CommandScheduler.getInstance().cancel(climbUp);
+            climber.stopArms();
         }
         SmartDashboard.putBoolean("ClimbingDown", climbingDown);
         SmartDashboard.putBoolean("ClimbingUp", climbingUp);
@@ -300,14 +292,14 @@ public class FortissiMOEContainer{
                         || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
         //collect
 
-        new JoystickButton(functionJoystick, 2).onTrue(Commands.defer(() -> armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-41.5)), Set.of(armSubsystem))
-                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
-                        functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(1) ||
-                        functionJoystick.getRawButton(8)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
-                        || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
-        //podium shot
+//        new JoystickButton(functionJoystick, 2).onTrue(Commands.defer(() -> armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-41.5)), Set.of(armSubsystem))
+//                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
+//                        functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(1) ||
+//                        functionJoystick.getRawButton(8)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
+//                        || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
+//        //auto aim shot
 
-        new JoystickButton(functionJoystick, 4).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-47.5)), Set.of(armSubsystem))
+        new JoystickButton(functionJoystick, 4).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-41.5)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
@@ -344,22 +336,23 @@ public class FortissiMOEContainer{
 
 //        new JoystickButton(driverJoystick, 7).onTrue(turnToAmp.until(()->(Math.abs(driverJoystick.getRawAxis(2)) >= .2)));
 //        new JoystickButton(driverJoystick, 8).onTrue(turnToSource.until(()->(Math.abs(driverJoystick.getRawAxis(2)) >= .2)));
-        /*new JoystickButton(functionJoystick, 4).onTrue(
+        new JoystickButton(functionJoystick, 2).onTrue(
                 Commands.parallel(
-                Commands.defer(()->armSubsystem.goToPoint(
+                /*Commands.defer(()->armSubsystem.goToPoint(
                 Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getX()),
                 Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getY())), Set.of(armSubsystem)).andThen(
                         Commands.run(()-> armSubsystem.holdPos(armSubsystem.shoulderPosRel(), armSubsystem.wristPosRel()))
                         )
                         .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(3))),
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(3))),*/
                         Commands.run(()->swerveSubsystem.setDesiredYaw(swerveSubsystem.getAngleBetweenSpeaker(
                                 ()->swerveSubsystem.getEstimatedPose().getTranslation()).getDegrees())).until(
                                 ()->Math.abs(driverJoystick.getRawAxis(2)) >= .1
-                        ))); //auto aim shot*/
+                        ))); //auto aim shot
         //104,-41
       //  new JoystickButton(driverJoystick, 7).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
+
     }
 
     public Command getAutonomousCommand() {

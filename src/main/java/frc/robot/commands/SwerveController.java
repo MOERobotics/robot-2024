@@ -85,12 +85,13 @@ public class SwerveController extends Command{
         SmartDashboard.putNumber("xspd", xspd);
         SmartDashboard.putNumber("yspd", yspd);
         SmartDashboard.putNumber("turnspd", turnspd);
-        if (xspd == 0 && yspd == 0 && turnspd == 0){
-            m_subsystem.stopModules();
-        }
-        else {
-            m_subsystem.driveAtSpeed(xspd, yspd, turnspd, !relativeDrive.get(), DriverStation.getAlliance().get()==DriverStation.Alliance.Red);
-        }
+        m_subsystem.driveAtSpeed(xspd, yspd, turnspd, !relativeDrive.get(), DriverStation.getAlliance().get()==DriverStation.Alliance.Red);
+//        if (xspd == 0 && yspd == 0 && turnspd == 0){
+//            m_subsystem.stopModules();
+//        }
+//        else {
+//            m_subsystem.driveAtSpeed(xspd, yspd, turnspd, !relativeDrive.get(), DriverStation.getAlliance().get()==DriverStation.Alliance.Red);
+//        }
     }
 
     @Override

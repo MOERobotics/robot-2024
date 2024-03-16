@@ -256,6 +256,7 @@ public class SwerveDrive extends SubsystemBase {
         if (align){
             turnspd = getYawCorrection();
         }
+        if (xspd == 0 && yspd == 0 && turnspd == 0) stopModules();
         ChassisSpeeds chassisSpeeds;
         if (fieldOriented){
             Rotation2d currRot = getRotation2d();
