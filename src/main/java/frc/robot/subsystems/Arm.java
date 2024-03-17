@@ -178,16 +178,18 @@ public class Arm extends SubsystemBase {
     }
 
     public Rotation2d wristState(){
-        double deg = wristEncoder.getAbsolutePosition() + wristOffset;
-        if (deg < -180) deg = deg + 360;
-        if (deg > 180) deg = deg - 360;
-        return Rotation2d.fromDegrees(deg);
+        return Rotation2d.fromDegrees(wristPosRel());
+//        double deg = wristEncoder.getAbsolutePosition() + wristOffset;
+//        if (deg < -180) deg = deg + 360;
+//        if (deg > 180) deg = deg - 360;
+//        return Rotation2d.fromDegrees(deg);
     }
     public double shoulderPosRel(){
         return shoulderRelEncoder.getPosition();
     }
     public double wristPosRel(){
-        return wristRelEncoder.getPosition();
+        double val = wristRelEncoder.getPosition()*(-126.3+2)/(-0.548-15.8)-126.3+2;
+        return val;
     }
 
     public void shoulderPowerController(double shoulderPow){
