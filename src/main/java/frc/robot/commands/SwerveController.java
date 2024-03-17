@@ -49,7 +49,7 @@ public class SwerveController extends Command{
     @Override
     public void execute() {
         double div = 1.0;
-        if (half.get()) div = 2.0;
+        if (half.get()) div = 1.0;
         double xspd = xspdFunction.get()/div;
         double yspd = yspdFunction.get()/div;
         double turnspd = turnspdFunction.get()/div;

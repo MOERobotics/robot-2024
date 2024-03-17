@@ -140,8 +140,16 @@ public class Arm extends SubsystemBase {
     public Translation2d autoAim(Supplier<Pose2d> robotPos){
         double dist = AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker).getDistance(robotPos.get().getTranslation());
         dist = Units.metersToInches(dist);
-        return new Translation2d(112, Math.min(Math.max(-45, 4.63e-5*Math.pow(dist, 3)-1.7e-2*Math.pow(dist, 2)
-        +2.13*dist-131.8), -30));
+        double func;
+        if (-.901*dist+130.46 < 0.0){
+            func = -38.5+Math.pow(.901*dist-130.46, 1.0/3.0);
+        }
+        else{
+            func = -38.5-Math.pow(-.901*dist+130.46, 1.0/3.0);
+        }
+        return new Translation2d(112, Math.min(Math.max(-45, func), -30));
+//        return new Translation2d(112, Math.min(Math.max(-45, 4.63e-5*Math.pow(dist, 3)-1.7e-2*Math.pow(dist, 2)
+//        +2.13*dist-131.8)-1, -30));
     }
 
 
