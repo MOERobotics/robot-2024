@@ -19,7 +19,10 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.StructArrayEntry;
+import edu.wpi.first.util.datalog.StructArrayLogEntry;
 import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -59,6 +62,7 @@ public class SwerveDrive extends SubsystemBase {
     private final PIDController xController,yController;
     Field2d field = new Field2d();
     SwerveDrivePoseEstimator swerveDrivePoseEstimator;
+    StructArrayLogEntry<SwerveModuleState> SwerveLogEntry;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
                        WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
                        double kP, double kI, double kD,
@@ -67,6 +71,8 @@ public class SwerveDrive extends SubsystemBase {
 
         this.pigeon = pigeon;
         this.maxMetersPerSec = maxMetersPerSec;
+
+        SwerveLogEntry = StructArrayLogEntry.create(DataLogManager.getLog(), "Swerve/States", SwerveModuleState.struct);
 
         this.maxMetersPerSecSquared = maxMetersPerSecSquared;
 
@@ -243,6 +249,7 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboard.putString("FR state", desiredStates[0].toString());
         SmartDashboard.putString("BR state", desiredStates[2].toString());
         SmartDashboard.putString("BL state", desiredStates[3].toString());
+        SwerveLogEntry.append(desiredStates);
         FRModule.setDesiredState(desiredStates[0]);
         FLModule.setDesiredState(desiredStates[1]);
         BRModule.setDesiredState(desiredStates[2]);
