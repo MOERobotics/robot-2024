@@ -18,14 +18,12 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.CollectorControllerCommand;
 import frc.robot.commands.ShooterControllerCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.SwerveController;
 import frc.robot.commands.autos.tripleNoteAutos;
-import frc.robot.commands.setHeading;
 import frc.robot.subsystems.*;
 
 import java.util.Set;
@@ -74,7 +72,7 @@ public class FortissiMOEContainer{
     double maxRPS =  1.5*2*Math.PI;
     double maxRPS2 = Math.PI;
 
-    double maxMPSSquared = 5;
+    double maxMPSSquared = 3;
     private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 
     private final SwerveModule backLeftModule = new SwerveModule(
@@ -126,7 +124,7 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
-            2.0e-2, 2.0e-3, 4.0e-4, 8.0e-3, 0, 1.0e-4, 23.839, 14.231,
+            2.0e-2, 2.0e-3, 4.0e-4, 8.0e-3,0, 1.0e-4, 23.839, 14.231,
             Rotation2d.fromDegrees(88), Rotation2d.fromDegrees(-47), 70,30);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
@@ -225,7 +223,7 @@ public class FortissiMOEContainer{
         SmartDashboard.putNumber("Roll", pigeon.getRoll());
         SmartDashboard.putNumber("Pitch", pigeon.getPitch());
         pdh.setSwitchableChannel((collectorSubsystem.isCollected() && ((System.currentTimeMillis()/100)%2 == 0))
-                ||  (shooterSubsystem.shooterAtSpeed() && shooterSubsystem.getDesShooterSpeedTop() != 0));
+                ||  (shooterSubsystem.shooterAtSpeed() && shooterSubsystem.getDesiredTopSpeed() != 0));
     });
 
     ////////////////////////////////////////////////////////////////////////////commands end
@@ -238,6 +236,8 @@ public class FortissiMOEContainer{
 
     public FortissiMOEContainer() {
         shooterSubsystem.setShooterRPMTolerance(500);
+        shooterSubsystem.setMaxShooterSpeeds(3500,3500);
+
         swerveSubsystem.setDefaultCommand(drive);
 //        collectorSubsystem.setDefaultCommand(collectorCommand);
 
@@ -275,6 +275,8 @@ public class FortissiMOEContainer{
         m_chooser.addOption("D Score Move", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DMoveAuto());
         m_chooser.addOption("D Score Collect (DC5)", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DC5Auto());
         m_chooser.addOption("4 Note Auto (CW2W1W3)", new tripleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).CW1W2W3());
+        m_chooser.addOption("centerLine Auto", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).DC5C4PassC3());
+        m_chooser.addOption("driveForward", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).rollOutAuto());
         SmartDashboard.putData("chooser", m_chooser);
     }
 
@@ -292,7 +294,9 @@ public class FortissiMOEContainer{
                         || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
         //collect
 
-//        new JoystickButton(functionJoystick, 2).onTrue(Commands.defer(() -> armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-41.5)), Set.of(armSubsystem))
+//        new JoystickButton(functionJoystick, 2).onTrue(Commands.defer(() -> armSubsystem.goToPoint(
+//                        Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveSubsystem.getEstimatedPose()).getX()),
+//                        Rotation2d.fromDegrees(armSubsystem.autoAim(()->swerveSubsystem.getEstimatedPose()).getY())), Set.of(armSubsystem))
 //                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
 //                        functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(1) ||
 //                        functionJoystick.getRawButton(8)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
@@ -338,18 +342,21 @@ public class FortissiMOEContainer{
 //        new JoystickButton(driverJoystick, 8).onTrue(turnToSource.until(()->(Math.abs(driverJoystick.getRawAxis(2)) >= .2)));
         new JoystickButton(functionJoystick, 2).onTrue(
                 Commands.parallel(
-                /*Commands.defer(()->armSubsystem.goToPoint(
+                Commands.defer(()->armSubsystem.goToPoint(
                 Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getX()),
                 Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getY())), Set.of(armSubsystem)).andThen(
-                        Commands.run(()-> armSubsystem.holdPos(armSubsystem.shoulderPosRel(), armSubsystem.wristPosRel()))
-                        )
+                        Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState())
+                        ))
                         .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
-                        functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(3))),*/
+                        functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(3))),
                         Commands.run(()->swerveSubsystem.setDesiredYaw(swerveSubsystem.getAngleBetweenSpeaker(
                                 ()->swerveSubsystem.getEstimatedPose().getTranslation()).getDegrees())).until(
                                 ()->Math.abs(driverJoystick.getRawAxis(2)) >= .1
                         ))); //auto aim shot
+
+        new JoystickButton(buttonBox, 6).whileTrue(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(2300,2300))).
+                whileFalse(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(3500,3500)));
         //104,-41
       //  new JoystickButton(driverJoystick, 7).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
 

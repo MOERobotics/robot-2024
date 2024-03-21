@@ -67,6 +67,7 @@ public class setHeading extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
+        //return true;
         return  Math.abs(MathUtil.inputModulus(swerveDrive.getYaw()-desiredYaw.get().getDegrees(),-180,180))<=2;//2 Degree Tolerance
     }
 
