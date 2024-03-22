@@ -131,7 +131,7 @@ public class FortissiMOEContainer{
 
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(5,
-            13,1.0e-4, 0,0,driveFF);
+            13,4.0e-4, 0,0,driveFF+2.4e-5);
     private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem(6,
             0.01,0,0,0,7);
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
@@ -235,7 +235,7 @@ public class FortissiMOEContainer{
 
 
     public FortissiMOEContainer() {
-        shooterSubsystem.setShooterRPMTolerance(500);
+        shooterSubsystem.setShooterRPMTolerance(150);
         shooterSubsystem.setMaxShooterSpeeds(3500,3500);
 
         swerveSubsystem.setDefaultCommand(drive);

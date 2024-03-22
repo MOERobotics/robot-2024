@@ -147,11 +147,11 @@ public class tripleNoteAutos {
         Rotation2d endRotation2 = Rotation2d.fromDegrees(0);
         Pose2d endPose2 = new Pose2d(endTranslation2, endRotation2); //goes from point w2 to start c
 
-        Translation2d endTranslation3 = new Translation2d(UsefulPoints.Points.WingedNote3.getX()-Units.inchesToMeters(14),
+        Translation2d endTranslation3 = new Translation2d(UsefulPoints.Points.WingedNote3.getX()-Units.inchesToMeters(10),
                 UsefulPoints.Points.WingedNote3.getY());
         Rotation2d startRotation3 = endRotation2;
         Pose2d startPose3 = new Pose2d(endTranslation2, startRotation3);
-        Rotation2d endRotation3 = (swerveDrive.getAngleBetweenSpeaker(endTranslation3).plus(Rotation2d.fromDegrees(-5)));
+        Rotation2d endRotation3 = Rotation2d.fromDegrees(0);
         Pose2d endPose3 = new Pose2d(endTranslation3,endRotation3); //startC to W3
 
         Translation2d endTranslation4 = endTranslation2;
@@ -175,11 +175,12 @@ public class tripleNoteAutos {
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
         ArrayList<Translation2d> internalPoints2 = new ArrayList<>();
         ArrayList<Translation2d> internalPoints3 = new ArrayList<>();
+        internalPoints3.add(endTranslation3.plus(new Translation2d(Units.inchesToMeters(-24),Units.inchesToMeters(5))));
         ArrayList<Translation2d> internalPoints4 = new ArrayList<>();
         ArrayList<Translation2d> internalPoints5 = new ArrayList<>();
-        internalPoints5.add(endTranslation5.plus(new Translation2d(Units.inchesToMeters(-24), 0)));
-
+        internalPoints5.add(endTranslation5.plus(new Translation2d(Units.inchesToMeters(-24), Units.inchesToMeters(-5))));
         ArrayList<Translation2d> internalPoints6 = new ArrayList<>();
+        internalPoints6.add(endTranslation6.plus(new Translation2d(Units.inchesToMeters(20),Units.inchesToMeters(5))));
 
 
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints,0,0);
@@ -218,17 +219,17 @@ public class tripleNoteAutos {
                 Commands.race(Commands.parallel(trajCommand3.andThen(()->swerveDrive.stopModules()), collectNote2),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
-                Commands.race(Commands.parallel(trajCommand4.andThen(headingCorrect4.withTimeout(.15)).andThen(()->swerveDrive.stopModules())),
+                Commands.race(Commands.parallel(trajCommand4.andThen(()->swerveDrive.stopModules())),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.race(shootLastNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(Commands.parallel(trajCommand5.andThen(()->swerveDrive.stopModules()), collectNote3),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
-                Commands.race(trajCommand6.andThen(headingCorrect6.withTimeout(.15)).andThen(()->swerveDrive.stopModules()),
+                Commands.race(trajCommand6.andThen(()->swerveDrive.stopModules()),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
-                Commands.parallel(shootAnotherLastNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState())))
+                Commands.race(shootAnotherLastNote.andThen(()->shooter.stopShooter()), Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState())))
         );
     }
 
