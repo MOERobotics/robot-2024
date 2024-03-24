@@ -9,6 +9,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.*;
 import frc.robot.commands.autos.doubleNoteAutos;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -282,6 +283,11 @@ public class FortissiMOEContainer{
 
 
     private void configureBindings() {
+		new JoystickButton(driverJoystick,4).whileTrue(armSubsystem.wristQuasiStatic(SysIdRoutine.Direction.kForward));
+	    new JoystickButton(driverJoystick,2).whileTrue(armSubsystem.wristQuasiStatic(SysIdRoutine.Direction.kReverse));
+		new JoystickButton(driverJoystick,7).whileTrue(armSubsystem.wristDynamic(SysIdRoutine.Direction.kForward));
+	    new JoystickButton(driverJoystick,8).whileTrue(armSubsystem.wristDynamic(SysIdRoutine.Direction.kReverse));
+
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
         new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.2)));
         new JoystickButton(buttonBox, 1).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));

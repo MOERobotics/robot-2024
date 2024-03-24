@@ -12,11 +12,16 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.*;
+import edu.wpi.first.units.Unit.*;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.AllianceFlip;
 import frc.robot.UsefulPoints;
 import frc.robot.commands.ArmPathFollow;
@@ -24,6 +29,8 @@ import frc.robot.commands.ArmPathFollow;
 import java.util.function.Supplier;
 
 import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
+import static edu.wpi.first.units.MutableMeasure.mutable;
+import static edu.wpi.first.units.Units.*;
 
 public class Arm extends SubsystemBase {
     private final CANSparkMax shoulderMotorLeft, shoulderMotorRight;
@@ -44,6 +51,13 @@ public class Arm extends SubsystemBase {
     private double maxSpeed, maxAccel, shoulderLength, wristLength;
     private double wristOffset = 0;
     private double shoulderOffset = 90;
+	private final Measure<Velocity<Voltage>>rampRate= Volts.of(0.1).per(Seconds.of(1));
+	private final Measure<Voltage>stepVolatage = Volts.of(2);
+	private final Measure<Time>timeout = Seconds.of(5);
+	private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
+	private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
+	private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
+	private final SysIdRoutine wristSysIdRoutine;
 
     public Arm(int rightShoulderMotorID, int leftShoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
                double kPShoulder, double kIShoulder, double kDShoulder,
@@ -84,7 +98,22 @@ public class Arm extends SubsystemBase {
 		setWristDestState(wristState().getDegrees());
         shoulderController.reset();
         wristController.reset();
-
+	    wristSysIdRoutine = new SysIdRoutine(
+			new SysIdRoutine.Config(rampRate,stepVolatage,timeout),
+			new SysIdRoutine.Mechanism(
+					(Measure<Voltage> volts)->{
+						wristMotor.setVoltage(volts.in(Volts));
+						},
+					log -> {
+						log.motor("wrist-motor").voltage(
+								m_appliedVoltage.mut_replace(
+									wristMotor.getBusVoltage()* RobotController.getBatteryVoltage(), Volts)
+						    ).angularPosition(m_angle.mut_replace(wristState().getDegrees(),Degrees)
+							).angularVelocity(m_velocity.mut_replace(wristEncoder.getVelocity(),DegreesPerSecond));
+					},
+					this
+			)
+		);
     }
 
     public void periodic(){
@@ -228,5 +257,12 @@ public class Arm extends SubsystemBase {
         //shoulderPower(0);
     }
 
+	public Command wristQuasiStatic(SysIdRoutine.Direction direction){
+		return wristSysIdRoutine.quasistatic(direction);
+	}
+
+	public Command wristDynamic(SysIdRoutine.Direction direction){
+		return wristSysIdRoutine.dynamic(direction);
+	}
 
 }
