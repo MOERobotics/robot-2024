@@ -4,25 +4,19 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.commands.*;
-import frc.robot.commands.autos.doubleNoteAutos;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.CollectorControllerCommand;
-import frc.robot.commands.ShooterControllerCommand;
-import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.SwerveController;
+import frc.robot.commands.*;
+import frc.robot.commands.autos.doubleNoteAutos;
 import frc.robot.commands.autos.tripleNoteAutos;
 import frc.robot.subsystems.*;
 
@@ -51,9 +45,8 @@ public class FortissiMOEContainer{
             0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
             0.83 * ClimberArm.CONVERSION_FACTOR_INCHES
     );
-    public AHRS navx = new AHRS(I2C.Port.kMXP, (byte)50);
 
-    WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
+    Gyroscope gyroscope = new Gyroscope.PigeonGyro(0);
     PowerDistribution pdh = new PowerDistribution(21, PowerDistribution.ModuleType.kRev);
 
     /////////////////////////////////////////////////////////////////////////////drive subsystems
@@ -120,7 +113,7 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS, maxMPSSquared, maxRPS, maxRPS2,1.0, 0, 0, 1.0, 0, 0, 4e-2, 0,0);
+            gyroscope, maxMPS, maxMPSSquared, maxRPS, maxRPS2,1.0, 0, 0, 1.0, 0, 0, 4e-2, 0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
@@ -188,7 +181,7 @@ public class FortissiMOEContainer{
     private final Command climbUp= new ClimbUp(
             climber,
             0.7,
-            ()-> -pigeon.getPitch()
+            ()-> -gyroscope.getPitch()
     );
 
 
@@ -220,8 +213,8 @@ public class FortissiMOEContainer{
         SmartDashboard.putBoolean("ClimbingDown", climbingDown);
         SmartDashboard.putBoolean("ClimbingUp", climbingUp);
 
-        SmartDashboard.putNumber("Roll", pigeon.getRoll());
-        SmartDashboard.putNumber("Pitch", pigeon.getPitch());
+        SmartDashboard.putNumber("Roll", gyroscope.getRoll());
+        SmartDashboard.putNumber("Pitch", gyroscope.getPitch());
         pdh.setSwitchableChannel((collectorSubsystem.isCollected() && ((System.currentTimeMillis()/100)%2 == 0))
                 ||  (shooterSubsystem.shooterAtSpeed() && shooterSubsystem.getDesiredTopSpeed() != 0));
     });
@@ -282,7 +275,7 @@ public class FortissiMOEContainer{
 
 
     private void configureBindings() {
-        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
+        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {gyroscope.reset(); swerveSubsystem.setDesiredYaw(0);}));
         new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.2)));
         new JoystickButton(buttonBox, 1).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
         new JoystickButton(functionJoystick, 7).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.2)));

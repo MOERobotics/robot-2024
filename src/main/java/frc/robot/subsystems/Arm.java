@@ -12,6 +12,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -31,6 +33,7 @@ public class Arm extends SubsystemBase {
 
     private final CANCoder shoulderEncoder;
     private final CANCoder wristEncoder;
+    private final Mechanism2d armMechanism;
 
     private final RelativeEncoder shoulderRelEncoder;
     private final RelativeEncoder wristRelEncoder;
@@ -51,7 +54,10 @@ public class Arm extends SubsystemBase {
                double shoulderLength, double wristLength,
                Rotation2d criticalShoulderAngle, Rotation2d criticalWristAngle,
                double maxSpeed, double maxAccel) {
-
+        armMechanism = new Mechanism2d(2,2);
+        var root = armMechanism.getRoot("arm", 0,0);
+        var segment1 = root.append(new MechanismLigament2d("arm segment 1", 1, 90));
+        var segment2 = segment1.append(new MechanismLigament2d("arm segment 2", 0.353, 90));
         shoulderMotorLeft = new CANSparkMax(leftShoulderMotorID, kBrushless);
         shoulderMotorRight = new CANSparkMax(rightShoulderMotorID, kBrushless);
         wristMotor = new CANSparkMax(wristMotorID, kBrushless);

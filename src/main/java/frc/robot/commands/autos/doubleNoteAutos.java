@@ -51,9 +51,7 @@ public class doubleNoteAutos {
     }
 
     public doubleNoteAutos(SwerveDrive subsystem, double startVelocity, double endVelocity) {
-        swerveDrive=subsystem;
-        this.startVelocity = startVelocity;
-        this.endVelocity = endVelocity;
+        this(subsystem, null, null, null, startVelocity, endVelocity);
     }
 
     public Command DoubleNoteAuto1(){//TODO: Fix coordinates, create actual shoot and collect commands
