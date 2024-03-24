@@ -21,11 +21,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.TestClimber;
-import frc.robot.commands.autos.doubleNoteAutos;
-import frc.robot.commands.autos.tripleNoteAutos;
-import frc.robot.commands.setHeading;
-import frc.robot.subsystems.Climber;
+//import frc.robot.commands.TestClimber;
+//import frc.robot.commands.autos.doubleNoteAutos;
+//import frc.robot.commands.autos.tripleNoteAutos;
+//import frc.robot.commands.setHeading;
+//import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ClimberArm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
@@ -128,9 +128,9 @@ public class SwerveBotContainer {
             () -> driverJoystick.getRawButton(1), 2,2, maxMPS, maxRPS
     );
 
-    Command setHeading = new setHeading(swerveSubsystem, () -> -driverJoystick.getRawAxis(1),
-            () -> -driverJoystick.getRawAxis(0), ()->(swerveSubsystem.getAngleBetweenSpeaker(
-            ()->swerveSubsystem.getEstimatedPose().getTranslation())));
+//    Command setHeading = new setHeading(swerveSubsystem, () -> -driverJoystick.getRawAxis(1),
+//            () -> -driverJoystick.getRawAxis(0), ()->(swerveSubsystem.getAngleBetweenSpeaker(
+//            ()->swerveSubsystem.getEstimatedPose().getTranslation())));
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
@@ -143,26 +143,26 @@ public class SwerveBotContainer {
         shooter = new DigitalOutput(4);
         pigeon.reset();
 
-        swerveSubsystem.setDefaultCommand(drive);
-        m_chooser.setDefaultOption("Double Note Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto1());
-        m_chooser.addOption("Double Note Auto 2", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto2());
-        m_chooser.addOption("Double Note Auto 3", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto3());
-        m_chooser.addOption("Double Note Auto 4", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto4());
-        m_chooser.addOption("Center Line Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).CenterLineAuto1());
-        m_chooser.addOption("FCenter Auto", new doubleNoteAutos(swerveSubsystem,0,0).FCenterAuto());
-        SmartDashboard.putData(m_chooser);
-
-        // Configure the trigger bindings
-        configureBindings();
-        var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
-        button8.whileTrue(new setHeading(swerveSubsystem,
-                () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(-60))));
-
-        var button7 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
-        button7.whileTrue(new setHeading(swerveSubsystem,
-                () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(90))));
+//        swerveSubsystem.setDefaultCommand(drive);
+//        m_chooser.setDefaultOption("Double Note Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto1());
+//        m_chooser.addOption("Double Note Auto 2", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto2());
+//        m_chooser.addOption("Double Note Auto 3", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto3());
+//        m_chooser.addOption("Double Note Auto 4", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto4());
+//        m_chooser.addOption("Center Line Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).CenterLineAuto1());
+//        m_chooser.addOption("FCenter Auto", new doubleNoteAutos(swerveSubsystem,0,0).FCenterAuto());
+//        SmartDashboard.putData(m_chooser);
+//
+//        // Configure the trigger bindings
+//        configureBindings();
+//        var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
+//        button8.whileTrue(new setHeading(swerveSubsystem,
+//                () -> -driverJoystick.getRawAxis(1),
+//                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(-60))));
+//
+//        var button7 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
+//        button7.whileTrue(new setHeading(swerveSubsystem,
+//                () -> -driverJoystick.getRawAxis(1),
+//                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(90))));
     }
 
 
@@ -172,7 +172,7 @@ public class SwerveBotContainer {
             new Trigger(funcOpJoystick.axisGreaterThan(3, 0.8, loop))
                     .whileTrue(Commands.runOnce(() -> shooter.set(true))).whileFalse(Commands.runOnce(()->shooter.set(false)));
 
-        new JoystickButton(funcOpJoystick, 3).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
+      //  new JoystickButton(funcOpJoystick, 3).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
     }
 
     private void shooterOn(Solenoid shooter) {

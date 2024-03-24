@@ -106,6 +106,7 @@ public class Vision {
     }
 
     public ObjectDetection[] objectDetection(){ //Both
+
         return subObjectDetections.get();
     }
 }
