@@ -1,0 +1,54 @@
+{
+  "HALProvider": {
+    "Analog Inputs": {
+      "window": {
+        "visible": true
+      }
+    },
+    "Other Devices": {
+      "Pigeon 2[0]": {
+        "header": {
+          "open": true
+        }
+      },
+      "navX-Sensor[0]": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/lmao": "Command",
+      "/SmartDashboard/odometry": "Field2d",
+      "/SmartDashboard/running command": "Scheduler"
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "LiveWindow": {
+        ".status": {
+          "open": true
+        }
+      },
+      "SmartDashboard": {
+        "lmao": {
+          "open": true
+        },
+        "open": true,
+        "running command": {
+          "open": true
+        }
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "Server": {
+      "open": true
+    },
+    "visible": true
+  }
+}

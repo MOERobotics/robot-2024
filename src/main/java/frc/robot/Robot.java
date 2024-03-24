@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.pathfinding.LocalADStar;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -15,21 +16,26 @@ import frc.robot.subsystems.SwerveDrive;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+
+  public static final boolean IS_LOGGING = true;
 //
-  //private FortissiMOEContainer m_robotContainer; //= new FortissiMOEContainer();;
+// private FortissiMOEContainer m_robotContainer; //= new FortissiMOEContainer();;
   private SwerveBotContainer m_robotContainer;
 
   private void initRobotContainer(boolean force) {
     if (m_robotContainer != null)
       return;
     if (force || DriverStation.getAlliance().isPresent())
-      m_robotContainer = new SwerveBotContainer();
-      //m_robotContainer = new FortissiMOEContainer();
+     m_robotContainer = new SwerveBotContainer();
+     //  m_robotContainer = new FortissiMOEContainer();
   }
 
   @Override
   public void robotInit() {
-//    m_robotContainer = new FortissiMOEContainer();
+      if(IS_LOGGING) {
+          DataLogManager.start();
+          DriverStation.startDataLog(DataLogManager.getLog());
+      }
     initRobotContainer(false);
 
   }
@@ -51,8 +57,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     initRobotContainer(true);
-  //  m_robotContainer.resetArmPos().schedule();
-    //m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    // m_robotContainer.resetArmPos().schedule();
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -70,8 +76,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    //m_robotContainer.resetArmPos().schedule();
-    //m_robotContainer.buttonsCommand.schedule();
+   // m_robotContainer.resetArmPos().schedule();
+   // m_robotContainer.buttonsCommand.schedule();
   }
 
   @Override

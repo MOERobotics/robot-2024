@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.WPIMathJNI;
@@ -19,7 +20,10 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.StructArrayEntry;
+import edu.wpi.first.util.datalog.StructArrayLogEntry;
 import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.AllianceFlip;
+import frc.robot.Robot;
 import frc.robot.UsefulPoints;
 import frc.robot.vision.Vision;
 
@@ -43,7 +48,7 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModule BLModule;
     SwerveModule FRModule;
     SwerveModule BRModule;
-    WPI_Pigeon2 pigeon;
+    private  final Gyroscope gyroscope;
 //    private final SwerveDriveOdometry odometer;
     private final double maxMetersPerSec;
     private final double maxMetersPerSecSquared;
@@ -59,14 +64,23 @@ public class SwerveDrive extends SubsystemBase {
     private final PIDController xController,yController;
     Field2d field = new Field2d();
     SwerveDrivePoseEstimator swerveDrivePoseEstimator;
+    StructArrayLogEntry<SwerveModuleState> SwerveLogEntry;
+
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
-                       WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
+                       Gyroscope gyroscope, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
                        double kP, double kI, double kD,
                        double xykP, double xykI, double xykD,
                        double thetaP, double thetaI, double thetaD) {
 
-        this.pigeon = pigeon;
+        this.gyroscope = gyroscope;
+
+
+
         this.maxMetersPerSec = maxMetersPerSec;
+
+        if(Robot.IS_LOGGING){
+            SwerveLogEntry = StructArrayLogEntry.create(DataLogManager.getLog(), "Swerve/States", SwerveModuleState.struct);
+        }
 
         this.maxMetersPerSecSquared = maxMetersPerSecSquared;
 
@@ -116,15 +130,15 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public double getYaw(){
-        return pigeon.getYaw();
+        return gyroscope.getYaw();
     }
 
 	public void setPigeon(double Yaw){
-		pigeon.setYaw(Yaw);
+        gyroscope.setYaw(Yaw);
 	}
 
     public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(MathUtil.inputModulus(getYaw(),-180,180));
+        return gyroscope.getRotation2d();
     }
 
 //    public Pose2d getPose() {
@@ -247,6 +261,9 @@ public class SwerveDrive extends SubsystemBase {
         FLModule.setDesiredState(desiredStates[1]);
         BRModule.setDesiredState(desiredStates[2]);
         BLModule.setDesiredState(desiredStates[3]);
+        if(Robot.IS_LOGGING){
+            SwerveLogEntry.append(desiredStates);
+        }
     }
 
     public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented, boolean red){
