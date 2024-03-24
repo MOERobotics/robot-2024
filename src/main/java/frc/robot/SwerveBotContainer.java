@@ -5,13 +5,10 @@
 package frc.robot;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -37,7 +34,7 @@ public class SwerveBotContainer {
 
     public DigitalOutput shooter;
 
-    WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
+    //WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
 
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
@@ -53,6 +50,7 @@ public class SwerveBotContainer {
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
     double maxRPS = Math.PI*2;
+    AHRS navx = new AHRS(SPI.Port.kMXP,(byte) 50);
     private final SwerveModule backLeftModule = new SwerveModule(
             19,
             18,
@@ -98,7 +96,7 @@ public class SwerveBotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS,0.04,0,0);
+            ()->(double)navx.getYaw(), maxMPS,0.04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
 
@@ -126,7 +124,7 @@ public class SwerveBotContainer {
 
         shooter = new DigitalOutput(4);
 
-        pigeon.reset();
+        navx.reset();
         swerveSubsystem.setDefaultCommand(drive);
         // Configure the trigger bindings
         configureBindings();
@@ -142,7 +140,7 @@ public class SwerveBotContainer {
     }
 
     private void configureBindings() {
-        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
+        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {navx.zeroYaw(); swerveSubsystem.setDesiredYaw(0);}));
         var loop = CommandScheduler.getInstance().getDefaultButtonLoop();
             new Trigger(funcOpJoystick.axisGreaterThan(3, 0.8, loop))
                     .whileTrue(Commands.runOnce(() -> shooter.set(true))).whileFalse(Commands.runOnce(()->shooter.set(false)));
