@@ -125,6 +125,7 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
             2.0e-2, 2.0e-3, 4.0e-4, 2.6e-2,0, 2.0e-4, 23.839, 14.231,
+            0,0,0,0,0,0,0,0,
             Rotation2d.fromDegrees(88), Rotation2d.fromDegrees(-47), 80,30);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
