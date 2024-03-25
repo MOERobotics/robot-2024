@@ -258,11 +258,11 @@ public class Arm extends SubsystemBase {
     }
 
 	public Command wristQuasiStatic(SysIdRoutine.Direction direction){
-		return wristSysIdRoutine.quasistatic(direction);
+		return wristSysIdRoutine.quasistatic(direction).andThen(()->setWristDestState(wristState().getDegrees()));
 	}
 
 	public Command wristDynamic(SysIdRoutine.Direction direction){
-		return wristSysIdRoutine.dynamic(direction);
+		return wristSysIdRoutine.dynamic(direction).andThen(()->setWristDestState(wristState().getDegrees()));
 	}
 
 }
