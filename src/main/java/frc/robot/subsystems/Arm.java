@@ -48,7 +48,8 @@ public class Arm extends SubsystemBase {
 
     private Rotation2d interShoulder, interWrist;
     private double currShoulder, currWrist;
-    private double maxSpeed, maxAccel, shoulderLength, wristLength;
+    private double maxSpeed, maxAccel, shoulderLength, wristLength, shoulderCOMLen, wristCOMLen,
+    shoulderInertia, wristInertia, shoulderMass, wristMass, shoulderGearing, wristGearing;
     private double wristOffset = 0;
     private double shoulderOffset = 90;
 	private final Measure<Velocity<Voltage>>rampRate= Volts.of(0.1).per(Seconds.of(1));
@@ -62,7 +63,9 @@ public class Arm extends SubsystemBase {
     public Arm(int rightShoulderMotorID, int leftShoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
                double kPShoulder, double kIShoulder, double kDShoulder,
                double kPWrist, double kIWrist, double kDWrist,
-               double shoulderLength, double wristLength,
+               double shoulderLength, double wristLength, double shoulderCOMLen, double wristCOMLen,
+               double shoulderInertia, double wristInertia, double shoulderMass, double wristMass,
+               double shoulderGearing, double wristGearing,
                Rotation2d criticalShoulderAngle, Rotation2d criticalWristAngle,
                double maxSpeed, double maxAccel) {
 
@@ -88,6 +91,10 @@ public class Arm extends SubsystemBase {
 
         this.maxAccel = maxAccel; this.maxSpeed = maxSpeed;
         this.shoulderLength = shoulderLength; this.wristLength = wristLength;
+        this.shoulderCOMLen = shoulderCOMLen; this.wristCOMLen = wristCOMLen;
+        this.shoulderInertia = shoulderInertia; this.wristInertia = wristInertia;
+        this.shoulderMass = shoulderMass; this.wristMass = wristMass;
+        this.shoulderGearing = shoulderGearing; this.wristGearing = wristGearing;
 
         shoulderController = new PIDController(kPShoulder, kIShoulder, kDShoulder);
         wristController = new PIDController(kPWrist, kIWrist, kDWrist);
@@ -147,6 +154,12 @@ public class Arm extends SubsystemBase {
     public void wristPower(double power){
         SmartDashboard.putNumber("wristpow", power);
         wristMotor.set(power);
+    }
+    public double getShoulderFF(Rotation2d shoulderVal){
+        return 0;
+    }
+    public double getWristFF(Rotation2d wristVal){
+        return 0;
     }
 
     public Command goToPoint(Rotation2d shoulderPos, Rotation2d wristPos) {
@@ -217,7 +230,7 @@ public class Arm extends SubsystemBase {
         return shoulderRelEncoder.getPosition();
     }
     public double wristPosRel(){
-        double val = wristRelEncoder.getPosition()*(-126.3+2)/(-0.548-15.8)-126.3+2;
+        double val = (wristRelEncoder.getPosition()*(-126.3+2)/(-0.548-15.8))*22/48-126.3+2;
         return val;
     }
 
