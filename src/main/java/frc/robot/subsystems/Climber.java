@@ -5,30 +5,22 @@ package frc.robot.subsystems;
 // the WPILib BSD license file in the root directory of this project.
 
 
-import com.ctre.phoenix6.hardware.Pigeon2;
-import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.SparkLimitSwitch;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
 
 
 
-    private final ClimberArm climberArmRight;
-    private final ClimberArm climberArmLeft;
+    private final ClimberArmSubsystem climberArmRight;
+    private final ClimberArmSubsystem climberArmLeft;
 
 
 
 
-    public Climber(int climberIDRight, int climberIDLeft, int stringPotIDRight, int stringPotIDLeft, boolean rightInverted, boolean leftInverted, double min_Inches_Right,
-                   double min_Inches_Left, double max_Inches_Right, double max_Inches_Left, double start_Inches_Left, double start_Inches_Right  ) {
-
-
-        climberArmRight = new ClimberArm(climberIDRight, stringPotIDRight, rightInverted, min_Inches_Right,max_Inches_Right,start_Inches_Right );
-        climberArmLeft = new ClimberArm(climberIDLeft, stringPotIDLeft, leftInverted, min_Inches_Left, max_Inches_Left,start_Inches_Left );
-
+    public Climber(ClimberArmSubsystem climberArmLeft, ClimberArmSubsystem climberArmRight) {
+        this.climberArmLeft = climberArmLeft;
+        this.climberArmRight = climberArmRight;
     }
 
 

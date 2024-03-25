@@ -23,7 +23,7 @@ public class shootSpeakerCommand extends Command {
      * @param shooterSubsystem The shooter subsystem used by this command.
      * @param collectorSubsystem The collector subsystem used by this command
      */
-    public shootSpeakerCommand(ShooterSubsystem shooterSubsystem,CollectorSubsystem collectorSubsystem) {
+    public shootSpeakerCommand(ShooterSubsystem shooterSubsystem, CollectorSubsystem collectorSubsystem) {
         this.shooter = shooterSubsystem;
         this.collector = collectorSubsystem;
         // Use addRequirements() here to declare subsystem dependencies.

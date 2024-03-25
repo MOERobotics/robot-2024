@@ -18,9 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SwerveController;
 import frc.robot.commands.setHeading;
-import frc.robot.subsystems.Gyroscope;
-import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -56,6 +54,14 @@ public class SwerveBotContainer {
 
     public Gyroscope gyroscope = new Gyroscope.NavXGyro();
     private final SendableChooser<Command> m_chooser = new SendableChooser<>();
+
+    private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem();
+    private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+    private final ClimberArmSubsystem climberArmSubsystemLeft = new ClimberArmSubsystem(0,0,0);
+    private final ClimberArmSubsystem climberArmSubsystemRight = new ClimberArmSubsystem(0,0,0);
+    private final Climber climber = new Climber(climberArmSubsystemLeft,climberArmSubsystemRight);
+
+
 
 
     private final SwerveModule backLeftModule = new SwerveModule(

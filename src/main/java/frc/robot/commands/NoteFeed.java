@@ -26,7 +26,7 @@ public class NoteFeed extends Command {
 	 * @param collectorSubsystem The collector subsystem used by this command
 	 * @param shooterRPM The supplier for the RPM which shooters should be set to
 	 */
-	public NoteFeed(ShooterSubsystem shooterSubsystem,CollectorSubsystem collectorSubsystem, Supplier<Integer> shooterRPM) {
+	public NoteFeed(ShooterSubsystem shooterSubsystem, CollectorSubsystem collectorSubsystem, Supplier<Integer> shooterRPM) {
 		this.shooter = shooterSubsystem;
 		this.collector = collectorSubsystem;
 		timer = new Timer();

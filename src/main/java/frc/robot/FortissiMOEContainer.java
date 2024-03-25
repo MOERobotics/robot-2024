@@ -22,6 +22,8 @@ import frc.robot.subsystems.*;
 
 import java.util.Set;
 
+import static frc.robot.subsystems.ClimberArmSubsystem.FortissiMOEClimberArm.CONVERSION_FACTOR_INCHES;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -32,18 +34,18 @@ import java.util.Set;
 public class FortissiMOEContainer{
 
     public Climber climber = new Climber(
-            7,
-            12,
-            1,
-            0,
-            false,
-            true,
-            0 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            0 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            3.94 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            3.57 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            0.83 * ClimberArm.CONVERSION_FACTOR_INCHES
+            new ClimberArmSubsystem.FortissiMOEClimberArm(
+                    7,1,false,
+                    0*CONVERSION_FACTOR_INCHES,
+                    3.94*CONVERSION_FACTOR_INCHES,
+                    .52*CONVERSION_FACTOR_INCHES
+            ),
+            new ClimberArmSubsystem.FortissiMOEClimberArm(
+                    12,0,true,
+                    0*CONVERSION_FACTOR_INCHES,
+                    3.57*CONVERSION_FACTOR_INCHES,
+                    .83*CONVERSION_FACTOR_INCHES
+            )
     );
 
     Gyroscope gyroscope = new Gyroscope.PigeonGyro(0);
@@ -123,9 +125,9 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
-	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(5,
+	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem.FortissiMOEShooter(5,
             13,1.0e-4, 0,0,driveFF);
-    private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem(6,
+    private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem.FortissiMOECollector(6,
             0.01,0,0,0,7);
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
 
