@@ -143,6 +143,8 @@ public class Arm extends SubsystemBase {
 //            if (boundChecker.negDerivShoulder(shoulderState(), shoulder, shoulderLength, wristLength)) shoulderPow = 0;
 //            if (boundChecker.negDerivWrist(wristState(),wrist, wristLength)) wristPow = 0;
 //        }
+        shoulderPow += getShoulderFF(shoulder, wrist);
+        wristPow += getWristFF(shoulder, wrist);
         shoulderPower(Math.min(shoulderPow, 1));
         wristPower(Math.min(wristPow, .7));
     }
@@ -155,10 +157,14 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("wristpow", power);
         wristMotor.set(power);
     }
-    public double getShoulderFF(Rotation2d shoulderVal){
+
+    public double getArmSpeed(){
         return 0;
     }
-    public double getWristFF(Rotation2d wristVal){
+    public double getShoulderFF(Rotation2d shoulderVal, Rotation2d wristVal){
+        return 0;
+    }
+    public double getWristFF(Rotation2d shoulderVal, Rotation2d wristVal){
         return 0;
     }
 
@@ -226,6 +232,11 @@ public class Arm extends SubsystemBase {
 //        if (deg > 180) deg = deg - 360;
 //        return Rotation2d.fromDegrees(deg);
     }
+
+    public Rotation2d combinedWrist(){
+        return Rotation2d.fromDegrees(180-(shoulderState().getDegrees()-90+wristState().getDegrees()));
+    }
+
     public double shoulderPosRel(){
         return shoulderRelEncoder.getPosition();
     }
@@ -259,13 +270,15 @@ public class Arm extends SubsystemBase {
         return currWrist;
     }
 
-    public void holdPos(double shoulderRel, double wristRel){
-        SmartDashboard.putNumber("shoulderRelSetpt", shoulderRel);
-        SmartDashboard.putNumber("wristRelSetpt", wristRel);
-        wristController.setSetpoint(wristRel);
-        shoulderController.setSetpoint(shoulderRel);
-        wristPower(wristController.calculate(wristState().getDegrees()));
-        shoulderPower(shoulderController.calculate(shoulderState().getDegrees()));
+    public void holdPos(double shoulder, double wrist){
+        SmartDashboard.putNumber("shoulderRelSetpt", shoulder);
+        SmartDashboard.putNumber("wristRelSetpt", wrist);
+        wristController.setSetpoint(wrist);
+        shoulderController.setSetpoint(shoulder);
+        Rotation2d wristRel = Rotation2d.fromDegrees(wrist);
+        Rotation2d shoulderRel = Rotation2d.fromDegrees(shoulder);
+        wristPower(wristController.calculate(wristState().getDegrees())+getWristFF(shoulderRel, wristRel));
+        shoulderPower(shoulderController.calculate(shoulderState().getDegrees())+getShoulderFF(shoulderRel, wristRel));
         //wristPower(0);
         //shoulderPower(0);
     }
