@@ -26,91 +26,31 @@ import frc.robot.subsystems.*;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class SwerveBotContainer {
+public class SwerveBotContainer extends GenericContainer{
 
     // public Solenoid shooter;
 
+    /////////////////////////////////////////////////////////////////////////////drive subsystems
+    public static final double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
+    public static final double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
+    public static final double pivotP = 8.0e-3*60;
+    public static final double pivotI = 0.0;
+    public static final double pivotD = 0.0;
+    public static final double driveP = 7.0e-5;
+    public static final double driveI = 0.0;
+    public static final double driveD = 1.0e-4;
+    public static final double driveFF = 1.76182e-4;
+    public static final double width = Units.inchesToMeters(14);
+    public static final double length = Units.inchesToMeters(14);
+    public static final double maxMPS = 176/39.3701;
+    public static final double maxMPSSquared = 5;
+    public static final double maxRPSSquared = Math.PI;
+    public static final double maxRPS = Math.PI*2;
 
-    public DigitalOutput shooter;
+    public DigitalOutput shooter2;
 
 //    WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
 
-    /////////////////////////////////////////////////////////////////////////////drive subsystems
-    double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
-    double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
-    double pivotP = 8.0e-3*60;
-    double pivotI = 0.0;
-    double pivotD = 0.0;
-    double driveP = 7.0e-5;
-    double driveI = 0.0;
-    double driveD = 1.0e-4;
-    double driveFF = 1.76182e-4;
-    double width = Units.inchesToMeters(14);
-    double length = Units.inchesToMeters(14);
-    double maxMPS = 176/39.3701;
-    double maxMPSSquared = 5;
-    double maxRPSSquared = Math.PI;
-    double maxRPS = Math.PI*2;
-
-    public Gyroscope gyroscope = new Gyroscope.NavXGyro();
-    private final SendableChooser<Command> m_chooser = new SendableChooser<>();
-
-    private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem();
-    private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-    private final ClimberArmSubsystem climberArmSubsystemLeft = new ClimberArmSubsystem(0,0,0);
-    private final ClimberArmSubsystem climberArmSubsystemRight = new ClimberArmSubsystem(0,0,0);
-    private final Climber climber = new Climber(climberArmSubsystemLeft,climberArmSubsystemRight);
-
-
-
-
-    private final SwerveModule backLeftModule = new SwerveModule(
-            19,
-            18,
-            34,
-            false,
-            true,
-            135,
-            new Translation2d(-width, length),
-            encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
-            driveP, driveI, driveD, driveFF
-    );
-    private final SwerveModule backRightModule = new SwerveModule(
-            1,
-            20,
-            33,
-            false,
-            true,
-            -135,
-            new Translation2d(-width, -length),
-            encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
-            driveP, driveI, driveD, driveFF
-    );
-    private final SwerveModule frontLeftModule = new SwerveModule(
-            11,
-            10,
-            31,
-            false,
-            true,
-            45,
-            new Translation2d(width, length),
-            encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
-            driveP, driveI, driveD, driveFF
-    );
-    private final SwerveModule frontRightModule = new SwerveModule(
-            9,
-            8,
-            32,
-            false,
-            true,
-            -45,
-            new Translation2d(width, -length),
-            encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
-            driveP, driveI, driveD, driveFF
-    );
-    private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            gyroscope, maxMPS,maxMPSSquared, maxRPS, maxRPSSquared,1,0,0, 1.0, 0, 0,
-            .04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -133,12 +73,77 @@ public class SwerveBotContainer {
 
 
 
+    public static SwerveBotContainer getContainer(){
+
+
+        Gyroscope gyroscope = new Gyroscope.NavXGyro();
+        CollectorSubsystem collectorSubsystem = new CollectorSubsystem();
+        ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+        ClimberArmSubsystem climberArmSubsystemLeft = new ClimberArmSubsystem(0,0,0);
+        ClimberArmSubsystem climberArmSubsystemRight = new ClimberArmSubsystem(0,0,0);
+        Climber climber = new Climber(climberArmSubsystemLeft,climberArmSubsystemRight);
 
 
 
-    public SwerveBotContainer() {
 
-        shooter = new DigitalOutput(4);
+        SwerveModule backLeftModule = new SwerveModule(
+                19,
+                18,
+                34,
+                false,
+                true,
+                135,
+                new Translation2d(-width, length),
+                encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
+                driveP, driveI, driveD, driveFF
+        );
+        SwerveModule backRightModule = new SwerveModule(
+                1,
+                20,
+                33,
+                false,
+                true,
+                -135,
+                new Translation2d(-width, -length),
+                encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
+                driveP, driveI, driveD, driveFF
+        );
+        SwerveModule frontLeftModule = new SwerveModule(
+                11,
+                10,
+                31,
+                false,
+                true,
+                45,
+                new Translation2d(width, length),
+                encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
+                driveP, driveI, driveD, driveFF
+        );
+        SwerveModule frontRightModule = new SwerveModule(
+                9,
+                8,
+                32,
+                false,
+                true,
+                -45,
+                new Translation2d(width, -length),
+                encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
+                driveP, driveI, driveD, driveFF
+        );
+        SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
+                gyroscope, maxMPS,maxMPSSquared, maxRPS, maxRPSSquared,1,0,0, 1.0, 0, 0,
+                .04,0,0);
+
+        return new SwerveBotContainer(gyroscope,collectorSubsystem,shooterSubsystem,climber, swerveSubsystem);
+    }
+
+
+    private SwerveBotContainer(Gyroscope gyro, CollectorSubsystem collect, ShooterSubsystem shooter,
+                              Climber climber, SwerveDrive swerve) {
+
+        super(gyro, collect, shooter, climber, swerve);
+
+        shooter2 = new DigitalOutput(4);
         gyroscope.reset();
 
         swerveSubsystem.setDefaultCommand(drive);
@@ -168,7 +173,7 @@ public class SwerveBotContainer {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {gyroscope.reset(); swerveSubsystem.setDesiredYaw(0);}));
         var loop = CommandScheduler.getInstance().getDefaultButtonLoop();
             new Trigger(funcOpJoystick.axisGreaterThan(3, 0.8, loop))
-                    .whileTrue(Commands.runOnce(() -> shooter.set(true))).whileFalse(Commands.runOnce(()->shooter.set(false)));
+                    .whileTrue(Commands.runOnce(() -> shooter2.set(true))).whileFalse(Commands.runOnce(()->shooter2.set(false)));
 
         new JoystickButton(funcOpJoystick, 3).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
     }
@@ -178,7 +183,7 @@ public class SwerveBotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return m_chooser.getSelected();
+        return null;
        // return Autos.exampleAuto(m_drive);
     }
 
