@@ -57,7 +57,7 @@ public class SwerveDrive extends SubsystemBase {
     boolean align = false;
     double kP, kI, kD, xykP, xykI, xykD;
 
-    Vision vision = new Vision();
+//    Vision vision = new Vision();
 
     private final ProfiledPIDController thetaController;
     private final ProfiledPIDController driveThetaController;
@@ -164,7 +164,7 @@ public class SwerveDrive extends SubsystemBase {
         return getAngleBetweenSpeaker(pos.get(), AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker));
     }
 
-    public List<Pose2d> getObjectPos(){
+    /*public List<Pose2d> getObjectPos(){
         ArrayList<Pose2d> desRobotPos = new ArrayList<>();
         var objectVal = vision.detections();
         for (int i = 0; i < objectVal.size(); i++){
@@ -173,7 +173,7 @@ public class SwerveDrive extends SubsystemBase {
             desRobotPos.add(getEstimatedPose().plus(new Transform2d(fieldObjPos, desObjRot)));
         }
         return desRobotPos;
-    }
+    }*/
 
     @Override
     public void periodic() {
@@ -186,7 +186,7 @@ public class SwerveDrive extends SubsystemBase {
 //        vision.setOdometryPosition(odometer.getPoseMeters());
         SmartDashboard.putNumber("Rotation",getEstimatedPose().getRotation().getDegrees());
         swerveDrivePoseEstimator.update(getRotation2d(), getModulePositions());
-        var aprilTagVal = vision.getAprilTagPose();
+        /*var aprilTagVal = vision.getAprilTagPose();
         if (aprilTagVal.isPresent()) {
             SmartDashboard.putNumber("timeStamp", aprilTagVal.get().timestamp);
             var dist = getEstimatedPose().getTranslation().getDistance(aprilTagVal.get().pose.getTranslation());
@@ -194,7 +194,7 @@ public class SwerveDrive extends SubsystemBase {
                     VecBuilder.fill(5e-2,5e-2,10));
         }
         SmartDashboard.putNumberArray("detections", getObjectPos().stream().flatMapToDouble(
-                pos -> DoubleStream.of(pos.getX(), pos.getX(), pos.getRotation().getDegrees())).toArray());
+                pos -> DoubleStream.of(pos.getX(), pos.getX(), pos.getRotation().getDegrees())).toArray());*/
         field.setRobotPose(swerveDrivePoseEstimator.getEstimatedPosition());
         SmartDashboard.putNumber("Posex", getEstimatedPose().getX());
         SmartDashboard.putNumber("Posey", getEstimatedPose().getY());

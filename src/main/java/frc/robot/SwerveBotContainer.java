@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SwerveController;
+import frc.robot.commands.autos.doubleNoteAutos;
 import frc.robot.commands.setHeading;
 import frc.robot.subsystems.Gyroscope;
 import frc.robot.subsystems.SwerveDrive;
@@ -165,6 +166,8 @@ public class SwerveBotContainer {
                     .whileTrue(Commands.runOnce(() -> shooter.set(true))).whileFalse(Commands.runOnce(()->shooter.set(false)));
 
         new JoystickButton(funcOpJoystick, 3).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
+        new JoystickButton(funcOpJoystick, 5).onTrue(new doubleNoteAutos(swerveSubsystem,0,0).goObjectDetectionNote());
+
     }
 
     private void shooterOn(Solenoid shooter) {

@@ -6,6 +6,7 @@ package frc.robot.commands.autos;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Unit;
@@ -22,6 +23,8 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.CollectorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.vision.ObjectDetection;
+import frc.robot.vision.Vision;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -39,6 +42,8 @@ public class doubleNoteAutos {
 //    private Command shootPosition = armSubsystem.goToPoint(Rotation2d.fromDegrees(104), Rotation2d.fromDegrees(-41));
     private ShooterSubsystem shooter;
     private CollectorSubsystem collector;
+
+    Vision vision = new Vision();
 
     /** Example static factory for an autonomous command. */
     public doubleNoteAutos(SwerveDrive subsystem, Arm armSubsystem, ShooterSubsystem shooter, CollectorSubsystem collector, double startVelocity, double endVelocity) {
@@ -476,6 +481,24 @@ public class doubleNoteAutos {
                 swerveDrive.setInitPosition(startPose),
                 trajCommand,
                 Commands.runOnce(()->swerveDrive.stopModules())
+        );
+    }
+
+    public Command waitForNoteCommand() {
+        return Commands.waitUntil(() -> !vision.detections().isEmpty());
+    }
+
+    public Command goObjectDetectionNote(){
+        return Commands.sequence(
+                waitForNoteCommand(),
+
+                Commands.defer( ()-> {
+                    Pose2d startPose = swerveDrive.getEstimatedPose();
+                    var detections = vision.detections();
+                    Pose2d endPose = startPose.transformBy(new Transform2d(detections.get(0), new Rotation2d(0)));
+                    var trajCommand = swerveDrive.generateTrajectory(startPose, endPose, new ArrayList<>(), 0, 0);
+                    return trajCommand;
+                }, Set.of(swerveDrive))
         );
     }
 
