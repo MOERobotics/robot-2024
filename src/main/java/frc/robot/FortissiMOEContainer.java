@@ -31,25 +31,9 @@ import static frc.robot.subsystems.ClimberArmSubsystem.FortissiMOEClimberArm.CON
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class FortissiMOEContainer{
+public class FortissiMOEContainer extends GenericContainer{
 
-    public Climber climber = new Climber(
-            new ClimberArmSubsystem.FortissiMOEClimberArm(
-                    7,1,false,
-                    0*CONVERSION_FACTOR_INCHES,
-                    3.94*CONVERSION_FACTOR_INCHES,
-                    .52*CONVERSION_FACTOR_INCHES
-            ),
-            new ClimberArmSubsystem.FortissiMOEClimberArm(
-                    12,0,true,
-                    0*CONVERSION_FACTOR_INCHES,
-                    3.57*CONVERSION_FACTOR_INCHES,
-                    .83*CONVERSION_FACTOR_INCHES
-            )
-    );
 
-    Gyroscope gyroscope = new Gyroscope.PigeonGyro(0);
-    PowerDistribution pdh = new PowerDistribution(21, PowerDistribution.ModuleType.kRev);
 
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
@@ -69,66 +53,10 @@ public class FortissiMOEContainer{
 
     double maxMPSSquared = 3;
     private final SendableChooser<Command> m_chooser = new SendableChooser<>();
+    PowerDistribution pdh = new PowerDistribution(21, PowerDistribution.ModuleType.kRev);
 
-    private final SwerveModule backLeftModule = new SwerveModule(
-            19,
-            18,
-            31,
-            false,
-            true,
-            135,
-            new Translation2d(-width, length),
-            encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
-            driveP, driveI, driveD, driveFF
-    );
-    private final SwerveModule backRightModule = new SwerveModule(
-            1,
-            20,
-            32,
-            false,
-            true,
-            -135,
-            new Translation2d(-width, -length),
-            encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
-            driveP, driveI, driveD, driveFF
-    );
-    private final SwerveModule frontLeftModule = new SwerveModule(
-            17,
-            16,
-            34,
-            false,
-            true,
-            45,
-            new Translation2d(width, length),
-            encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
-            driveP, driveI, driveD, driveFF
-    );
-    private final SwerveModule frontRightModule = new SwerveModule(
-            3,
-            2,
-            33,
-            false,
-            true,
-            -45,
-            new Translation2d(width, -length),
-            encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
-            driveP, driveI, driveD, driveFF
-    );
-    private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            gyroscope, maxMPS, maxMPSSquared, maxRPS, maxRPS2,1.0, 0, 0, 1.0, 0, 0, 4e-2, 0,0);
-    /////////////////////////////////////////////////////////////////////////////drive subsystems end
-    /////////////////////////////////////////////////////////////////////////////arm subsystem start
-    private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
-            2.0e-2, 2.0e-3, 4.0e-4, 8.0e-3,0, 1.0e-4, 23.839, 14.231,
-            Rotation2d.fromDegrees(88), Rotation2d.fromDegrees(-47), 70,30);
 
-    /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
-    ///////////////////////////////////////////////////////////////////////////////////////head subsystem
-	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem.FortissiMOEShooter(5,
-            13,1.0e-4, 0,0,driveFF);
-    private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem.FortissiMOECollector(6,
-            0.01,0,0,0,7);
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
 
 
@@ -140,6 +68,86 @@ public class FortissiMOEContainer{
     ////////////////////////////////////////////////////////////////////////////commands
 
 
+    public static FortissiMOEContainer getContainerFortissiMOE{
+            Climber climber = new Climber(
+                    new ClimberArmSubsystem.FortissiMOEClimberArm(
+                            7,1,false,
+                            0*CONVERSION_FACTOR_INCHES,
+                            3.94*CONVERSION_FACTOR_INCHES,
+                            .52*CONVERSION_FACTOR_INCHES
+                    ),
+                    new ClimberArmSubsystem.FortissiMOEClimberArm(
+                            12,0,true,
+                            0*CONVERSION_FACTOR_INCHES,
+                            3.57*CONVERSION_FACTOR_INCHES,
+                            .83*CONVERSION_FACTOR_INCHES
+                    )
+            );
+
+            Gyroscope gyroscope = new Gyroscope.PigeonGyro(0);
+            PowerDistribution pdh = new PowerDistribution(21, PowerDistribution.ModuleType.kRev);
+            SwerveModule backLeftModule = new SwerveModule(
+                    19,
+                    18,
+                    31,
+                    false,
+                    true,
+                    135,
+                    new Translation2d(-width, length),
+                    encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
+                    driveP, driveI, driveD, driveFF
+            );
+            SwerveModule backRightModule = new SwerveModule(
+                    1,
+                    20,
+                    32,
+                    false,
+                    true,
+                    -135,
+                    new Translation2d(-width, -length),
+                    encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
+                    driveP, driveI, driveD, driveFF
+            );
+            SwerveModule frontLeftModule = new SwerveModule(
+                    17,
+                    16,
+                    34,
+                    false,
+                    true,
+                    45,
+                    new Translation2d(width, length),
+                    encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
+                    driveP, driveI, driveD, driveFF
+            );
+            SwerveModule frontRightModule = new SwerveModule(
+                    3,
+                    2,
+                    33,
+                    false,
+                    true,
+                    -45,
+                    new Translation2d(width, -length),
+                    encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
+                    driveP, driveI, driveD, driveFF
+            );
+            SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
+                    gyroscope, maxMPS, maxMPSSquared, maxRPS, maxRPS2,1.0, 0, 0, 1.0, 0, 0, 4e-2, 0,0);
+            /////////////////////////////////////////////////////////////////////////////drive subsystems end
+            /////////////////////////////////////////////////////////////////////////////arm subsystem start
+            Arm armSubsystem = new Arm(4, 15,14, 35, 36,
+                    2.0e-2, 2.0e-3, 4.0e-4, 8.0e-3,0, 1.0e-4, 23.839, 14.231,
+                    Rotation2d.fromDegrees(88), Rotation2d.fromDegrees(-47), 70,30);
+
+            /////////////////////////////////////////////////////////////////////////// arm subsystem end
+
+            ShooterSubsystem shooterSubsystem = new ShooterSubsystem.FortissiMOEShooter(5,
+                    13,1.0e-4, 0,0,driveFF);
+            CollectorSubsystem collectorSubsystem = new CollectorSubsystem.FortissiMOECollector(6,
+                    0.01,0,0,0,7);
+
+            return new FortissiMOEContainer(gyroscope, collectorSubsystem,
+                    shooterSubsystem, climber, swerveSubsystem, armSubsystem);
+    }
 
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
@@ -167,9 +175,6 @@ public class FortissiMOEContainer{
             ()->functionJoystick.getRawButton(6),
             collectorSubsystem
     );
-
-
-
     private final Command moveArms= new TestClimber(
             climber,
             () -> buttonBox.getRawButton(7),
@@ -229,7 +234,10 @@ public class FortissiMOEContainer{
 
 
 
-    public FortissiMOEContainer() {
+    public FortissiMOEContainer(Gyroscope gyro, CollectorSubsystem collectorSubsystem, ShooterSubsystem shooterSubsystem,
+                                Climber climberSubsystem, SwerveDrive swerveSubsystem, ArmSubsystem armSubsystem) {
+
+        super(gyro, collectorSubsystem, shooterSubsystem, climberSubsystem, swerveSubsystem, armSubsystem);
         shooterSubsystem.setShooterRPMTolerance(500);
         shooterSubsystem.setMaxShooterSpeeds(3500,3500);
 

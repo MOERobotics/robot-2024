@@ -12,13 +12,13 @@ public abstract class GenericContainer {
     public final Climber climber;
     public final SwerveDrive swerveSubsystem;
 
-    public GenericContainer(Gyroscope gyro, CollectorSubsystem collect, ShooterSubsystem shooter
-            , Climber climber, SwerveDrive swerve){
+    public GenericContainer(Gyroscope gyro, CollectorSubsystem collectorSubsystem, ShooterSubsystem shooterSubsystem
+            , Climber climberSubsystem, SwerveDrive swerveSubsystem, ArmSubsystem armSubsystem){
         this.gyroscope = gyro;
-        this.collectorSubsystem = collect;
-        this.shooterSubsystem = shooter;
-        this.climber = climber;
-        this.swerveSubsystem = swerve;
+        this.collectorSubsystem = collectorSubsystem;
+        this.shooterSubsystem = shooterSubsystem;
+        this.climber = climberSubsystem;
+        this.swerveSubsystem = swerveSubsystem;
 
     }
 

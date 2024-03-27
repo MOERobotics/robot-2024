@@ -73,8 +73,7 @@ public class SwerveBotContainer extends GenericContainer{
 
 
 
-    public static SwerveBotContainer getContainer(){
-
+    public static SwerveBotContainer getContainerSwerveBot(){
 
         Gyroscope gyroscope = new Gyroscope.NavXGyro();
         CollectorSubsystem collectorSubsystem = new CollectorSubsystem();
@@ -82,9 +81,6 @@ public class SwerveBotContainer extends GenericContainer{
         ClimberArmSubsystem climberArmSubsystemLeft = new ClimberArmSubsystem(0,0,0);
         ClimberArmSubsystem climberArmSubsystemRight = new ClimberArmSubsystem(0,0,0);
         Climber climber = new Climber(climberArmSubsystemLeft,climberArmSubsystemRight);
-
-
-
 
         SwerveModule backLeftModule = new SwerveModule(
                 19,
