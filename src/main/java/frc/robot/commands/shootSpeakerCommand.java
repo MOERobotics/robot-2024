@@ -12,7 +12,6 @@ import frc.robot.subsystems.ShooterSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class shootSpeakerCommand extends Command {
-    //    private final HeadSubsystem headSubsystem;
     private final ShooterSubsystem shooter;
     private  final CollectorSubsystem collector;
     private Timer timer;

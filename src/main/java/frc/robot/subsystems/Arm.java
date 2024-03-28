@@ -226,11 +226,11 @@ public class Arm extends SubsystemBase {
     }
 
     public Rotation2d wristState(){
-        return Rotation2d.fromDegrees(wristPosRel());
-//        double deg = wristEncoder.getAbsolutePosition() + wristOffset;
-//        if (deg < -180) deg = deg + 360;
-//        if (deg > 180) deg = deg - 360;
-//        return Rotation2d.fromDegrees(deg);
+        //return Rotation2d.fromDegrees(wristPosRel());
+        double deg = wristEncoder.getAbsolutePosition() + wristOffset;
+        if (deg < -180) deg = deg + 360;
+        if (deg > 180) deg = deg - 360;
+        return Rotation2d.fromDegrees(-deg);
     }
 
     public Rotation2d combinedWrist(){
