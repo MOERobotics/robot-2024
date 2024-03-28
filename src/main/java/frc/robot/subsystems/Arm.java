@@ -160,7 +160,8 @@ public class Arm extends SubsystemBase {
         else{
             func = -38.5-Math.pow(-.901*dist+130.46, 1.0/3.0);
         }
-        return new Translation2d(112, Math.min(Math.max(-45, func), -30));
+        func -= 6;
+        return new Translation2d(112, Math.min(Math.max(-56, func), -30));
 //        return new Translation2d(112, Math.min(Math.max(-45, 4.63e-5*Math.pow(dist, 3)-1.7e-2*Math.pow(dist, 2)
 //        +2.13*dist-131.8)-1, -30));
     }
