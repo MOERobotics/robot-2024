@@ -129,15 +129,16 @@ public class SwerveBotContainer extends GenericContainer{
         SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
                 gyroscope, maxMPS,maxMPSSquared, maxRPS, maxRPSSquared,1,0,0, 1.0, 0, 0,
                 .04,0,0);
+        ArmSubsystem armSubsystem = new ArmSubsystem();
 
-        return new SwerveBotContainer(gyroscope,collectorSubsystem,shooterSubsystem,climber, swerveSubsystem);
+        return new SwerveBotContainer(gyroscope,collectorSubsystem,shooterSubsystem,climber, swerveSubsystem, armSubsystem);
     }
 
 
     private SwerveBotContainer(Gyroscope gyro, CollectorSubsystem collect, ShooterSubsystem shooter,
-                              Climber climber, SwerveDrive swerve) {
+                              Climber climber, SwerveDrive swerve, ArmSubsystem armSubsystem) {
 
-        super(gyro, collect, shooter, climber, swerve);
+        super(gyro, collect, shooter, climber, swerve, armSubsystem);
 
         shooter2 = new DigitalOutput(4);
         gyroscope.reset();

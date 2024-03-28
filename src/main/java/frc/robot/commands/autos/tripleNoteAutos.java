@@ -15,7 +15,7 @@ import frc.robot.UsefulPoints;
 import frc.robot.commands.Collect;
 import frc.robot.commands.setHeading;
 import frc.robot.commands.shootSpeakerCommand;
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CollectorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveDrive;
@@ -33,10 +33,10 @@ public class tripleNoteAutos {
     private final double endVelocity;
     private ShooterSubsystem shooter;
     private CollectorSubsystem collector;
-    private Arm armSubsystem;
+    private ArmSubsystem armSubsystem;
 
     /** Example static factory for an autonomous command. */
-    public tripleNoteAutos(SwerveDrive subsystem, Arm armSubsystem, ShooterSubsystem shooter, CollectorSubsystem collector, double startVelocity, double endVelocity) {
+    public tripleNoteAutos(SwerveDrive subsystem, ArmSubsystem armSubsystem, ShooterSubsystem shooter, CollectorSubsystem collector, double startVelocity, double endVelocity) {
         swerveDrive=subsystem;
         this.armSubsystem = armSubsystem;
         this.startVelocity = startVelocity;

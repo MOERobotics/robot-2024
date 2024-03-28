@@ -13,8 +13,8 @@ public class ShooterSubsystem extends SubsystemBase {
     protected double maxBotSpeed;
     protected double desiredTopSpeed;
     protected double desiredBotSpeed;
-    private double shooterSpeedTop = 0;//Store desired speeds
-    private double shooterSpeedBottom = 0;
+    protected double shooterSpeedTop = 0;//Store desired speeds
+    protected double shooterSpeedBottom = 0;
 
     public ShooterSubsystem() {
         shooterRPMTolerance = 5;
@@ -113,8 +113,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
         private final RelativeEncoder shooterTopEncoder;
         private final RelativeEncoder shooterBottomEncoder;
-        private double shooterSpeedTop=0;//Store desired speeds
-        private double shooterSpeedBottom=0;
         private double shooterRPMTolerance=0;
         private double maxTopSpeed, maxBotSpeed;
         private double desiredTopSpeed, desiredBotSpeed;
@@ -155,7 +153,7 @@ public class ShooterSubsystem extends SubsystemBase {
         public void setShooterTopSpeed(double speed){
 
             setDesiredTopSpeed(speed);
-            shooterSpeedTop=speed;
+            this.shooterSpeedTop=speed;
             SmartDashboard.putNumber("shooterTopDesired", speed);
             shooterTopController.setReference(speed, CANSparkBase.ControlType.kVelocity);
             //shooterTop.set(speed);

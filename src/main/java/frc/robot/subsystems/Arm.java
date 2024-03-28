@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.AllianceFlip;
@@ -93,6 +91,7 @@ public class Arm extends SubsystemBase {
 
     }
 
+    @Override
     public void periodic(){
         //TODO: make the mechanism 2d object in here
         SmartDashboard.putNumber("shoulderValue", shoulderState().getDegrees());
@@ -103,6 +102,7 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("desiredWrist", getWristDesState());
     }
 
+    @Override
     public void pathFollow(Rotation2d shoulder, Rotation2d wrist){
         //x is shoulder, y is wrist
         shoulderController.setSetpoint(shoulder.getDegrees());
@@ -117,15 +117,18 @@ public class Arm extends SubsystemBase {
         wristPower(Math.min(wristPow, .7));
     }
 
+    @Override
     public void shoulderPower(double power){
         SmartDashboard.putNumber("shoulderpow", power);
         shoulderMotorLeft.set(power);
     }
+    @Override
     public void wristPower(double power){
         SmartDashboard.putNumber("wristpow", power);
         wristMotor.set(power);
     }
 
+    @Override
     public Command goToPoint(Rotation2d shoulderPos, Rotation2d wristPos) {
 
         SmartDashboard.putNumber("movingToPoint", shoulderPos.getDegrees());
@@ -143,6 +146,7 @@ public class Arm extends SubsystemBase {
         );
     }
 
+    @Override
     public Translation2d autoAim(Supplier<Pose2d> robotPos){
         double dist = AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker).getDistance(robotPos.get().getTranslation());
         dist = Units.metersToInches(dist);
@@ -159,6 +163,7 @@ public class Arm extends SubsystemBase {
     }
 
 
+    @Override
     public Command controlRobot2O(Rotation2d shoulderPos, Rotation2d wristPos){
         if (boundChecker.inPointyPart2O(shoulderState(), wristState())
         || boundChecker.inPointyPart2O(shoulderPos, wristPos)){
@@ -171,11 +176,13 @@ public class Arm extends SubsystemBase {
         return new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel);
     }
 
+    @Override
     public void stopMotors(){
         wristPower(0); shoulderPower(0);
     }
 
 
+    @Override
     public Rotation2d shoulderState() {
         double deg = shoulderEncoder.getAbsolutePosition()+shoulderOffset;
         if (deg < -180) deg = deg + 360;
@@ -183,6 +190,7 @@ public class Arm extends SubsystemBase {
         return Rotation2d.fromDegrees(deg);
     }
 
+    @Override
     public Rotation2d wristState(){
         return Rotation2d.fromDegrees(wristPosRel());
 //        double deg = wristEncoder.getAbsolutePosition() + wristOffset;
@@ -190,39 +198,49 @@ public class Arm extends SubsystemBase {
 //        if (deg > 180) deg = deg - 360;
 //        return Rotation2d.fromDegrees(deg);
     }
+    @Override
     public double shoulderPosRel(){
         return shoulderRelEncoder.getPosition();
     }
+    @Override
     public double wristPosRel(){
         double val = wristRelEncoder.getPosition()*(-126.3+2)/(-0.548-15.8)-126.3+2;
         return val;
     }
 
+    @Override
     public void shoulderPowerController(double shoulderPow){
         shoulderPower(shoulderPow);
         setShoulderDesState(shoulderState().getDegrees());
     }
+    @Override
     public void wristPowerController(double wristPow){
         wristPower(wristPow);
         setWristDestState(wristState().getDegrees());
     }
+    @Override
     public void setShoulderDesState(double pos){
         currShoulder = pos;
     }
+    @Override
     public void setWristDestState(double pos){
         currWrist = pos;
     }
 
+    @Override
     public void setState(double shoulderDesState, double wristDesState){
         setShoulderDesState(shoulderDesState); setWristDestState(wristDesState);
     }
+    @Override
     public double getShoulderDesState(){
         return currShoulder;
     }
+    @Override
     public double getWristDesState(){
         return currWrist;
     }
 
+    @Override
     public void holdPos(double shoulderRel, double wristRel){
         SmartDashboard.putNumber("shoulderRelSetpt", shoulderRel);
         SmartDashboard.putNumber("wristRelSetpt", wristRel);

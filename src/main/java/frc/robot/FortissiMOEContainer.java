@@ -36,22 +36,22 @@ public class FortissiMOEContainer extends GenericContainer{
 
 
     /////////////////////////////////////////////////////////////////////////////drive subsystems
-    double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
-    double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
-    double pivotP = 8.0e-3*60;
-    double pivotI = 0.0;
-    double pivotD = 0.0;
-    double driveP = 5.0e-5;
-    double driveI = 0.0;
-    double driveD = 2.0e-4;
-    double driveFF = 1.76182e-4;
-    double width = Units.inchesToMeters(14);
-    double length = Units.inchesToMeters(14);
-    double maxMPS = 174/39.3701;
-    double maxRPS =  1.5*2*Math.PI;
-    double maxRPS2 = Math.PI;
+    static double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
+    static double velocityConversionFactor = 32.73*1.03/1.022 * Units.metersToInches(1);
+    static double pivotP = 8.0e-3*60;
+    static double pivotI = 0.0;
+    static double pivotD = 0.0;
+    static double driveP = 5.0e-5;
+    static double driveI = 0.0;
+    static double driveD = 2.0e-4;
+    static double driveFF = 1.76182e-4;
+    static double width = Units.inchesToMeters(14);
+    static double length = Units.inchesToMeters(14);
+    static double maxMPS = 174/39.3701;
+    static double maxRPS =  1.5*2*Math.PI;
+    static double maxRPS2 = Math.PI;
 
-    double maxMPSSquared = 3;
+    static double maxMPSSquared = 3;
     private final SendableChooser<Command> m_chooser = new SendableChooser<>();
     PowerDistribution pdh = new PowerDistribution(21, PowerDistribution.ModuleType.kRev);
 
@@ -68,7 +68,7 @@ public class FortissiMOEContainer extends GenericContainer{
     ////////////////////////////////////////////////////////////////////////////commands
 
 
-    public static FortissiMOEContainer getContainerFortissiMOE{
+    public static FortissiMOEContainer getContainerFortissiMOE(){
             Climber climber = new Climber(
                     new ClimberArmSubsystem.FortissiMOEClimberArm(
                             7,1,false,
@@ -134,9 +134,9 @@ public class FortissiMOEContainer extends GenericContainer{
                     gyroscope, maxMPS, maxMPSSquared, maxRPS, maxRPS2,1.0, 0, 0, 1.0, 0, 0, 4e-2, 0,0);
             /////////////////////////////////////////////////////////////////////////////drive subsystems end
             /////////////////////////////////////////////////////////////////////////////arm subsystem start
-            Arm armSubsystem = new Arm(4, 15,14, 35, 36,
+            /* Arm armSubsystem = new Arm(4, 15,14, 35, 36,
                     2.0e-2, 2.0e-3, 4.0e-4, 8.0e-3,0, 1.0e-4, 23.839, 14.231,
-                    Rotation2d.fromDegrees(88), Rotation2d.fromDegrees(-47), 70,30);
+                    Rotation2d.fromDegrees(88), Rotation2d.fromDegrees(-47), 70,30); */
 
             /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -144,6 +144,7 @@ public class FortissiMOEContainer extends GenericContainer{
                     13,1.0e-4, 0,0,driveFF);
             CollectorSubsystem collectorSubsystem = new CollectorSubsystem.FortissiMOECollector(6,
                     0.01,0,0,0,7);
+            ArmSubsystem armSubsystem = new ArmSubsystem();
 
             return new FortissiMOEContainer(gyroscope, collectorSubsystem,
                     shooterSubsystem, climber, swerveSubsystem, armSubsystem);
@@ -285,16 +286,14 @@ public class FortissiMOEContainer extends GenericContainer{
 
 
     private void configureBindings() {
-        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {gyroscope.reset(); swerveSubsystem.setDesiredYaw(0);}));
-        new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.2)));
-        new JoystickButton(buttonBox, 1).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
-        new JoystickButton(functionJoystick, 7).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.2)));
-        new JoystickButton(buttonBox, 2).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
         new JoystickButton(functionJoystick, 1).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(83), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem))
-                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
-                        functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(2)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
-                        || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
+            .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
+                functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
+                functionJoystick.getRawButton(2)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
+                || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
+
+
+
         //collect
 
 //        new JoystickButton(functionJoystick, 2).onTrue(Commands.defer(() -> armSubsystem.goToPoint(
@@ -358,8 +357,6 @@ public class FortissiMOEContainer extends GenericContainer{
                                 ()->Math.abs(driverJoystick.getRawAxis(2)) >= .1
                         ))); //auto aim shot
 
-        new JoystickButton(buttonBox, 6).whileTrue(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(2300,2300))).
-                whileFalse(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(3500,3500)));
         //104,-41
       //  new JoystickButton(driverJoystick, 7).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
 

@@ -9,21 +9,21 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.helpers.LineHelpers;
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.ArmSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import static java.lang.Math.abs;
 
 /** An example command that uses an example subsystem. */
 public class ArmPathFollow extends Command {
-    private final Arm armSubsystem;
+    private final ArmSubsystem armSubsystem;
     Translation2d desiredPoint;
     Translation2d startPoint, currPos;
     Timer timer;
     double targetDist, speed, accel, s;
 
 
-    public ArmPathFollow(Arm subsystem, Rotation2d shoulderPos, Rotation2d wristPos, double speed, double accel) {
+    public ArmPathFollow(ArmSubsystem subsystem, Rotation2d shoulderPos, Rotation2d wristPos, double speed, double accel) {
         armSubsystem = subsystem;
         addRequirements(subsystem);
         desiredPoint = new Translation2d(shoulderPos.getDegrees(), wristPos.getDegrees());
