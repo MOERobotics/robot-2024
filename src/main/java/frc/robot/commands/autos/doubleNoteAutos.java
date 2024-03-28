@@ -43,7 +43,7 @@ public class doubleNoteAutos {
     private ShooterSubsystem shooter;
     private CollectorSubsystem collector;
 
-    Vision vision = new Vision();
+//    Vision vision = new Vision();
 
     /** Example static factory for an autonomous command. */
     public doubleNoteAutos(SwerveDrive subsystem, Arm armSubsystem, ShooterSubsystem shooter, CollectorSubsystem collector, double startVelocity, double endVelocity) {
@@ -484,23 +484,23 @@ public class doubleNoteAutos {
         );
     }
 
-    public Command waitForNoteCommand() {
-        return Commands.waitUntil(() -> !vision.detections().isEmpty());
-    }
+//    public Command waitForNoteCommand() {
+//        return Commands.waitUntil(() -> !vision.detections().isEmpty());
+//    }
 
-    public Command goObjectDetectionNote(){
-        return Commands.sequence(
-                waitForNoteCommand(),
-
-                Commands.defer( ()-> {
-                    Pose2d startPose = swerveDrive.getEstimatedPose();
-                    var detections = vision.detections();
-                    Pose2d endPose = startPose.transformBy(new Transform2d(detections.get(0), new Rotation2d(0)));
-                    var trajCommand = swerveDrive.generateTrajectory(startPose, endPose, new ArrayList<>(), 0, 0);
-                    return trajCommand;
-                }, Set.of(swerveDrive))
-        );
-    }
+//    public Command goObjectDetectionNote(){
+//        return Commands.sequence(
+//                waitForNoteCommand(),
+//
+//                Commands.defer( ()-> {
+//                    Pose2d startPose = swerveDrive.getEstimatedPose();
+//                    var detections = vision.detections();
+//                    Pose2d endPose = startPose.transformBy(new Transform2d(detections.get(0), new Rotation2d(0)));
+//                    var trajCommand = swerveDrive.generateTrajectory(startPose, endPose, new ArrayList<>(), 0, 0);
+//                    return trajCommand;
+//                }, Set.of(swerveDrive))
+//        );
+//    }
 
 
 

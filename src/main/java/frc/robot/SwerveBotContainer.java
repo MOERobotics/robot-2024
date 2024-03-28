@@ -7,21 +7,21 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.DriveToNoteCommand;
 import frc.robot.commands.SwerveController;
 import frc.robot.commands.autos.doubleNoteAutos;
 import frc.robot.commands.setHeading;
 import frc.robot.subsystems.Gyroscope;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
+import frc.robot.vision.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -57,6 +57,8 @@ public class SwerveBotContainer {
 
     public Gyroscope gyroscope = new Gyroscope.NavXGyro();
     private final SendableChooser<Command> m_chooser = new SendableChooser<>();
+
+    Vision vision = new Vision();
 
 
     private final SwerveModule backLeftModule = new SwerveModule(
@@ -108,8 +110,9 @@ public class SwerveBotContainer {
             .04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
-    private final Joystick driverJoystick = new Joystick(1); ///joystick imports
+//    private final Joystick driverJoystick = new Joystick(1); ///joystick imports
     private final Joystick funcOpJoystick = new Joystick(0);
+    private final PS5Controller driverJoystick  = new PS5Controller(1);
 
     ////////////////////////////////////////////////////////////////////////////commands
 
@@ -166,7 +169,14 @@ public class SwerveBotContainer {
                     .whileTrue(Commands.runOnce(() -> shooter.set(true))).whileFalse(Commands.runOnce(()->shooter.set(false)));
 
         new JoystickButton(funcOpJoystick, 3).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
-        new JoystickButton(funcOpJoystick, 5).onTrue(new doubleNoteAutos(swerveSubsystem,0,0).goObjectDetectionNote());
+//        new JoystickButton(funcOpJoystick, 5).onTrue(new doubleNoteAutos(swerveSubsystem,0,0).goObjectDetectionNote());
+        var driveToNote = new DriveToNoteCommand(
+                swerveSubsystem,
+                vision,
+                () -> Math.hypot(driverJoystick.getRawAxis(0), driverJoystick.getRawAxis(1)),
+                (rumblePercent) -> driverJoystick.setRumble(GenericHID.RumbleType.kBothRumble, rumblePercent)
+        );
+        new JoystickButton(driverJoystick, 8).whileTrue(driveToNote);
 
     }
 
@@ -180,16 +190,3 @@ public class SwerveBotContainer {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

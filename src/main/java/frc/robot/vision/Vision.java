@@ -68,7 +68,7 @@ public class Vision {
         ArrayList<Translation2d> dets = new ArrayList<>();
         var entry = subNotes.getAtomic();
         if (entry.timestamp > oldDetTime && entry.value.length %3 == 0){
-//            oldDetTime = entry.timestamp;
+            oldDetTime = entry.timestamp;
             for (int i = 0; i < entry.value.length/3; i++){
                 dets.add(new Translation2d(entry.value[i*3], entry.value[i*3+1]));
             }
