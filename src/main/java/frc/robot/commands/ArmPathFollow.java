@@ -54,18 +54,19 @@ public class ArmPathFollow extends Command {
                 - startPoint.getX()) + startPoint.getY();
 
         double wristVel = (desiredPoint.getY()-startPoint.getY())/(desiredPoint.getDistance(startPoint))*v;
+        double shoulderVel = (desiredPoint.getX()-startPoint.getX())/(desiredPoint.getDistance(startPoint))*v;
 
-        if (Math.abs(desiredPoint.getX() - startPoint.getX()) <= 2){
+        if (Math.abs(desiredPoint.getX() - startPoint.getX()) <= 5){
             wristPos = (desiredPoint.getY()-startPoint.getY())/(desiredPoint.getDistance(startPoint))*s+startPoint.getY();
         }
-        if (desiredPoint.getDistance(startPoint) <= 2){
+        if (desiredPoint.getDistance(startPoint) <= 5){
             s = desiredPoint.getDistance(startPoint)+1;
         }
         SmartDashboard.putNumber("ArmPathFollow writePos", wristPos);
         SmartDashboard.putNumber("ArmPathFollow shoulderPos", shoulderPos);
         SmartDashboard.putNumber("ArmPathFollow desiredWrist", desiredPoint.getY());
         SmartDashboard.putNumber("ArmPathFollow desiredShoulder", desiredPoint.getX());
-        armSubsystem.pathFollow(Rotation2d.fromDegrees(shoulderPos), Rotation2d.fromDegrees(wristPos), wristVel);
+        armSubsystem.pathFollow(Rotation2d.fromDegrees(shoulderPos), Rotation2d.fromDegrees(wristPos), wristVel, shoulderVel);
 
         armSubsystem.setWristDestState(wristPos);
         armSubsystem.setShoulderDesState(shoulderPos);

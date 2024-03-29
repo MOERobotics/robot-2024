@@ -125,10 +125,12 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 37,
-            1.7e-2, 1.7e-3, 4.0e-4, .1724,0, 6.76e-3, .0185, .14833,
-            1.42e-4, 1.36e-4,23.839, 14.231,
-            0,0,0,0,0,0,0,0,
-            Rotation2d.fromDegrees(100), Rotation2d.fromDegrees(-35), 100,900);
+            24.0e-2, 24.0e-3, 48.0e-4, .1724,5.0e-2, 6.76e-3,
+            .0185, .14833, 1.42e-4, 1.36e-4,
+            .94908/3, .54837/3, .033244/3, .00498/3,
+            .6048, .3615, .18133,.14154,10.725,27.837,
+            5.6705,5.899,0,0,
+            Rotation2d.fromDegrees(100), Rotation2d.fromDegrees(-35), 200,300);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -285,17 +287,17 @@ public class FortissiMOEContainer{
 
 
     private void configureBindings() {
-		new JoystickButton(driverJoystick,4).whileTrue(armSubsystem.wristQuasiStatic(SysIdRoutine.Direction.kForward));
-	    new JoystickButton(driverJoystick,2).whileTrue(armSubsystem.wristQuasiStatic(SysIdRoutine.Direction.kReverse));
-		new JoystickButton(driverJoystick,7).whileTrue(armSubsystem.wristDynamic(SysIdRoutine.Direction.kForward));
-	    new JoystickButton(driverJoystick,8).whileTrue(armSubsystem.wristDynamic(SysIdRoutine.Direction.kReverse));
+		new JoystickButton(driverJoystick,4).whileTrue(armSubsystem.shoulderQuasiStatic(SysIdRoutine.Direction.kForward));
+	    new JoystickButton(driverJoystick,2).whileTrue(armSubsystem.shoulderQuasiStatic(SysIdRoutine.Direction.kReverse));
+		new JoystickButton(driverJoystick,7).whileTrue(armSubsystem.shoulderDynamic(SysIdRoutine.Direction.kForward));
+	    new JoystickButton(driverJoystick,8).whileTrue(armSubsystem.shoulderDynamic(SysIdRoutine.Direction.kReverse));
 
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
-        new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.2)));
+        new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderVoltageController(1.5)));
         new JoystickButton(buttonBox, 1).whileTrue(Commands.run(()->armSubsystem.wristVoltageController(1.5))); //in volts lol
-        new JoystickButton(functionJoystick, 7).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.2)));
+        new JoystickButton(functionJoystick, 7).whileTrue(Commands.run(()->armSubsystem.shoulderVoltageController(-1.5)));
         new JoystickButton(buttonBox, 2).whileTrue(Commands.run(()->armSubsystem.wristVoltageController(-1.5)));
-        new JoystickButton(functionJoystick, 1).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(84), Rotation2d.fromDegrees(-43)), Set.of(armSubsystem))
+        new JoystickButton(functionJoystick, 1).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(85), Rotation2d.fromDegrees(-43)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(2)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
@@ -332,7 +334,7 @@ public class FortissiMOEContainer{
                         || buttonBox.getRawButton(2) || functionJoystick.getRawButton(9))));
         //amp shot
 
-        new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-102.5)), Set.of(armSubsystem))
+        new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(113), Rotation2d.fromDegrees(-105)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(10) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)

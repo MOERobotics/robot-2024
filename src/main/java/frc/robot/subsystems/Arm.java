@@ -45,24 +45,25 @@ public class Arm extends SubsystemBase {
     private Rotation2d interShoulder, interWrist;
     private double currShoulder, currWrist;
     private double maxSpeed, maxAccel, shoulderLength, wristLength, shoulderCOMLen, wristCOMLen,
-    shoulderInertia, wristInertia, shoulderMass, wristMass, shoulderGearing, wristGearing;
+    shoulderCOMOffset, wristCOMOffset, shoulderMass, wristMass, shoulderGearing, wristGearing;
     private double wristOffset = 0;
     private double shoulderOffset = 90;
-	private final Measure<Velocity<Voltage>>rampRate= Volts.of(0.1).per(Seconds.of(1));
-	private final Measure<Voltage>stepVolatage = Volts.of(2);
+	private final Measure<Velocity<Voltage>>rampRate= Volts.of(0.25).per(Seconds.of(1));
+	private final Measure<Voltage> stepVoltage = Volts.of(2);
 	private final Measure<Time>timeout = Seconds.of(5);
 	private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
 	private final MutableMeasure<Angle> m_angle = mutable(Degrees.of(0));
 	private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(DegreesPerSecond.of(0));
-	private final SysIdRoutine wristSysIdRoutine;
-    private final ArmFeedforward wristFF;
+	private final SysIdRoutine shoulderSysIdRoutine;
+    private final ArmFeedforward wristFF, shoulderFF;
 
     public Arm(int rightShoulderMotorID, int leftShoulderMotorID, int wristMotorID, int shoulderEncoderID, int wristEncoderID,
                double kPShoulder, double kIShoulder, double kDShoulder,
                double kPWrist, double kIWrist, double kDWrist,
                double kGWrist, double kSWrist, double kVWrist, double kAWrist,
+               double kGShoulder, double kSShoulder, double kVShoulder, double kAShoulder,
                double shoulderLength, double wristLength, double shoulderCOMLen, double wristCOMLen,
-               double shoulderInertia, double wristInertia, double shoulderMass, double wristMass,
+               double shoulderCOMOffset, double wristCOMOffset, double shoulderMass, double wristMass,
                double shoulderGearing, double wristGearing,
                Rotation2d criticalShoulderAngle, Rotation2d criticalWristAngle,
                double maxSpeed, double maxAccel) {
@@ -94,10 +95,11 @@ public class Arm extends SubsystemBase {
         this.maxAccel = maxAccel; this.maxSpeed = maxSpeed;
         this.shoulderLength = shoulderLength; this.wristLength = wristLength;
         this.shoulderCOMLen = shoulderCOMLen; this.wristCOMLen = wristCOMLen;
-        this.shoulderInertia = shoulderInertia; this.wristInertia = wristInertia;
+        this.shoulderCOMOffset = shoulderCOMOffset; this.wristCOMOffset = wristCOMOffset;
         this.shoulderMass = shoulderMass; this.wristMass = wristMass;
         this.shoulderGearing = shoulderGearing; this.wristGearing = wristGearing;
         wristFF = new ArmFeedforward(kSWrist, kGWrist, kVWrist, kAWrist);
+        shoulderFF = new ArmFeedforward(kSShoulder, kGShoulder, kVShoulder, kAShoulder);
 
         shoulderController = new PIDController(kPShoulder, kIShoulder, kDShoulder);
         wristController = new PIDController(kPWrist, kIWrist, kDWrist);
@@ -108,18 +110,18 @@ public class Arm extends SubsystemBase {
 		setWristDestState(wristState().getDegrees());
         shoulderController.reset();
         wristController.reset();
-	    wristSysIdRoutine = new SysIdRoutine(
-			new SysIdRoutine.Config(rampRate,stepVolatage,timeout),
+	    shoulderSysIdRoutine = new SysIdRoutine(
+			new SysIdRoutine.Config(rampRate, stepVoltage,timeout),
 			new SysIdRoutine.Mechanism(
 					(Measure<Voltage> volts)->{
-						wristMotor.setVoltage(volts.in(Volts));
+						shoulderMotorLeft.setVoltage(volts.in(Volts));
 						},
 					log -> {
 						log.motor("wrist-motor").voltage(
 								m_appliedVoltage.mut_replace(
-									wristMotor.getAppliedOutput()*wristMotor.getBusVoltage(), Volts)
-						    ).angularPosition(m_angle.mut_replace(combinedWrist().getDegrees(),Degrees)
-							).angularVelocity(m_velocity.mut_replace(getWristVelocity(),DegreesPerSecond));
+									shoulderMotorLeft.getAppliedOutput()*shoulderMotorLeft.getBusVoltage(), Volts)
+						    ).angularPosition(m_angle.mut_replace(COMAngle().getDegrees(),Degrees)
+							).angularVelocity(m_velocity.mut_replace(getShoulderVelocity(),DegreesPerSecond));
 					},
 					this
 			)
@@ -135,32 +137,34 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("desiredShould", getShoulderDesState());
         SmartDashboard.putNumber("desiredWrist", getWristDesState());
         SmartDashboard.putNumber("combinedWrist", combinedWrist().getDegrees());
+        SmartDashboard.putNumber("com angle",COMAngle().getDegrees());
     }
 
-    public void pathFollow(Rotation2d shoulder, Rotation2d wrist, double wristVel){
+    public void pathFollow(Rotation2d shoulder, Rotation2d wrist, double wristVel, double shoulderVel){
         //x is shoulder, y is wrist
         shoulderController.setSetpoint(shoulder.getDegrees());
         double shoulderPow = (shoulderController.calculate(shoulderState().getDegrees()));
 
         wristController.setSetpoint(wrist.getDegrees());
         double wristPow = (wristController.calculate(wristState().getDegrees()));
-        if (combWristConversion(shoulder, wrist).getDegrees() >= 80) wristPow = wristPow/2;
+        //if (combWristConversion(shoulder, wrist).getDegrees() >= 80) wristPow = wristPow/2;
 //        if (!boundChecker.inBounds(shoulder, wrist, shoulderLength, wristLength)){
 //            if (boundChecker.negDerivShoulder(shoulderState(), shoulder, shoulderLength, wristLength)) shoulderPow = 0;
 //            if (boundChecker.negDerivWrist(wristState(),wrist, wristLength)) wristPow = 0;
 //        }
-        shoulderPow += getShoulderFF(shoulder, wrist);
+        shoulderPow += getShoulderFF(shoulder, wrist, Units.degreesToRadians(shoulderVel));
         wristPow += getWristFF(shoulder, wrist, Units.degreesToRadians(wristVel));
-        shoulderPower(Math.min(shoulderPow, 1));
-        wristVoltage(Math.min(wristPow, 8));
+        shoulderVoltage(shoulderPow);
+        wristVoltage(wristPow);
     }
 
-    public void shoulderPower(double power){
+    public void shoulderVoltage(double power){
+        power = Math.max(Math.min(power, 8),-8);
         SmartDashboard.putNumber("shoulderpow", power);
-        shoulderMotorLeft.set(power);
+        shoulderMotorLeft.setVoltage(power);
     }
     public void wristVoltage(double power){
-        power = Math.min(power, 8);
+        power = Math.max(Math.min(power, 8), -8);
         SmartDashboard.putNumber("wristpow", power);
         wristMotor.setVoltage(power);
     }
@@ -168,8 +172,8 @@ public class Arm extends SubsystemBase {
     public double getArmSpeed(){
         return 0;
     }
-    public double getShoulderFF(Rotation2d shoulderVal, Rotation2d wristVal){
-        return 0;
+    public double getShoulderFF(Rotation2d shoulderVal, Rotation2d wristVal, double velocity){
+        return shoulderFF.calculate(COMAngleConversion(shoulderVal, wristVal).getRadians(), velocity);
     }
     public double getWristFF(Rotation2d shoulderVal, Rotation2d wristVal, double velocity){
         return wristFF.calculate(combWristConversion(shoulderVal, wristVal).getRadians(), velocity);
@@ -221,7 +225,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void stopMotors(){
-        wristVoltage(0); shoulderPower(0);
+        wristVoltage(0); shoulderVoltage(0);
     }
 
 
@@ -241,10 +245,26 @@ public class Arm extends SubsystemBase {
     }
 
     public Rotation2d combinedWrist(){
-        return Rotation2d.fromDegrees(180-(shoulderState().getDegrees()-90+180+wristState().getDegrees()));
+        return combWristConversion(shoulderState(), wristState());
     }
     public Rotation2d combWristConversion(Rotation2d shoulder, Rotation2d wrist){
         return Rotation2d.fromDegrees(180-(shoulder.getDegrees()-90+180+wrist.getDegrees()));
+    }
+
+    public Rotation2d COMAngle(){
+        return COMAngleConversion(shoulderState(), wristState());
+    }
+
+    public Rotation2d COMAngleConversion(Rotation2d shoulder, Rotation2d wrist){
+        double shoulderDeg = shoulder.getDegrees();//Math.round(shoulder);//Math.floor(shoulder) + Math.round((shoulder-Math.floor(shoulder))*10)/10.0;
+        double wristDeg = wrist.getDegrees();//Math.round(wrist); //+ Math.round((wrist-Math.floor(wrist))*10)/10.0;
+        double COMx = (shoulderMass*shoulderCOMLen*Math.cos(Units.degreesToRadians(shoulderDeg-90+shoulderCOMOffset))
+                + wristMass*(shoulderLength*Math.cos(Units.degreesToRadians(shoulderDeg-90))
+                +wristCOMLen*Math.cos(Units.degreesToRadians(wristDeg-wristCOMOffset))))/(shoulderMass+wristMass);
+        double COMy = (shoulderMass*shoulderCOMLen*Math.sin(Units.degreesToRadians(shoulderDeg-90+shoulderCOMOffset))
+                + wristMass*(shoulderLength*Math.sin(Units.degreesToRadians(shoulderDeg-90))
+                -wristCOMLen*Math.sin(Units.degreesToRadians(wristDeg-wristCOMOffset))))/(shoulderMass+wristMass);
+        return Rotation2d.fromRadians(Math.atan2(COMy,COMx));
     }
 
     public double shoulderPosRel(){
@@ -255,8 +275,8 @@ public class Arm extends SubsystemBase {
         return val;
     }
 
-    public void shoulderPowerController(double shoulderPow){
-        shoulderPower(shoulderPow);
+    public void shoulderVoltageController(double shoulderPow){
+        shoulderVoltage(shoulderPow);
         setShoulderDesState(shoulderState().getDegrees());
     }
     public void wristVoltageController(double wristPow){
@@ -283,6 +303,9 @@ public class Arm extends SubsystemBase {
     public double getWristVelocity(){
         return wristRelEncoder.getVelocity()*(-126.3+2)/(-0.548-15.8)*22/48;
     }
+    public double getShoulderVelocity(){
+        return shoulderEncoder.getVelocity();
+    }
 
     public void holdPos(double shoulder, double wrist){
         SmartDashboard.putNumber("shoulderRelSetpt", shoulder);
@@ -292,19 +315,19 @@ public class Arm extends SubsystemBase {
         Rotation2d wristRel = Rotation2d.fromDegrees(wrist);
         Rotation2d shoulderRel = Rotation2d.fromDegrees(shoulder);
         double wristPow = wristController.calculate(wristState().getDegrees());
-        if (combWristConversion(Rotation2d.fromDegrees(shoulder), Rotation2d.fromDegrees(wrist)).getDegrees() >= 80) wristPow /= 2;
+        //if (combWristConversion(Rotation2d.fromDegrees(shoulder), Rotation2d.fromDegrees(wrist)).getDegrees() >= 80) wristPow /= 2;
         wristVoltage(wristPow+getWristFF(shoulderRel, wristRel, 0));
-        shoulderPower(shoulderController.calculate(shoulderState().getDegrees())+getShoulderFF(shoulderRel, wristRel));
+        shoulderVoltage(shoulderController.calculate(shoulderState().getDegrees())+getShoulderFF(shoulderRel, wristRel, 0));
         //wristPower(0);
         //shoulderPower(0);
     }
 
-	public Command wristQuasiStatic(SysIdRoutine.Direction direction){
-		return wristSysIdRoutine.quasistatic(direction).handleInterrupt(()->setWristDestState(wristState().getDegrees())).andThen(()->setWristDestState(wristState().getDegrees()));
+	public Command shoulderQuasiStatic(SysIdRoutine.Direction direction){
+		return shoulderSysIdRoutine.quasistatic(direction).handleInterrupt(()->setShoulderDesState(shoulderState().getDegrees())).andThen(()->setShoulderDesState(shoulderState().getDegrees()));
 	}
 
-	public Command wristDynamic(SysIdRoutine.Direction direction){
-		return wristSysIdRoutine.dynamic(direction).handleInterrupt(()->setWristDestState(wristState().getDegrees())).andThen(()->setWristDestState(wristState().getDegrees()));
+	public Command shoulderDynamic(SysIdRoutine.Direction direction){
+		return shoulderSysIdRoutine.dynamic(direction).handleInterrupt(()->setShoulderDesState(shoulderState().getDegrees())).andThen(()->setShoulderDesState(shoulderState().getDegrees()));
 	}
 
 }
