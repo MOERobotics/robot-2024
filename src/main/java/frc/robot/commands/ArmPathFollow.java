@@ -47,10 +47,13 @@ public class ArmPathFollow extends Command {
     public void execute() {
 
         s = LineHelpers.getS(desiredPoint.getDistance(startPoint), speed, accel, v_0, timer.get());
+        double v = LineHelpers.getVel(desiredPoint.getDistance(startPoint), speed, accel, v_0, timer.get());
         var shoulderPos = (desiredPoint.getX()-startPoint.getX())/desiredPoint.getDistance(startPoint)*s+startPoint.getX();
 
         double wristPos = (desiredPoint.getY()-startPoint.getY())/(desiredPoint.getX()-startPoint.getX())*(armSubsystem.shoulderState().getDegrees()
                 - startPoint.getX()) + startPoint.getY();
+
+        double wristVel = (desiredPoint.getY()-startPoint.getY())/(desiredPoint.getDistance(startPoint))*v;
 
         if (Math.abs(desiredPoint.getX() - startPoint.getX()) <= 2){
             wristPos = (desiredPoint.getY()-startPoint.getY())/(desiredPoint.getDistance(startPoint))*s+startPoint.getY();
@@ -62,7 +65,8 @@ public class ArmPathFollow extends Command {
         SmartDashboard.putNumber("ArmPathFollow shoulderPos", shoulderPos);
         SmartDashboard.putNumber("ArmPathFollow desiredWrist", desiredPoint.getY());
         SmartDashboard.putNumber("ArmPathFollow desiredShoulder", desiredPoint.getX());
-        armSubsystem.pathFollow(Rotation2d.fromDegrees(shoulderPos), Rotation2d.fromDegrees(wristPos));
+        armSubsystem.pathFollow(Rotation2d.fromDegrees(shoulderPos), Rotation2d.fromDegrees(wristPos), wristVel);
+
         armSubsystem.setWristDestState(wristPos);
         armSubsystem.setShoulderDesState(shoulderPos);
         currPos = new Translation2d(armSubsystem.shoulderState().getDegrees(), armSubsystem.wristState().getDegrees());

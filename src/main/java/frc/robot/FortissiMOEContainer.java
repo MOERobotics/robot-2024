@@ -125,9 +125,10 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 37,
-            2.0e-2, 2.0e-3, 4.0e-4, 2.6e-2,0, 2.0e-4, 23.839, 14.231,
+            1.7e-2, 1.7e-3, 4.0e-4, .1724,0, 6.76e-3, .0185, .14833,
+            1.42e-4, 1.36e-4,23.839, 14.231,
             0,0,0,0,0,0,0,0,
-            Rotation2d.fromDegrees(88), Rotation2d.fromDegrees(-47), 80,30);
+            Rotation2d.fromDegrees(100), Rotation2d.fromDegrees(-35), 100,900);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
@@ -291,9 +292,9 @@ public class FortissiMOEContainer{
 
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
         new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.2)));
-        new JoystickButton(buttonBox, 1).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
+        new JoystickButton(buttonBox, 1).whileTrue(Commands.run(()->armSubsystem.wristVoltageController(1.5))); //in volts lol
         new JoystickButton(functionJoystick, 7).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.2)));
-        new JoystickButton(buttonBox, 2).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
+        new JoystickButton(buttonBox, 2).whileTrue(Commands.run(()->armSubsystem.wristVoltageController(-1.5)));
         new JoystickButton(functionJoystick, 1).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(84), Rotation2d.fromDegrees(-43)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
