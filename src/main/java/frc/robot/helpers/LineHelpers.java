@@ -23,9 +23,9 @@ public class LineHelpers {
 
 
 
-public static Translation2d getPosition (Translation2d start, Translation2d end, double s){
-       return start.interpolate(end, s/ start.getDistance(end));
-}
+    public static Translation2d getPosition (Translation2d start, Translation2d end, double s){
+           return start.interpolate(end, s/ start.getDistance(end));
+    }
 
 
     public static double getS(double distance, double maxSpeed, double maxAccel, double v_0, double t){
@@ -53,6 +53,28 @@ public static Translation2d getPosition (Translation2d start, Translation2d end,
         }
         else {
             return d_1 + d_2 + d_3;
+        }
+    }
+
+    public static double getVel(double distance, double maxSpeed, double maxAccel, double v_0, double t){
+        double maxVel = Math.min(maxSpeed, (-v_0 + Math.sqrt(v_0*v_0 + 2*maxAccel*distance)/2));
+        double t_1 = (maxVel-v_0)/maxAccel;
+        double t_3 = maxVel/maxAccel;
+        double t_2 = Math.max(0,(distance-(.5*maxAccel*t_1*t_1+v_0*t_1-.5*maxAccel*t_3*t_3+maxVel*t_3))/maxVel);
+
+        // if the amount of time you want it take is less than the time it takes to max
+        if (t <= t_1){
+            return maxAccel*t+v_0;
+        }
+        else if ((t-t_1) <= t_2){
+            return maxVel;
+        }
+        else if (t-t_1-t_2 <= t_3){
+            double offSetT = t - t_1-t_2;
+            return maxVel - maxAccel*offSetT;
+        }
+        else {
+            return 0;
         }
     }
 
