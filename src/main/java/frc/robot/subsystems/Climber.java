@@ -28,7 +28,6 @@ public class Climber extends SubsystemBase {
 
         climberArmRight = new ClimberArm(climberIDRight, stringPotIDRight, rightInverted, min_Inches_Right,max_Inches_Right,start_Inches_Right );
         climberArmLeft = new ClimberArm(climberIDLeft, stringPotIDLeft, leftInverted, min_Inches_Left, max_Inches_Left,start_Inches_Left );
-
     }
 
 
