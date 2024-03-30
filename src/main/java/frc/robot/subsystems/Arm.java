@@ -42,7 +42,7 @@ public class Arm extends SubsystemBase {
     private final PIDController wristController;
 
 
-    private Rotation2d interShoulder, interWrist;
+    private Rotation2d interShoulder, interWrist, highTransitionShoulderAngle, highTransitionWristAngle;
     private double currShoulder, currWrist;
     private double maxSpeed, maxAccel, shoulderLength, wristLength, shoulderCOMLen, wristCOMLen,
     shoulderCOMOffset, wristCOMOffset, shoulderMass, wristMass, shoulderGearing, wristGearing;
@@ -66,6 +66,7 @@ public class Arm extends SubsystemBase {
                double shoulderCOMOffset, double wristCOMOffset, double shoulderMass, double wristMass,
                double shoulderGearing, double wristGearing,
                Rotation2d criticalShoulderAngle, Rotation2d criticalWristAngle,
+               Rotation2d highTransitionShoulderAngle, Rotation2d highTransitionWristAngle,
                double maxSpeed, double maxAccel) {
 
         shoulderMotorLeft = new CANSparkMax(leftShoulderMotorID, kBrushless);
@@ -106,6 +107,7 @@ public class Arm extends SubsystemBase {
         //wristController.setIZone();
 
         interShoulder = criticalShoulderAngle; interWrist = criticalWristAngle;
+        this.highTransitionShoulderAngle = highTransitionShoulderAngle; this.highTransitionWristAngle = highTransitionWristAngle;
 		setShoulderDesState(shoulderState().getDegrees());
 		setWristDestState(wristState().getDegrees());
         shoulderController.reset();
@@ -190,6 +192,28 @@ public class Arm extends SubsystemBase {
         }
         safeShoulder = interShoulder; safeWrist = interWrist;
         SmartDashboard.putBoolean("transition spot", true);
+
+        //this is if we have a bumper intersection location
+        if (shoulderLength*Math.sin(shoulderState().getRadians()-Math.PI/2) - wristLength*Math.sin(combinedWrist().getRadians()) + Units.inchesToMeters(14.5)
+         <= Units.inchesToMeters(10) &&
+        shoulderLength*Math.sin(shoulderState().getRadians()-Math.PI/2) - wristLength*Math.sin(combinedWrist().getRadians()) + Units.inchesToMeters(14.5)
+                >= Units.inchesToMeters(5)
+        ||
+        shoulderLength*Math.sin(shoulderPos.getRadians()-Math.PI/2) - wristLength*Math.sin(combWristConversion(shoulderPos, wristPos).getRadians()) + Units.inchesToMeters(14.5)
+        <= Units.inchesToMeters(10) &&
+        shoulderLength*Math.sin(shoulderPos.getRadians()-Math.PI/2) - wristLength*Math.sin(combWristConversion(shoulderPos, wristPos).getRadians()) + Units.inchesToMeters(14.5)
+                >= Units.inchesToMeters(5)
+
+        || wristPos.getDegrees() <= -90 || wristState().getDegrees() <= -90
+        ){
+            System.out.println("new motion!");
+            return new SequentialCommandGroup(
+                    new ArmPathFollow(this, highTransitionShoulderAngle, highTransitionWristAngle, maxSpeed, maxAccel),
+                    new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel)
+            );
+        }
+        //otherwise just go through safe point
+        System.out.println("normal safe point");
         return new SequentialCommandGroup(
                 new ArmPathFollow(this, safeShoulder, safeWrist, maxSpeed, maxAccel).withName("Arm to safe"),
                 new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel).withName("Arm safe -> dest")
@@ -200,14 +224,17 @@ public class Arm extends SubsystemBase {
         double dist = AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker).getDistance(robotPos.get().getTranslation());
         dist = Units.metersToInches(dist);
         double func;
-        if (-.901*dist+130.46 < 0.0){
+        if (-.901*dist+130.46 < -12.0){
             func = -38.5+Math.pow(.901*dist-130.46, 1.0/3.0);
         }
-        else{
+        else if (-.901*dist+130.46 > 12.0){
             func = -38.5-Math.pow(-.901*dist+130.46, 1.0/3.0);
         }
-        func -= 6;
-        return new Translation2d(112, Math.min(Math.max(-56, func), -30));
+        else{
+            func = (-36.29+40.71)/24*(dist-144.8)-38.5;
+        }
+        func -= 15.75;
+        return new Translation2d(120, Math.min(Math.max(-60, func), -45));
 //        return new Translation2d(112, Math.min(Math.max(-45, 4.63e-5*Math.pow(dist, 3)-1.7e-2*Math.pow(dist, 2)
 //        +2.13*dist-131.8)-1, -30));
     }
