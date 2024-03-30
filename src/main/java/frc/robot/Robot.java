@@ -47,7 +47,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    m_robotContainer.resetArmPos();
+    if (m_robotContainer != null){
+      m_robotContainer.resetArmPos();
+    }
   }
 
   @Override
