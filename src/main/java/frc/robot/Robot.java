@@ -128,6 +128,17 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
+    if(functionJoystick.getRawButton(9)){
+      m_robotContainer.armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-31)).schedule();
+    } else if(functionJoystick.getRawButton(10)){
+      m_robotContainer.armSubsystem.goToPoint(Rotation2d.fromDegrees(146), Rotation2d.fromDegrees(-71)).schedule();
+    }else if(functionJoystick.getRawButton(4)){
+      m_robotContainer.armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-41.5)).schedule();
+    }else if(functionJoystick.getRawButton(3)){
+      m_robotContainer.armSubsystem.goToPoint(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-102.5)).schedule();
+    }else if(buttonBox.getRawButton(3)){
+      m_robotContainer.armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-135)).schedule();
+    }
     if(buttonBox.getRawButton(8)){
       m_robotContainer.armSubsystem.wristPowerController(.1);
     }
