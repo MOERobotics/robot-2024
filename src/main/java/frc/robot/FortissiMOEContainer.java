@@ -6,8 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.*;
@@ -15,7 +14,6 @@ import frc.robot.commands.autos.doubleNoteAutos;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -26,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.SwerveController;
 import frc.robot.commands.autos.tripleNoteAutos;
 import frc.robot.subsystems.*;
+import frc.robot.vision.Vision;
 
 import java.util.Set;
 
@@ -74,6 +73,8 @@ public class FortissiMOEContainer{
     double maxRPS2 = Math.PI;
 
     double maxMPSSquared = 3;
+
+    Vision vision = new Vision();
     private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 
     private final SwerveModule backLeftModule = new SwerveModule(
@@ -143,7 +144,7 @@ public class FortissiMOEContainer{
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
 
 
-    private final Joystick driverJoystick = new Joystick(1); ///joystick imports
+    private final XboxController driverJoystick = new XboxController(1); ///joystick imports TESTING OUT RUMBLE CHANGE TO PS5 CONTROLLER IF ANYTHING BREAKS
 	private final Joystick functionJoystick = new Joystick(0);
     private final Joystick buttonBox = new Joystick(2);
 
@@ -372,6 +373,17 @@ public class FortissiMOEContainer{
                 whileFalse(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(3200,3200)));
         //104,-41
       //  new JoystickButton(driverJoystick, 7).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
+
+        var driveToNote = new DriveToNoteCommand(
+                swerveSubsystem,
+                vision,
+                () -> Math.hypot(driverJoystick.getRawAxis(0), driverJoystick.getRawAxis(1))*(maxMPS),
+                (rumblePercent) -> {
+                    SmartDashboard.putNumber("JoyRumble", rumblePercent);
+                    driverJoystick.setRumble(PS5Controller.RumbleType.kBothRumble, rumblePercent); //TODO: try different rumble types.
+                }
+        );
+        new JoystickButton(driverJoystick, 8).whileTrue(driveToNote);
 
     }
 
