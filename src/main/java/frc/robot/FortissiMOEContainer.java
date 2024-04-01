@@ -289,10 +289,11 @@ public class FortissiMOEContainer{
 
 
     private void configureBindings() {
-		new JoystickButton(driverJoystick,4).whileTrue(armSubsystem.shoulderQuasiStatic(SysIdRoutine.Direction.kForward));
-	    new JoystickButton(driverJoystick,2).whileTrue(armSubsystem.shoulderQuasiStatic(SysIdRoutine.Direction.kReverse));
-		new JoystickButton(driverJoystick,7).whileTrue(armSubsystem.shoulderDynamic(SysIdRoutine.Direction.kForward));
-	    new JoystickButton(driverJoystick,8).whileTrue(armSubsystem.shoulderDynamic(SysIdRoutine.Direction.kReverse));
+        //SYSID BINDINGS - SHOULD NOT BE USED ON ACTUAL BOT
+//		new JoystickButton(driverJoystick,4).whileTrue(armSubsystem.shoulderQuasiStatic(SysIdRoutine.Direction.kForward));
+//	    new JoystickButton(driverJoystick,2).whileTrue(armSubsystem.shoulderQuasiStatic(SysIdRoutine.Direction.kReverse));
+//		new JoystickButton(driverJoystick,7).whileTrue(armSubsystem.shoulderDynamic(SysIdRoutine.Direction.kForward));
+//	    new JoystickButton(driverJoystick,8).whileTrue(armSubsystem.shoulderDynamic(SysIdRoutine.Direction.kReverse));
 
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
         new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderVoltageController(1.5)));
