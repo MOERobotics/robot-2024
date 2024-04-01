@@ -242,7 +242,7 @@ public class FortissiMOEContainer{
 
     public FortissiMOEContainer() {
         shooterSubsystem.setShooterRPMTolerance(150);
-        shooterSubsystem.setMaxShooterSpeeds(3500,3500);
+        shooterSubsystem.setMaxShooterSpeeds(3200,3200);
 
         swerveSubsystem.setDefaultCommand(drive);
 //        collectorSubsystem.setDefaultCommand(collectorCommand);
@@ -329,7 +329,7 @@ public class FortissiMOEContainer{
                         || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(4))));
         //wing shot
 
-        new JoystickButton(functionJoystick, 10).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(144), Rotation2d.fromDegrees(-80)), Set.of(armSubsystem))
+        new JoystickButton(functionJoystick, 10).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(147), Rotation2d.fromDegrees(-78)), Set.of(armSubsystem))
                 .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
                         functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
                         functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4) || buttonBox.getRawButton(1)
@@ -367,8 +367,8 @@ public class FortissiMOEContainer{
                                 ()->Math.abs(driverJoystick.getRawAxis(2)) >= .1
                         ))); //auto aim shot
 
-        new JoystickButton(buttonBox, 6).whileTrue(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(2300,2300))).
-                whileFalse(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(3500,3500)));
+        new JoystickButton(buttonBox, 6).whileTrue(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(2800,2800))).
+                whileFalse(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(3200,3200)));
         //104,-41
       //  new JoystickButton(driverJoystick, 7).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
 
