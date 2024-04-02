@@ -35,7 +35,9 @@ public class ShooterSubsystem extends SubsystemBase {
 	private SimpleMotorFeedforward ShooterTopFF,ShooterBotFF;
 
     public ShooterSubsystem(int shooterTopID, int shooterBottomID, double shooterP,
-                            double shooterI, double shooterD, double shooterFF) {
+                            double shooterI, double shooterD,
+                            double shooterTopkS, double shooterTopkV, double shooterTopkA,
+                            double shooterBotkS, double shooterBotkV, double shooterBotkA) {
         shooterTop = new CANSparkMax(shooterTopID, CANSparkLowLevel.MotorType.kBrushless);
         shooterBottom = new CANSparkMax(shooterBottomID, CANSparkLowLevel.MotorType.kBrushless);
         shooterTop.setInverted(true);
@@ -48,22 +50,22 @@ public class ShooterSubsystem extends SubsystemBase {
 
         shooterTopEncoder = shooterTop.getEncoder();
         shooterTopController = shooterTop.getPIDController();
-        shooterTopController.setP(1.9e-10); shooterTopController.setI(0);
-        shooterTopController.setD(0); shooterTopController.setFF(0);
+        shooterTopController.setP(shooterP ); shooterTopController.setI(shooterI);
+        shooterTopController.setD(shooterD); shooterTopController.setFF(0);
         shooterTopController.setOutputRange(0, 1);
 
         shooterBottomEncoder = shooterBottom.getEncoder();
         shooterBottomController = shooterBottom.getPIDController();
-        shooterBottomController.setP(1.9e-10); shooterBottomController.setI(0);
-        shooterBottomController.setD(0); shooterBottomController.setFF(0);
+        shooterBottomController.setP(shooterP); shooterBottomController.setI(shooterI);
+        shooterBottomController.setD(shooterD); shooterBottomController.setFF(0);
         shooterTopController.setOutputRange(0, 1);
         shooterRPMTolerance=5;
         maxBotSpeed = 3500; maxTopSpeed = 3500;
         desiredBotSpeed = 0; desiredTopSpeed = 0;
 		shooterTop.setSmartCurrentLimit(40);
 	    shooterBottom.setSmartCurrentLimit(40);
-		ShooterTopFF=new SimpleMotorFeedforward(0.40322,0.002178,0.001054);
-		ShooterBotFF=new SimpleMotorFeedforward(0.22312,0.002178,0.00078615);
+		ShooterTopFF=new SimpleMotorFeedforward(shooterTopkS,shooterTopkV,shooterTopkA);
+		ShooterBotFF=new SimpleMotorFeedforward(shooterBotkS,shooterBotkV,shooterBotkA);
 		//SYS ID for bottom shooter
 	    ShooterSysIdRoutine = new SysIdRoutine(
 			    new SysIdRoutine.Config(rampRate,stepVoltage,timeout),
