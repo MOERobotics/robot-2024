@@ -125,7 +125,7 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 37,
-            24.0e-2, 24.0e-3, 48.0e-4, .224,5.0e-2, 6.76e-3,
+            24.0e-2, 24.0e-3, 48.0e-4, .1724,5.0e-2, 6.76e-3,
             .0185, .14833, 1.42e-4, 1.36e-4,
             .95908/3, .54837/3, .033244/3, .00498/3,
             .6048, .3615, .18133,.14154,10.725,27.837,
@@ -172,7 +172,7 @@ public class FortissiMOEContainer{
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
     Command collectorCommand = new CollectorControllerCommand(
-            0.45,
+            0.25,//.45
             ()->functionJoystick.getRawAxis(2)>=0.5,
             ()->functionJoystick.getRawAxis(3)>=0.5,
             ()->functionJoystick.getRawButton(6),
