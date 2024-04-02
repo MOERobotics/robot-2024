@@ -184,6 +184,10 @@ public class SwerveDrive extends SubsystemBase {
         field.setRobotPose(swerveDrivePoseEstimator.getEstimatedPosition());
         SmartDashboard.putNumber("Posex", getEstimatedPose().getX());
         SmartDashboard.putNumber("Posey", getEstimatedPose().getY());
+        SmartDashboard.putNumber("FLDriveEncoder", FLModule.getDrivePosition());
+        SmartDashboard.putNumber("BLDriveEncoder", BLModule.getDrivePosition());
+        SmartDashboard.putNumber("FRDriveEncoder", FRModule.getDrivePosition());
+        SmartDashboard.putNumber("BRDriveEncoder", BRModule.getDrivePosition());
     }
 
     public void stopModules() {

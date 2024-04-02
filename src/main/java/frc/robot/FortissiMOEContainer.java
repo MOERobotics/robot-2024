@@ -125,7 +125,7 @@ public class FortissiMOEContainer{
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 37,
-            24.0e-2, 24.0e-3, 48.0e-4, .224,5.0e-2, 6.76e-3,
+            24.0e-2, 24.0e-3, 48.0e-4, .1724,5.0e-2, 6.76e-3,
             .0185, .14833, 1.42e-4, 1.36e-4,
             .95908/3, .54837/3, .033244/3, .00498/3,
             .6048, .3615, .18133,.14154,10.725,27.837,
@@ -172,7 +172,7 @@ public class FortissiMOEContainer{
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
     Command collectorCommand = new CollectorControllerCommand(
-            0.45,
+            0.35,//.45
             ()->functionJoystick.getRawAxis(2)>=0.5,
             ()->functionJoystick.getRawAxis(3)>=0.5,
             ()->functionJoystick.getRawButton(6),
@@ -283,15 +283,17 @@ public class FortissiMOEContainer{
         m_chooser.addOption("4 Note Auto (CW2W1W3)", new tripleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).CW1W2W3());
         m_chooser.addOption("centerLine Auto", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).DC5C4PassC3());
         m_chooser.addOption("driveForward", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).rollOutAuto());
+        m_chooser.addOption("3 Note Centerline Auto (DC3C2)", new tripleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).DC3C2());
         SmartDashboard.putData("chooser", m_chooser);
     }
 
 
     private void configureBindings() {
-		new JoystickButton(driverJoystick,4).whileTrue(armSubsystem.shoulderQuasiStatic(SysIdRoutine.Direction.kForward));
-	    new JoystickButton(driverJoystick,2).whileTrue(armSubsystem.shoulderQuasiStatic(SysIdRoutine.Direction.kReverse));
-		new JoystickButton(driverJoystick,7).whileTrue(armSubsystem.shoulderDynamic(SysIdRoutine.Direction.kForward));
-	    new JoystickButton(driverJoystick,8).whileTrue(armSubsystem.shoulderDynamic(SysIdRoutine.Direction.kReverse));
+        //SYSID BINDINGS - SHOULD NOT BE USED ON ACTUAL BOT
+//		new JoystickButton(driverJoystick,4).whileTrue(armSubsystem.shoulderQuasiStatic(SysIdRoutine.Direction.kForward));
+//	    new JoystickButton(driverJoystick,2).whileTrue(armSubsystem.shoulderQuasiStatic(SysIdRoutine.Direction.kReverse));
+//		new JoystickButton(driverJoystick,7).whileTrue(armSubsystem.shoulderDynamic(SysIdRoutine.Direction.kForward));
+//	    new JoystickButton(driverJoystick,8).whileTrue(armSubsystem.shoulderDynamic(SysIdRoutine.Direction.kReverse));
 
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
         new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderVoltageController(1.5)));
