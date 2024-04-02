@@ -207,16 +207,16 @@ public class Arm extends SubsystemBase {
         || wristPos.getDegrees() <= -90 || wristState().getDegrees() <= -90
         ){
             System.out.println("new motion!");
-            return new SequentialCommandGroup(
-                    new ArmPathFollow(this, highTransitionShoulderAngle, highTransitionWristAngle, maxSpeed, maxAccel),
-                    new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel)
+            return (
+                    new ArmPathFollow(this, highTransitionShoulderAngle, highTransitionWristAngle, maxSpeed, maxAccel).andThen(
+                    new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel))
             );
         }
         //otherwise just go through safe point
         System.out.println("normal safe point");
-        return new SequentialCommandGroup(
-                new ArmPathFollow(this, safeShoulder, safeWrist, maxSpeed, maxAccel).withName("Arm to safe"),
-                new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel).withName("Arm safe -> dest")
+        return (
+                new ArmPathFollow(this, safeShoulder, safeWrist, maxSpeed, maxAccel).withName("Arm to safe").andThen(
+                new ArmPathFollow(this, shoulderPos, wristPos, maxSpeed, maxAccel).withName("Arm safe -> dest"))
         );
     }
 
@@ -224,16 +224,19 @@ public class Arm extends SubsystemBase {
         double dist = AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker).getDistance(robotPos.get().getTranslation());
         dist = Units.metersToInches(dist);
         double func;
-        if (-.901*dist+130.46 < -12.0){
-            func = -38.5+Math.pow(.901*dist-130.46, 1.0/3.0);
+        if (-.9005*dist+130.46 < -12.0){
+            func = -38.5+Math.pow(.9005*dist-130.46, 1.0/3.0);
         }
-        else if (-.901*dist+130.46 > 12.0){
-            func = -38.5-Math.pow(-.901*dist+130.46, 1.0/3.0);
+        else if (-.9005*dist+130.46 > 12.0){
+            func = -38.5-Math.pow(-.9005*dist+130.46, 1.0/3.0);
         }
-        else{
-            func = (-36.29+40.71)/24*(dist-144.8)-38.5;
+        else if (-.9005*dist+130.46 < 0){
+            func = -38.5+Math.pow(.9005*dist-130.46, 1.0/3.0)+.5;
         }
-        func -= 14.5;
+        else {
+            func = -38.5-Math.pow(-.9005*dist+130.46, 1.0/3.0)+.5;
+        }
+        func -= 14.65;
         return new Translation2d(120, Math.min(Math.max(-60, func), -45));
 
     }

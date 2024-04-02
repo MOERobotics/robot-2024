@@ -76,6 +76,7 @@ public class ArmPathFollow extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        System.out.println("finished this command");
         armSubsystem.setWristDestState(desiredPoint.getY());
         armSubsystem.setShoulderDesState(desiredPoint.getX());
     }

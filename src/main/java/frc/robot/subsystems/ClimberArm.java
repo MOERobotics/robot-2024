@@ -45,8 +45,8 @@ public class ClimberArm extends SubsystemBase {
         climberMotor = new CANSparkMax(climberID, kBrushless);
         climberMotor.setInverted(isInverted);
         stringPot = climberMotor.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
-        upperLimit = climberMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
-        lowerLimit = climberMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
+        upperLimit = climberMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
+        lowerLimit = climberMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
 
         climberEncoder = climberMotor.getEncoder();
     }

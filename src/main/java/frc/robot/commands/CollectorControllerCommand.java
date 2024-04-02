@@ -53,7 +53,7 @@ public class CollectorControllerCommand extends Command {
         double finalSpeed = 0;
 
         if (buttonOut.get() && !buttonIn.get()) { //collector out
-            finalSpeed = -speed;
+            finalSpeed = -1;//speed;
         }
         if (!buttonOut.get() && buttonIn.get() && !subsystem.isCollected()) { //collector in no note
             finalSpeed = speed;

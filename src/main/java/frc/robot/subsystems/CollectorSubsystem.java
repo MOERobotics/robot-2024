@@ -30,7 +30,7 @@ public class CollectorSubsystem extends SubsystemBase {
         collectorController.setD(collectorD);
         collectorController.setFF(collectorFF);
         collectorController.setOutputRange(-1, 1);
-        collector.setSmartCurrentLimit(25);
+        collector.setSmartCurrentLimit(40);
     }
     public boolean isCollected(){
         SmartDashboard.putBoolean("Beambreak", collectorBeam.get());

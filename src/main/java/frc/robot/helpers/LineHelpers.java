@@ -52,7 +52,7 @@ public class LineHelpers {
             return maxVel*(offSetT) - .5*maxAccel*offSetT*offSetT +d_1 + d_2;
         }
         else {
-            return d_1 + d_2 + d_3;
+            return distance+1; //make sure to cancel fully
         }
     }
 
