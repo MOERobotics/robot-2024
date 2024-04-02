@@ -14,7 +14,7 @@ import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
 
 public class ClimberArm extends SubsystemBase {
 
-
+//right voltage upper limit 2.8; upper left .49; lower left 2.214; lower rigyht 2.81
     private final CANSparkMax climberMotor;
     private double speed;
 
@@ -22,7 +22,7 @@ public class ClimberArm extends SubsystemBase {
 
     private final double climberMaxHeight = 800;
 
-    private final AnalogInput stringPot;
+    private final SparkAnalogSensor stringPot;
 
     public final static double CONVERSION_FACTOR_INCHES = 9.956;
 
@@ -34,29 +34,34 @@ public class ClimberArm extends SubsystemBase {
 
     private final RelativeEncoder climberEncoder;
 
+    private final SparkLimitSwitch upperLimit, lowerLimit;
+
     public ClimberArm(int climberID, int stringPotID, boolean isInverted, double min_Inches, double max_Inches, double start_Inches) {
 
 
        this.min_Inches = min_Inches;
        this.max_Inches= max_Inches;
        this.start_Inches=start_Inches;
-        stringPot = new AnalogInput(stringPotID);
         climberMotor = new CANSparkMax(climberID, kBrushless);
         climberMotor.setInverted(isInverted);
+        stringPot = climberMotor.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
+        upperLimit = climberMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
+        lowerLimit = climberMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
+
         climberEncoder = climberMotor.getEncoder();
     }
 
 
     public void drive(double speed) {
 
-
+/*
         if (speed > 0 && !canGoUp()) {
             speed = 0;
         }
         else if (speed < 0 && !canGoDown()) {
             speed = 0;
         }
-
+*/
 
         climberMotor.set(speed);
         this.speed = speed;
@@ -88,10 +93,13 @@ public class ClimberArm extends SubsystemBase {
         return (stringPot.getVoltage() * CONVERSION_FACTOR_INCHES)/max_Inches ;
     }
     public boolean canGoUp(){
-        return  getPositionInches()< max_Inches;
+        //return  getPositionInches()< max_Inches;
+        return upperLimit.isPressed();
     }
     public boolean canGoDown(){
-        return getPositionInches() > min_Inches;
+
+        //return getPositionInches() > min_Inches;
+        return lowerLimit.isPressed();
     }
 
 
