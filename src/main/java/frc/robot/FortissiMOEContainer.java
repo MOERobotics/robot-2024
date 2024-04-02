@@ -139,7 +139,8 @@ public class FortissiMOEContainer{
 
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(5,
-            13,4.0e-4, 0,0,driveFF+2.4e-5);
+            13,1.9e-10, 0,0,0.40322,0.002178,
+            0.001054, 0.22312,0.002178,0.00078615);
     private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem(6,
             0.01,0,0,0,7);
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
