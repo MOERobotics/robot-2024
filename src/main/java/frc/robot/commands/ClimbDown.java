@@ -41,17 +41,8 @@ public class ClimbDown extends Command {
     public void execute() {
 
 
-        if(climber.canGoUpRight()){
-            climber.driveRight(speed);
-        } else {
-            climber.driveRight(0);
-        }
-
-        if(climber.canGoUpLeft()){
-            climber.driveLeft(speed);
-        } else {
-            climber.driveLeft(0);
-        }
+        climber.driveLeft(speed);
+        climber.driveRight(speed);
 
     }
     // Called once the command ends or is interrupted.
