@@ -137,7 +137,7 @@ public class tripleNoteAutos {
         Rotation2d startRotation = new Rotation2d(0);
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointC, startRotation);
         Rotation2d endRotation = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote2));
-        Translation2d endTranslation = new Translation2d(UsefulPoints.Points.WingedNote2.getX()-Units.inchesToMeters(8),
+        Translation2d endTranslation = new Translation2d(UsefulPoints.Points.WingedNote2.getX()-Units.inchesToMeters(10),
                 UsefulPoints.Points.WingedNote2.getY());
         Pose2d endPose = new Pose2d(endTranslation, endRotation); //goes from start c to point w2
 
