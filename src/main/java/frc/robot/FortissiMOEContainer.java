@@ -172,7 +172,7 @@ public class FortissiMOEContainer{
 
     // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
     Command collectorCommand = new CollectorControllerCommand(
-            0.25,//.45
+            0.35,//.45
             ()->functionJoystick.getRawAxis(2)>=0.5,
             ()->functionJoystick.getRawAxis(3)>=0.5,
             ()->functionJoystick.getRawButton(6),
