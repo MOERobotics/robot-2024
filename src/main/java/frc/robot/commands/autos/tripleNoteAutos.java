@@ -236,8 +236,8 @@ public class tripleNoteAutos {
         //go to C3 collect; go to ~W3; shoot; C2 collect; go to ~W3; shoot
         //traj 1
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointD, UsefulPoints.Points.RotationOfStartingPointD);
-        Rotation2d endRotation = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.CenterNote3));
-        Translation2d endTranslation = new Translation2d(UsefulPoints.Points.CenterNote3.getX()-Units.inchesToMeters(14),
+        Rotation2d endRotation = new Rotation2d(0);
+        Translation2d endTranslation = new Translation2d(UsefulPoints.Points.CenterNote3.getX()-Units.inchesToMeters(12),
                 UsefulPoints.Points.CenterNote3.getY()+Units.inchesToMeters(10));
         Pose2d endPose = new Pose2d(endTranslation, endRotation); //goes from start D to C3
 
