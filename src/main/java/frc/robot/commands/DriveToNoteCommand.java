@@ -79,7 +79,7 @@ public class DriveToNoteCommand extends Command {
         var robotAngle = unitDelta.getAngle();
         subsystem.setDesiredYaw(robotAngle.getDegrees());
 
-        subsystem.driveAtSpeed(unitDelta.getX(), unitDelta.getY(), 0, true);
+        //subsystem.driveAtSpeed(unitDelta.getX(), unitDelta.getY(), 0, true);
     }
 
     // Called once the command ends or is interrupted.

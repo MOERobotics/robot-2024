@@ -351,16 +351,16 @@ public class FortissiMOEContainer{
                 whileFalse(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(3200,3200)));
         //half speed reduction
 
-        var driveToNote = new DriveToNoteCommand(
-                swerveSubsystem,
-                vision,
-                () -> Math.max(0, Math.hypot(driverJoystick.getRawAxis(0), driverJoystick.getRawAxis(1))-.05)*(maxMPS),
-                (rumblePercent) -> {
-                    SmartDashboard.putNumber("JoyRumble", rumblePercent);
-                    driverJoystick.setRumble(PS5Controller.RumbleType.kBothRumble, rumblePercent); //TODO: try different rumble types.
-                }
-        );
-        new JoystickButton(driverJoystick, 8).whileTrue(driveToNote);
+//        var driveToNote = new DriveToNoteCommand(
+//                swerveSubsystem,
+//                vision,
+//                () -> Math.max(0, Math.hypot(driverJoystick.getRawAxis(0), driverJoystick.getRawAxis(1))-.05)*(maxMPS),
+//                (rumblePercent) -> {
+//                    SmartDashboard.putNumber("JoyRumble", rumblePercent);
+//                    driverJoystick.setRumble(PS5Controller.RumbleType.kBothRumble, rumblePercent); //TODO: try different rumble types.
+//                }
+//        );
+        new JoystickButton(driverJoystick, 8).whileTrue(Commands.run(()->swerveSubsystem.setDesiredYaw(swerveSubsystem.getObjectPosRot().getDegrees())));
         // object detection note pickup button
 
     }

@@ -59,6 +59,7 @@ public class SwerveDrive extends SubsystemBase {
     private final PIDController xController,yController;
     Field2d field = new Field2d();
     SwerveDrivePoseEstimator swerveDrivePoseEstimator;
+    private Translation2d target = null;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
                        WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
                        double kP, double kI, double kD,
@@ -150,19 +151,17 @@ public class SwerveDrive extends SubsystemBase {
         return getAngleBetweenSpeaker(pos.get(), AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker));
     }
 
-    public List<Pose2d> getObjectPos(){
-        ArrayList<Pose2d> desRobotPos = new ArrayList<>();
-        var objectVal = vision.detections();
-        for (int i = 0; i < objectVal.size(); i++){
-            Translation2d fieldObjPos = objectVal.get(i).rotateBy(getRotation2d());
-            Rotation2d desObjRot = Rotation2d.fromRadians(Math.atan2(fieldObjPos.getY(), fieldObjPos.getX()));
-            desRobotPos.add(getEstimatedPose().plus(new Transform2d(fieldObjPos, desObjRot)));
-        }
-        return desRobotPos;
+    public Rotation2d getObjectPosRot(){
+        var robotPose = getEstimatedPose();
+        var delta = target.minus(robotPose.getTranslation());
+        var robotAngle = delta.getAngle();
+
+        return robotAngle;
     }
 
     @Override
     public void periodic() {
+        updateTarget();
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("yaw", getYaw());
 		SmartDashboard.putNumber("Yaw2d",getRotation2d().getDegrees());
@@ -179,8 +178,7 @@ public class SwerveDrive extends SubsystemBase {
             swerveDrivePoseEstimator.addVisionMeasurement(aprilTagVal.get().pose, aprilTagVal.get().timestamp,
                     VecBuilder.fill(5e-2,5e-2,10));
         }
-        SmartDashboard.putNumberArray("detections", getObjectPos().stream().flatMapToDouble(
-                pos -> DoubleStream.of(pos.getX(), pos.getX(), pos.getRotation().getDegrees())).toArray());
+
         field.setRobotPose(swerveDrivePoseEstimator.getEstimatedPosition());
         SmartDashboard.putNumber("Posex", getEstimatedPose().getX());
         SmartDashboard.putNumber("Posey", getEstimatedPose().getY());
@@ -280,5 +278,24 @@ public class SwerveDrive extends SubsystemBase {
     public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented){
         driveAtSpeed(xspd, yspd, turnspd, fieldOriented, false);
     }
+
+    private void updateTarget() {
+        var robotPose = getEstimatedPose();
+        var detectionMaxThreshold = Double.POSITIVE_INFINITY;
+        if (target != null) {
+            detectionMaxThreshold = robotPose.getTranslation().getDistance(target) + Units.feetToMeters(2);
+        }
+
+        var detections = vision.detections();
+        for (var detection : detections){
+            var distance = detection.getNorm();
+            if (distance < detectionMaxThreshold){
+                var detectionFieldCoord = robotPose.transformBy(new Transform2d(detection, new Rotation2d())).getTranslation();
+                target = detectionFieldCoord;
+                detectionMaxThreshold = distance;
+            }
+        }
+    }
+
 
 }
