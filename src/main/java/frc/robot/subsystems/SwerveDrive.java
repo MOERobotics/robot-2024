@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -57,9 +58,9 @@ public class SwerveDrive extends SubsystemBase {
     private final ProfiledPIDController thetaController;
     private final ProfiledPIDController driveThetaController;
     private final PIDController xController,yController;
-    Field2d field = new Field2d();
+    public final Field2d field = new Field2d();
     SwerveDrivePoseEstimator swerveDrivePoseEstimator;
-    private Translation2d target = null;
+	private TimeInterpolatableBuffer<Pose2d> BufferedPose;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
                        WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
                        double kP, double kI, double kD,
@@ -92,6 +93,7 @@ public class SwerveDrive extends SubsystemBase {
         align = false;
         SmartDashboard.putData("odometry", field);
         swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(kDriveKinematics, new Rotation2d(0), getModulePositions(), new Pose2d());
+	    BufferedPose = TimeInterpolatableBuffer.createBuffer(3);
     }
 
     public double getDesiredYaw(){
@@ -151,17 +153,19 @@ public class SwerveDrive extends SubsystemBase {
         return getAngleBetweenSpeaker(pos.get(), AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker));
     }
 
-    public Rotation2d getObjectPosRot(){
-        var robotPose = getEstimatedPose();
-        var delta = target.minus(robotPose.getTranslation());
-        var robotAngle = delta.getAngle();
-
-        return robotAngle;
+    public List<Pose2d> getObjectPos(){
+        ArrayList<Pose2d> desRobotPos = new ArrayList<>();
+        var objectVal = vision.detections();
+        for (int i = 0; i < objectVal.size(); i++){
+            Translation2d fieldObjPos = objectVal.get(i).rotateBy(getRotation2d());
+            Rotation2d desObjRot = Rotation2d.fromRadians(Math.atan2(fieldObjPos.getY(), fieldObjPos.getX()));
+            desRobotPos.add(getEstimatedPose().plus(new Transform2d(fieldObjPos, desObjRot)));
+        }
+        return desRobotPos;
     }
 
     @Override
     public void periodic() {
-        updateTarget();
         // This method will be called once per scheduler run
         SmartDashboard.putNumber("yaw", getYaw());
 		SmartDashboard.putNumber("Yaw2d",getRotation2d().getDegrees());
@@ -180,6 +184,7 @@ public class SwerveDrive extends SubsystemBase {
         }
 
         field.setRobotPose(swerveDrivePoseEstimator.getEstimatedPosition());
+	    BufferedPose.addSample(Timer.getFPGATimestamp(),getEstimatedPose());
         SmartDashboard.putNumber("Posex", getEstimatedPose().getX());
         SmartDashboard.putNumber("Posey", getEstimatedPose().getY());
         SmartDashboard.putNumber("FLDriveEncoder", FLModule.getDrivePosition());
@@ -187,6 +192,9 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboard.putNumber("FRDriveEncoder", FRModule.getDrivePosition());
         SmartDashboard.putNumber("BRDriveEncoder", BRModule.getDrivePosition());
     }
+	public Pose2d getBufferedPose(double TimeStamp){
+		return BufferedPose.getSample(TimeStamp).orElseGet(swerveDrivePoseEstimator::getEstimatedPosition);
+	}
 
     public void stopModules() {
         FLModule.stop();
@@ -278,24 +286,5 @@ public class SwerveDrive extends SubsystemBase {
     public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented){
         driveAtSpeed(xspd, yspd, turnspd, fieldOriented, false);
     }
-
-    private void updateTarget() {
-        var robotPose = getEstimatedPose();
-        var detectionMaxThreshold = Double.POSITIVE_INFINITY;
-        if (target != null) {
-            detectionMaxThreshold = robotPose.getTranslation().getDistance(target) + Units.feetToMeters(2);
-        }
-
-        var detections = vision.detections();
-        for (var detection : detections){
-            var distance = detection.getNorm();
-            if (distance < detectionMaxThreshold){
-                var detectionFieldCoord = robotPose.transformBy(new Transform2d(detection, new Rotation2d())).getTranslation();
-                target = detectionFieldCoord;
-                detectionMaxThreshold = distance;
-            }
-        }
-    }
-
 
 }
