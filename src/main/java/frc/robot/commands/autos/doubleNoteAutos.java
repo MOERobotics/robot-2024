@@ -50,7 +50,14 @@ public class doubleNoteAutos {
         this.endVelocity = endVelocity;
         this.shooter = shooter;
         this.collector = collector;
-    }
+    } public doubleNoteAutos(SwerveDrive subsystem, Arm armSubsystem, ShooterSubsystem shooter, CollectorSubsystem collector, double startVelocity, double endVelocity) {
+		swerveDrive = subsystem;
+		this.armSubsystem = armSubsystem;
+		this.startVelocity = startVelocity;
+		this.endVelocity = endVelocity;
+		this.shooter = shooter;
+		this.collector = collector;
+	}
 
     public doubleNoteAutos(SwerveDrive subsystem, double startVelocity, double endVelocity) {
         swerveDrive=subsystem;
@@ -159,7 +166,6 @@ public class doubleNoteAutos {
                         ),
                         Commands.run(()->armSubsystem.holdPos(81, -38))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
-                Commands
 //                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(113.5), Rotation2d.fromDegrees(-42.19)), Set.of(armSubsystem)),
                 Commands.race(trajCommand2.andThen(()-> swerveDrive.stopModules()), Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
 //                Commands.race(headingCorrect.withTimeout(3), Commands.run(()->armSubsystem.holdPos(113.5, -42.19))),
