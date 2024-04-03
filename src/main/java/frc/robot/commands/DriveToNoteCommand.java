@@ -84,7 +84,7 @@ public class DriveToNoteCommand extends Command {
 	    var yawOffset = subsystem.getRotation2d().minus(robotPose.getRotation());
 	    subsystem.setDesiredYaw(robotAngle.getDegrees()+yawOffset.getDegrees());//Set absolute heading
 
-        //subsystem.driveAtSpeed(unitDelta.getX(), unitDelta.getY(), 0, true);
+        subsystem.driveAtSpeed(unitDelta.getX(), unitDelta.getY(), 0, true);
     }
 
     // Called once the command ends or is interrupted.

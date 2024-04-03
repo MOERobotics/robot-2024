@@ -228,13 +228,13 @@ public class Arm extends SubsystemBase {
             func = -38.5+Math.pow(.9005*dist-130.46, 1.0/3.0);
         }
         else if (-.9005*dist+130.46 > 12.0){
-            func = -38.5-Math.pow(-.9005*dist+130.46, 1.0/3.0);
+            func = -38.5-Math.pow(-.9005*dist+130.46, 1.0/3.0)+.5;
         }
         else if (-.9005*dist+130.46 < 0){
             func = -38.5+Math.pow(.9005*dist-130.46, 1.0/3.0)+.5;
         }
         else {
-            func = -38.5-Math.pow(-.9005*dist+130.46, 1.0/3.0)+.5;
+            func = -38.5-Math.pow(-.9005*dist+130.46, 1.0/3.0)+1;
         }
         func -= 14.65;
         return new Translation2d(120, Math.min(Math.max(-60, func), -45));
