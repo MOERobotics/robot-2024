@@ -46,7 +46,7 @@ public class Arm extends SubsystemBase {
     private double currShoulder, currWrist;
     private double maxSpeed, maxAccel, shoulderLength, wristLength, shoulderCOMLen, wristCOMLen,
     shoulderCOMOffset, wristCOMOffset, shoulderMass, wristMass, shoulderGearing, wristGearing;
-    private double wristOffset = -2;
+    private double wristOffset = 0;
     private double shoulderOffset = 90;
 	private final Measure<Velocity<Voltage>>rampRate= Volts.of(0.25).per(Seconds.of(1));
 	private final Measure<Voltage> stepVoltage = Volts.of(2);
@@ -237,7 +237,7 @@ public class Arm extends SubsystemBase {
             func = -38.5-Math.pow(-.9005*dist+130.46, 1.0/3.0)+1;
         }
         func -= 14.65;
-        return new Translation2d(120, Math.min(Math.max(-60, func), -45));
+        return new Translation2d(120, Math.min(Math.max(-58, func), -43));
 
     }
 

@@ -92,7 +92,7 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("shooterBotSpeed", getShooterSpeedBottom());
 		SmartDashboard.putNumber("shooterTopVoltage",shooterTop.getAppliedOutput()*shooterTop.getBusVoltage());
 	    SmartDashboard.putNumber("shooterBotVoltage",shooterBottom.getAppliedOutput()*shooterBottom.getBusVoltage());
-        SmartDashboard.putBoolean("shooterOn", getMaxShooterSpeedTop() != 0);
+        SmartDashboard.putBoolean("shooterOn", getDesiredTopSpeed() != 0);
     }
     public void setShooterTopSpeed(double speed){
         setDesiredTopSpeed(speed);

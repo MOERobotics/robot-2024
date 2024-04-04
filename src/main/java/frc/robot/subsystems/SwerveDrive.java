@@ -46,7 +46,7 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModule BRModule;
     WPI_Pigeon2 pigeon;
 //    private final SwerveDriveOdometry odometer;
-    private final double maxMetersPerSec;
+    private final double maxMetersPerSec, maxMPSAuto;
     private final double maxMetersPerSecSquared;
     public SwerveDriveKinematics kDriveKinematics;
     double desiredYaw;
@@ -62,7 +62,7 @@ public class SwerveDrive extends SubsystemBase {
     SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 	private TimeInterpolatableBuffer<Pose2d> BufferedPose;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
-                       WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
+                       WPI_Pigeon2 pigeon, double maxMPSAuto, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
                        double kP, double kI, double kD,
                        double xykP, double xykI, double xykD,
                        double thetaP, double thetaI, double thetaD) {
@@ -71,6 +71,7 @@ public class SwerveDrive extends SubsystemBase {
         this.maxMetersPerSec = maxMetersPerSec;
 
         this.maxMetersPerSecSquared = maxMetersPerSecSquared;
+        this.maxMPSAuto = maxMPSAuto;
 
         this.FLModule = FLModule;
 
@@ -196,7 +197,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public Command generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
-        TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
+        TrajectoryConfig config = new TrajectoryConfig(maxMPSAuto,maxMetersPerSecSquared);
         config.setEndVelocity(endVelocityMetersPerSecond);
         config.setStartVelocity(startVelocityMetersPerSecond);
         var trajectory = TrajectoryGenerator.generateTrajectory(
@@ -212,6 +213,34 @@ public class SwerveDrive extends SubsystemBase {
                 trajectory,
 //                vision::getRobotPosition,
 		        this::getEstimatedPose,
+                kDriveKinematics,
+                xController,
+                yController,
+                thetaController,
+                this::setModuleStates,
+                this
+        );
+        return Commands.parallel(
+
+                Commands.runOnce(() -> field.getObject("traj").setTrajectory(trajectory)),
+                trajCommand
+        );
+    }
+
+    public Command generateTrajectoryQuintic(ArrayList<Pose2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
+        TrajectoryConfig config = new TrajectoryConfig(maxMPSAuto,maxMetersPerSecSquared);
+        config.setEndVelocity(endVelocityMetersPerSecond);
+        config.setStartVelocity(startVelocityMetersPerSecond);
+        var trajectory = TrajectoryGenerator.generateTrajectory(
+                AllianceFlip.apply(internalPoints),
+                config
+        );
+        SmartDashboard.putNumber("Time",trajectory.getTotalTimeSeconds());
+        SmartDashboard.putNumber("trajEndRotation", trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getRotation().getDegrees());
+        SwerveControllerCommand trajCommand = new SwerveControllerCommand(
+                trajectory,
+//                vision::getRobotPosition,
+                this::getEstimatedPose,
                 kDriveKinematics,
                 xController,
                 yController,

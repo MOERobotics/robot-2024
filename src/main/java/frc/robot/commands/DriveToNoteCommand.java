@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.vision.Vision;
@@ -78,21 +79,26 @@ public class DriveToNoteCommand extends Command {
         // Drive towards target
         var robotPose = subsystem.getEstimatedPose();
         var delta = target.minus(robotPose.getTranslation());
-        var unitDelta = delta.div(delta.getNorm()).times(speedSupplier.getAsDouble());
+
+        var unitDelta = delta.div(delta.getNorm());//.times(speedSupplier.getAsDouble());
 
         var robotAngle = unitDelta.getAngle();
-        var yawOffset = subsystem.getRotation2d().minus(robotPose.getRotation());
-        subsystem.setDesiredYaw(robotAngle.getDegrees()+yawOffset.getDegrees());//Set absolute heading
+        if (delta.getNorm() <= 24) robotAngle = robotPose.getRotation().times(-1);
+            SmartDashboard.putNumber("robot Object Detection angle", robotAngle.getDegrees());
+       // var yawOffset = subsystem.getRotation2d().minus(robotPose.getRotation());
+        subsystem.setDesiredYaw(-robotAngle.getDegrees());//Set absolute heading
 
-        subsystem.driveAtSpeed(unitDelta.getX(), unitDelta.getY(), 0, true);
+        var speedVal = speedSupplier.getAsDouble();
+        if (speedVal < .1) speedVal = 0;
+
+        subsystem.driveAtSpeed(robotAngle.getCos()*speedVal,
+                robotAngle.getSin()*speedVal, 0, true);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        if (rumbleCallback != null){
-            rumbleCallback.accept(0);
-        }
+
     }
 
     // Returns true when the command should end.

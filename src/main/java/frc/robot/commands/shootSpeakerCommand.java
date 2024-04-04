@@ -48,6 +48,7 @@ public class shootSpeakerCommand extends Command {
         shooter.setShooterTopSpeed(speedCalc());
         shooter.setShooterBottomSpeed(speedCalc());
         if(shooter.shooterAtSpeed() && !shot){
+            System.out.println("at speed, let's shoot");
             shot = true;
             collector.setCollectorSpeed(1);
             timer.restart();

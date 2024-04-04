@@ -59,8 +59,8 @@ public class CollectorControllerCommand extends Command {
             finalSpeed = speed;
             timer.restart();
         }
-        if (subsystem.isCollected() && timer.get() <= .05){
-            finalSpeed = -speed/4;
+        if (subsystem.isCollected() && timer.get() <= .1){
+            finalSpeed = -speed/3;
         }
         if(index.get()){
             finalSpeed = 1;
