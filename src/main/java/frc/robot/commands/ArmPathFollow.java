@@ -36,6 +36,7 @@ public class ArmPathFollow extends Command {
 
     @Override
     public void initialize() {
+        System.out.println("initialized");
         SmartDashboard.putNumber("made it to init", timer.get());
         startPoint = new Translation2d(armSubsystem.shoulderState().getDegrees(), armSubsystem.wristState().getDegrees());
         targetDist = startPoint.getDistance(desiredPoint);
@@ -60,7 +61,7 @@ public class ArmPathFollow extends Command {
             wristPos = (desiredPoint.getY()-startPoint.getY())/(desiredPoint.getDistance(startPoint))*s+startPoint.getY();
         }
         if (desiredPoint.getDistance(startPoint) <= 5){
-            s = desiredPoint.getDistance(startPoint)+1;
+            s = desiredPoint.getDistance(startPoint);
         }
         SmartDashboard.putNumber("ArmPathFollow writePos", wristPos);
         SmartDashboard.putNumber("ArmPathFollow shoulderPos", shoulderPos);
@@ -77,6 +78,7 @@ public class ArmPathFollow extends Command {
     @Override
     public void end(boolean interrupted) {
         System.out.println("finished this command");
+        System.out.println(s);
         armSubsystem.setWristDestState(desiredPoint.getY());
         armSubsystem.setShoulderDesState(desiredPoint.getX());
     }
@@ -84,7 +86,7 @@ public class ArmPathFollow extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return s >= startPoint.getDistance(desiredPoint);
+        return Math.abs(s - startPoint.getDistance(desiredPoint)) <= .1;
         //return currPos.getDistance(desiredPoint) <= 5;
     }
 }

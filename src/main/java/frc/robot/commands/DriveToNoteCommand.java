@@ -24,7 +24,7 @@ public class DriveToNoteCommand extends Command {
 
     private Translation2d target = null;
     private int idleLoopCount = 0;
-	private final double Latency = 0.25;//Pose latency in seconds
+    private final double Latency = 0.25;//Pose latency in seconds
 
     public DriveToNoteCommand(SwerveDrive subsystem, Vision vision, DoubleSupplier speedSupplier) {
         this(subsystem, vision, speedSupplier, null);
@@ -73,16 +73,16 @@ public class DriveToNoteCommand extends Command {
             }
             return;
         }
-		// Put the detection on NetworkTables, for debugging
-		subsystem.field.getObject("NoteTarget").setPose(new Pose2d(target, new Rotation2d()));
+        // Put the detection on NetworkTables, for debugging
+        subsystem.field.getObject("NoteTarget").setPose(new Pose2d(target, new Rotation2d()));
         // Drive towards target
         var robotPose = subsystem.getEstimatedPose();
         var delta = target.minus(robotPose.getTranslation());
         var unitDelta = delta.div(delta.getNorm()).times(speedSupplier.getAsDouble());
 
         var robotAngle = unitDelta.getAngle();
-	    var yawOffset = subsystem.getRotation2d().minus(robotPose.getRotation());
-	    subsystem.setDesiredYaw(robotAngle.getDegrees()+yawOffset.getDegrees());//Set absolute heading
+        var yawOffset = subsystem.getRotation2d().minus(robotPose.getRotation());
+        subsystem.setDesiredYaw(robotAngle.getDegrees()+yawOffset.getDegrees());//Set absolute heading
 
         subsystem.driveAtSpeed(unitDelta.getX(), unitDelta.getY(), 0, true);
     }

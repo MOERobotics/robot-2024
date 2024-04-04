@@ -46,7 +46,7 @@ public class Arm extends SubsystemBase {
     private double currShoulder, currWrist;
     private double maxSpeed, maxAccel, shoulderLength, wristLength, shoulderCOMLen, wristCOMLen,
     shoulderCOMOffset, wristCOMOffset, shoulderMass, wristMass, shoulderGearing, wristGearing;
-    private double wristOffset = 0;
+    private double wristOffset = -2;
     private double shoulderOffset = 90;
 	private final Measure<Velocity<Voltage>>rampRate= Volts.of(0.25).per(Seconds.of(1));
 	private final Measure<Voltage> stepVoltage = Volts.of(2);

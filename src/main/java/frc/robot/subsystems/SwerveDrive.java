@@ -130,9 +130,6 @@ public class SwerveDrive extends SubsystemBase {
         return Rotation2d.fromDegrees(MathUtil.inputModulus(getYaw(),-180,180));
     }
 
-//    public Pose2d getPose() {
-//        return odometer.getPoseMeters();
-//    }
     public Pose2d getEstimatedPose(){
         return swerveDrivePoseEstimator.getEstimatedPosition();
     }
@@ -153,16 +150,6 @@ public class SwerveDrive extends SubsystemBase {
         return getAngleBetweenSpeaker(pos.get(), AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker));
     }
 
-    public List<Pose2d> getObjectPos(){
-        ArrayList<Pose2d> desRobotPos = new ArrayList<>();
-        var objectVal = vision.detections();
-        for (int i = 0; i < objectVal.size(); i++){
-            Translation2d fieldObjPos = objectVal.get(i).rotateBy(getRotation2d());
-            Rotation2d desObjRot = Rotation2d.fromRadians(Math.atan2(fieldObjPos.getY(), fieldObjPos.getX()));
-            desRobotPos.add(getEstimatedPose().plus(new Transform2d(fieldObjPos, desObjRot)));
-        }
-        return desRobotPos;
-    }
 
     @Override
     public void periodic() {
