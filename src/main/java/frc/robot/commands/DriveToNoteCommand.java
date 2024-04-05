@@ -83,10 +83,10 @@ public class DriveToNoteCommand extends Command {
         var unitDelta = delta.div(delta.getNorm());//.times(speedSupplier.getAsDouble());
 
         var robotAngle = unitDelta.getAngle();
-        if (delta.getNorm() <= 24) robotAngle = robotPose.getRotation().times(-1);
+        if (delta.getNorm() <= Units.inchesToMeters(24)) robotAngle = robotPose.getRotation().times(1);
             SmartDashboard.putNumber("robot Object Detection angle", robotAngle.getDegrees());
        // var yawOffset = subsystem.getRotation2d().minus(robotPose.getRotation());
-        subsystem.setDesiredYaw(-robotAngle.getDegrees());//Set absolute heading
+        subsystem.setDesiredYaw(robotAngle.getDegrees());//Set absolute heading
 
         var speedVal = speedSupplier.getAsDouble();
         if (speedVal < .1) speedVal = 0;

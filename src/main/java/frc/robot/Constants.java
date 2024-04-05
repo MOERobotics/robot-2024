@@ -18,6 +18,6 @@ public final class Constants {
 	public static class OperatorConstants {
 		public static final int kDriverControllerPort = 0;
 	}
-    public static Rotation2d collectorShoulder = Rotation2d.fromDegrees(84.4);
+    public static Rotation2d collectorShoulder = Rotation2d.fromDegrees(83.6);
     public static Rotation2d collectorWrist = Rotation2d.fromDegrees(-45);
 }
