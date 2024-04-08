@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -44,8 +45,8 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModule FRModule;
     SwerveModule BRModule;
     WPI_Pigeon2 pigeon;
-//    private final SwerveDriveOdometry odometer;
-    private final double maxMetersPerSec;
+    private final SwerveDriveOdometry odometer;
+    private final double maxMetersPerSec, maxMPSAuto;
     private final double maxMetersPerSecSquared;
     public SwerveDriveKinematics kDriveKinematics;
     double desiredYaw;
@@ -57,10 +58,11 @@ public class SwerveDrive extends SubsystemBase {
     private final ProfiledPIDController thetaController;
     private final ProfiledPIDController driveThetaController;
     private final PIDController xController,yController;
-    Field2d field = new Field2d();
+    public final Field2d field = new Field2d();
     SwerveDrivePoseEstimator swerveDrivePoseEstimator;
+	private TimeInterpolatableBuffer<Pose2d> BufferedPose;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
-                       WPI_Pigeon2 pigeon, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
+                       WPI_Pigeon2 pigeon, double maxMPSAuto, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
                        double kP, double kI, double kD,
                        double xykP, double xykI, double xykD,
                        double thetaP, double thetaI, double thetaD) {
@@ -69,6 +71,7 @@ public class SwerveDrive extends SubsystemBase {
         this.maxMetersPerSec = maxMetersPerSec;
 
         this.maxMetersPerSecSquared = maxMetersPerSecSquared;
+        this.maxMPSAuto = maxMPSAuto;
 
         this.FLModule = FLModule;
 
@@ -87,10 +90,11 @@ public class SwerveDrive extends SubsystemBase {
         yController = new PIDController(xykP,xykI,xykD);
         kDriveKinematics = new SwerveDriveKinematics(FRModule.moduleTranslation(), FLModule.moduleTranslation(),
                 BRModule.moduleTranslation(), BLModule.moduleTranslation());
-//        odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0), getModulePositions());
+        odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0), getModulePositions());
         align = false;
         SmartDashboard.putData("odometry", field);
         swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(kDriveKinematics, new Rotation2d(0), getModulePositions(), new Pose2d());
+	    BufferedPose = TimeInterpolatableBuffer.createBuffer(3);
     }
 
     public double getDesiredYaw(){
@@ -99,7 +103,7 @@ public class SwerveDrive extends SubsystemBase {
 
     public Command setInitPosition(Pose2d initPose){
         return Commands.sequence(Commands.runOnce(()->setPigeon(AllianceFlip.apply(initPose).getRotation().getDegrees())),
-//		        Commands.runOnce(()->odometer.update(getRotation2d(),getModulePositions())),
+		        Commands.runOnce(()->odometer.update(getRotation2d(),getModulePositions())),
                 Commands.runOnce(() -> {}), //wait a cycle to reset the pigeon or everything breaks
                 Commands.runOnce(() -> {}),
                 Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose))),
@@ -107,6 +111,7 @@ public class SwerveDrive extends SubsystemBase {
         );
     }
     public void setDesiredYaw(double yaw){
+        align = true;
         desiredYaw = yaw;
     }
 
@@ -126,15 +131,13 @@ public class SwerveDrive extends SubsystemBase {
         return Rotation2d.fromDegrees(MathUtil.inputModulus(getYaw(),-180,180));
     }
 
-//    public Pose2d getPose() {
-//        return odometer.getPoseMeters();
-//    }
     public Pose2d getEstimatedPose(){
         return swerveDrivePoseEstimator.getEstimatedPosition();
     }
+    public Pose2d getOdomOnlyPose(){return odometer.getPoseMeters();}
 
     public void resetOdometry(Pose2d pose) {
-//        odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
+        odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
         swerveDrivePoseEstimator.resetPosition(getRotation2d(), getModulePositions(), pose);
     }
 
@@ -149,16 +152,6 @@ public class SwerveDrive extends SubsystemBase {
         return getAngleBetweenSpeaker(pos.get(), AllianceFlip.apply(UsefulPoints.Points.middleOfSpeaker));
     }
 
-    public List<Pose2d> getObjectPos(){
-        ArrayList<Pose2d> desRobotPos = new ArrayList<>();
-        var objectVal = vision.detections();
-        for (int i = 0; i < objectVal.size(); i++){
-            Translation2d fieldObjPos = objectVal.get(i).rotateBy(getRotation2d());
-            Rotation2d desObjRot = Rotation2d.fromRadians(Math.atan2(fieldObjPos.getY(), fieldObjPos.getX()));
-            desRobotPos.add(getEstimatedPose().plus(new Transform2d(fieldObjPos, desObjRot)));
-        }
-        return desRobotPos;
-    }
 
     @Override
     public void periodic() {
@@ -166,8 +159,8 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboard.putNumber("yaw", getYaw());
 		SmartDashboard.putNumber("Yaw2d",getRotation2d().getDegrees());
         SmartDashboard.putNumber("desired yaw", getDesiredYaw());
-//        odometer.update(getRotation2d(), getModulePositions());
-//        field.getObject("odom").setPose(odometer.getPoseMeters());
+        odometer.update(getRotation2d(), getModulePositions());
+        field.getObject("odom").setPose(odometer.getPoseMeters());
 //        vision.setOdometryPosition(odometer.getPoseMeters());
         SmartDashboard.putNumber("Rotation",getEstimatedPose().getRotation().getDegrees());
         swerveDrivePoseEstimator.update(getRotation2d(), getModulePositions());
@@ -178,12 +171,19 @@ public class SwerveDrive extends SubsystemBase {
             swerveDrivePoseEstimator.addVisionMeasurement(aprilTagVal.get().pose, aprilTagVal.get().timestamp,
                     VecBuilder.fill(5e-2,5e-2,10));
         }
-        SmartDashboard.putNumberArray("detections", getObjectPos().stream().flatMapToDouble(
-                pos -> DoubleStream.of(pos.getX(), pos.getX(), pos.getRotation().getDegrees())).toArray());
+
         field.setRobotPose(swerveDrivePoseEstimator.getEstimatedPosition());
+	    BufferedPose.addSample(Timer.getFPGATimestamp(),getEstimatedPose());
         SmartDashboard.putNumber("Posex", getEstimatedPose().getX());
         SmartDashboard.putNumber("Posey", getEstimatedPose().getY());
+        SmartDashboard.putNumber("FLDriveEncoder", FLModule.getDrivePosition());
+        SmartDashboard.putNumber("BLDriveEncoder", BLModule.getDrivePosition());
+        SmartDashboard.putNumber("FRDriveEncoder", FRModule.getDrivePosition());
+        SmartDashboard.putNumber("BRDriveEncoder", BRModule.getDrivePosition());
     }
+	public Pose2d getBufferedPose(double TimeStamp){
+		return BufferedPose.getSample(TimeStamp).orElseGet(swerveDrivePoseEstimator::getEstimatedPosition);
+	}
 
     public void stopModules() {
         FLModule.stop();
@@ -198,7 +198,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public Command generateTrajectory(Pose2d start, Pose2d end, ArrayList<Translation2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
-        TrajectoryConfig config = new TrajectoryConfig(maxMetersPerSec,maxMetersPerSecSquared);
+        TrajectoryConfig config = new TrajectoryConfig(maxMPSAuto,maxMetersPerSecSquared);
         config.setEndVelocity(endVelocityMetersPerSecond);
         config.setStartVelocity(startVelocityMetersPerSecond);
         var trajectory = TrajectoryGenerator.generateTrajectory(
@@ -213,7 +213,37 @@ public class SwerveDrive extends SubsystemBase {
         SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                 trajectory,
 //                vision::getRobotPosition,
-		        this::getEstimatedPose,
+//		        this::getEstimatedPose,
+                this::getOdomOnlyPose,
+                kDriveKinematics,
+                xController,
+                yController,
+                thetaController,
+                this::setModuleStates,
+                this
+        );
+        return Commands.parallel(
+
+                Commands.runOnce(() -> field.getObject("traj").setTrajectory(trajectory)),
+                trajCommand
+        );
+    }
+
+    public Command generateTrajectoryQuintic(ArrayList<Pose2d> internalPoints, double startVelocityMetersPerSecond, double endVelocityMetersPerSecond){
+        TrajectoryConfig config = new TrajectoryConfig(maxMPSAuto,maxMetersPerSecSquared);
+        config.setEndVelocity(endVelocityMetersPerSecond);
+        config.setStartVelocity(startVelocityMetersPerSecond);
+        var trajectory = TrajectoryGenerator.generateTrajectory(
+                AllianceFlip.apply(internalPoints),
+                config
+        );
+        SmartDashboard.putNumber("Time",trajectory.getTotalTimeSeconds());
+        SmartDashboard.putNumber("trajEndRotation", trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getRotation().getDegrees());
+        SwerveControllerCommand trajCommand = new SwerveControllerCommand(
+                trajectory,
+//                vision::getRobotPosition,
+//                this::getEstimatedPose,
+                this::getOdomOnlyPose,
                 kDriveKinematics,
                 xController,
                 yController,
@@ -249,9 +279,13 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public void driveAtSpeed(double xspd, double yspd, double turnspd, boolean fieldOriented, boolean red){
-//        if (align){
-//            turnspd = thetaController.calculate(pigeon.getYaw(), desiredYaw);
-//        }
+        if (turnspd != 0) {
+            align = false;
+        }
+        if (align){
+            turnspd = getYawCorrection();
+        }
+        if (xspd == 0 && yspd == 0 && turnspd == 0) stopModules();
         ChassisSpeeds chassisSpeeds;
         if (fieldOriented){
             Rotation2d currRot = getRotation2d();

@@ -45,4 +45,7 @@ public class AllianceFlip {
 		return pts.stream().map(AllianceFlip::apply).toList();
 	}
 
+    public static List<Pose2d> apply(ArrayList<Pose2d> pts) {
+        return pts.stream().map(AllianceFlip::apply).toList();
+    }
 }

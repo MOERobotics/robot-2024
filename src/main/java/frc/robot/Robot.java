@@ -39,13 +39,16 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     SmartDashboard.putData("running command", CommandScheduler.getInstance());
+    initRobotContainer(false);
   }
 
   @Override
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    if (m_robotContainer!= null) m_robotContainer.resetArmPos();
+  }
 
   @Override
   public void autonomousInit() {

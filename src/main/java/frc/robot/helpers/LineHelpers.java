@@ -23,42 +23,58 @@ public class LineHelpers {
 
 
 
-public static Translation2d getPosition (Translation2d start, Translation2d end, double s){
-       return start.interpolate(end, s/ start.getDistance(end));
-}
+    public static Translation2d getPosition (Translation2d start, Translation2d end, double s){
+           return start.interpolate(end, s/ start.getDistance(end));
+    }
 
 
-    public static double getS(double distance, double maxSpeed, double maxAccel, double t){
+    public static double getS(double distance, double maxSpeed, double maxAccel, double v_0, double t){
         // using max speed it finds max velocity that the robot should travel
-        double maxVel = Math.min(maxSpeed, Math.sqrt(distance*maxAccel));
+        double maxVel = Math.min(maxSpeed, (-v_0 + Math.sqrt(v_0*v_0 + 2*maxAccel*distance)/2));
+        double t_1 = (maxVel-v_0)/maxAccel;
+        double t_3 = maxVel/maxAccel;
+        double t_2 = Math.max(0,(distance-(.5*maxAccel*t_1*t_1+v_0*t_1-.5*maxAccel*t_3*t_3+maxVel*t_3))/maxVel);
+
         // it finds time to max which is the time it takes to reach the max speed(beginning of the trapezoid)
-        double timeToMax = maxVel/maxAccel;
-        // calculates overlap time between ??
-        double overLapTime = (distance-maxVel*timeToMax);
+        double d_1 = .5*maxAccel*t_1*t_1+v_0*t_1;
+        double d_2 = maxVel*t_2;
+        double d_3 = maxVel*t_3-.5*maxAccel*t_3*t_3;
 
         // if the amount of time you want it take is less than the time it takes to max
-        if (t < timeToMax){
-
-            // returns s
-            return .5*maxAccel*t*t;
+        if (t <= t_1){
+            return .5*maxAccel*t*t+v_0*t;
         }
-
-        // if the robot is speeding up?
-
-        else if (t <= overLapTime+timeToMax){
-
-            // return s
-            return .5*maxAccel*timeToMax*timeToMax + maxVel*(t-timeToMax);
-
-
+        else if ((t-t_1) <= t_2){
+            return maxVel*(t-t_1)+d_1;
         }
-        //
-        else if (t < overLapTime+2*timeToMax){
-            double prevDist = .5*maxAccel*timeToMax*timeToMax + maxVel*overLapTime;
-            return prevDist - .5*maxAccel*t*t + maxVel*t;
+        else if (t-t_1-t_2 <= t_3){
+            double offSetT = t - t_1-t_2;
+            return maxVel*(offSetT) - .5*maxAccel*offSetT*offSetT +d_1 + d_2;
         }
-        else{
-            return distance;
+        else {
+            return distance; //make sure to cancel fully
+        }
+    }
+
+    public static double getVel(double distance, double maxSpeed, double maxAccel, double v_0, double t){
+        double maxVel = Math.min(maxSpeed, (-v_0 + Math.sqrt(v_0*v_0 + 2*maxAccel*distance)/2));
+        double t_1 = (maxVel-v_0)/maxAccel;
+        double t_3 = maxVel/maxAccel;
+        double t_2 = Math.max(0,(distance-(.5*maxAccel*t_1*t_1+v_0*t_1-.5*maxAccel*t_3*t_3+maxVel*t_3))/maxVel);
+
+        // if the amount of time you want it take is less than the time it takes to max
+        if (t <= t_1){
+            return maxAccel*t+v_0;
+        }
+        else if ((t-t_1) <= t_2){
+            return maxVel;
+        }
+        else if (t-t_1-t_2 <= t_3){
+            double offSetT = t - t_1-t_2;
+            return maxVel - maxAccel*offSetT;
+        }
+        else {
+            return 0;
         }
     }
 

@@ -6,27 +6,26 @@ package frc.robot;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.*;
 import frc.robot.commands.autos.doubleNoteAutos;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.CollectorControllerCommand;
 import frc.robot.commands.ShooterControllerCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.SwerveController;
 import frc.robot.commands.autos.tripleNoteAutos;
-import frc.robot.commands.setHeading;
 import frc.robot.subsystems.*;
+import frc.robot.vision.Vision;
 
 import java.util.Set;
 
@@ -46,8 +45,8 @@ public class FortissiMOEContainer{
             0,
             false,
             true,
-            0.7 * ClimberArm.CONVERSION_FACTOR_INCHES,
-            0.42 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            0 * ClimberArm.CONVERSION_FACTOR_INCHES,
+            0 * ClimberArm.CONVERSION_FACTOR_INCHES,
             3.94 * ClimberArm.CONVERSION_FACTOR_INCHES,
             3.57 * ClimberArm.CONVERSION_FACTOR_INCHES,
             0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
@@ -71,10 +70,13 @@ public class FortissiMOEContainer{
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
+    double maxMPSAuto = 4;
     double maxRPS =  1.5*2*Math.PI;
     double maxRPS2 = Math.PI;
 
-    double maxMPSSquared = 2.5;
+    double maxMPSSquared = 2;
+
+    Vision vision = new Vision();
     private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 
     private final SwerveModule backLeftModule = new SwerveModule(
@@ -122,24 +124,31 @@ public class FortissiMOEContainer{
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            pigeon, maxMPS, maxMPSSquared, maxRPS, maxRPS2,1.0, 0, 0, 1.0, 0, 0, 4e-2, 0,0);
+            pigeon, maxMPSAuto, maxMPS, maxMPSSquared, maxRPS, maxRPS2,1.0, 0, 0, 1.0, 0, 0, 4e-2, 0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
+
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
-    private final Arm armSubsystem = new Arm(4, 15,14, 35, 36,
-            1.5e-2, 1.5e-3, 1.0e-4, 4.0e-2, 0, 4.0e-4, 1.0e-2,1.0e-3,0,0, 0, Rotation2d.fromDegrees(102),
-            Rotation2d.fromDegrees(-67), 80,30);
+    private final Arm armSubsystem = new Arm(4, 15,14, 35, 37,
+            24.0e-2, 24.0e-3, 48.0e-4, .1724,0/*3.0e-2*/, 2.0e-3,
+            .0185, .14833, 1.42e-4, 1.36e-4,
+            .95908/3, .54837/3, .033244/3, .00498/3,
+            .6048, .3615, .18133,.14154,10.725,27.837,
+            5.6705,5.899,0,0,
+            Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(-60), Rotation2d.fromDegrees(123), Rotation2d.fromDegrees(-60),
+            100,300);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
 
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem(5,
-            13,1.0e-4, 0,0,driveFF);
+            13,1.9e-10, 0,0,0.40322,0.002178,
+            0.001054, 0.22312,0.002178,0.00078615);
     private final CollectorSubsystem collectorSubsystem = new CollectorSubsystem(6,
             0.01,0,0,0,7);
     ///////////////////////////////////////////////////////////////////////////////////////head subsystem
 
 
-    private final Joystick driverJoystick = new Joystick(1); ///joystick imports
+    private final XboxController driverJoystick = new XboxController(1); ///joystick imports TESTING OUT RUMBLE CHANGE TO PS5 CONTROLLER IF ANYTHING BREAKS
 	private final Joystick functionJoystick = new Joystick(0);
     private final Joystick buttonBox = new Joystick(2);
 
@@ -156,19 +165,9 @@ public class FortissiMOEContainer{
             () -> driverJoystick.getRawButton(3), 2,3, maxMPS, maxRPS
     );
 
-    /* turnToAmp = new setHeading( swerveSubsystem,
-            ()-> -driverJoystick.getRawAxis(1),
-            ()-> -driverJoystick.getRawAxis(0),
-            ()->(Rotation2d.fromDegrees(90)));
-    Command turnToSource = new setHeading(swerveSubsystem,
-            ()-> -driverJoystick.getRawAxis(1),
-            ()-> -driverJoystick.getRawAxis(0),
-            ()->(Rotation2d.fromDegrees(-60)));
-*/
 
-    // private final Command turnRobotOn = new CollectorOnOrOffCommand(headSubsystem, true);
     Command collectorCommand = new CollectorControllerCommand(
-            0.45,
+            0.35,//.45
             ()->functionJoystick.getRawAxis(2)>=0.5,
             ()->functionJoystick.getRawAxis(3)>=0.5,
             ()->functionJoystick.getRawButton(6),
@@ -189,14 +188,14 @@ public class FortissiMOEContainer{
 
     private final Command climbUp= new ClimbUp(
             climber,
-            0.7,
+            1,
             ()-> -pigeon.getPitch()
     );
 
 
     private final Command climbDown= new ClimbDown(
             climber,
-            0.8
+            1
     );
 
 
@@ -206,49 +205,45 @@ public class FortissiMOEContainer{
 
 
     public final Command buttonsCommand = Commands.run(() -> {
-        SmartDashboard.putData("lmao", climbUp);
         if (driverJoystick.getRawButtonPressed(6)) {
-            if (climbingUp) {
-                CommandScheduler.getInstance().cancel(climbUp);
-                this.climbingUp = false;
-            } else {
-                climbUp.schedule();
-                this.climbingUp = true;
-                SmartDashboard.putBoolean("ClimbingUp", climbingUp);
-            }
+            CommandScheduler.getInstance().cancel(climbDown);
+            climbUp.schedule();
         }
         if (driverJoystick.getRawButtonPressed(5)) {
-            if (climbingDown) {
-                CommandScheduler.getInstance().cancel(climbDown);
-                this.climbingDown = false;
-                SmartDashboard.putBoolean("ClimbingDown", climbingDown);
-            } else {
-                climbDown.schedule();
-                this.climbingDown = true;
-            }
+            CommandScheduler.getInstance().cancel(climbUp);
+            climbDown.schedule();
+        }
+        if (!driverJoystick.getRawButton(5) && !driverJoystick.getRawButton(6)){
+            CommandScheduler.getInstance().cancel(climbDown);
+            CommandScheduler.getInstance().cancel(climbUp);
+            climber.stopArms();
         }
         SmartDashboard.putBoolean("ClimbingDown", climbingDown);
         SmartDashboard.putBoolean("ClimbingUp", climbingUp);
 
         SmartDashboard.putNumber("Roll", pigeon.getRoll());
         SmartDashboard.putNumber("Pitch", pigeon.getPitch());
-        pdh.setSwitchableChannel(collectorSubsystem.isCollected() && (System.currentTimeMillis()/100)%2 == 0);
-
+        pdh.setSwitchableChannel((collectorSubsystem.isCollected() && ((System.currentTimeMillis()/100)%2 == 0))
+                ||  (shooterSubsystem.shooterAtSpeed() && shooterSubsystem.getDesiredTopSpeed() != 0 && collectorSubsystem.isCollected()));
     });
+    //weirdest command ever - climbing & pdh logic
 
     ////////////////////////////////////////////////////////////////////////////commands end
 
     Command shooterControl = new ShooterControllerCommand(shooterSubsystem, armSubsystem::getShoulderDesState,
             ()->functionJoystick.getRawButtonPressed(5));
-    Command setHeading = new setHeading(swerveSubsystem, () -> -driverJoystick.getRawAxis(1),
-            () -> -driverJoystick.getRawAxis(0), ()->(swerveSubsystem.getAngleBetweenSpeaker(
-            ()->swerveSubsystem.getEstimatedPose().getTranslation())));
     ////////////////////////////////////////////////////////////////////////////commands end
+    Trigger shoulderUp = new Trigger(()-> functionJoystick.getRawAxis(1) <= -.3);
+    Trigger shoulderDown = new Trigger(()-> functionJoystick.getRawAxis(1) >= .3);
 
+    Trigger wristUp = new Trigger(()-> functionJoystick.getRawAxis(0) >= .3);
+    Trigger wristDown = new Trigger(()-> functionJoystick.getRawAxis(0) <= -.3);
 
 
     public FortissiMOEContainer() {
-        shooterSubsystem.setShooterRPMTolerance(500);
+        shooterSubsystem.setShooterRPMTolerance(250);
+        shooterSubsystem.setMaxShooterSpeeds(3200,3200);
+
         swerveSubsystem.setDefaultCommand(drive);
 //        collectorSubsystem.setDefaultCommand(collectorCommand);
 
@@ -272,87 +267,107 @@ public class FortissiMOEContainer{
 
 
         SmartDashboard.putData("Scheduler", CommandScheduler.getInstance());
-//
-        SmartDashboard.putString("hi","hi");
+
         m_chooser.setDefaultOption("Double Note Auto 1 (CW2)", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem, collectorSubsystem,0,0).DoubleNoteAuto1());
         m_chooser.addOption("Double Note Auto 2 (BW1)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto2());
        // m_chooser.addOption("Double Note Auto 3 (CW1)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto3());
         m_chooser.addOption("Double Note Auto 4 (DW3)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto4());
        // m_chooser.addOption("Triple Note Auto (BW1W2)", new tripleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).BW1W2());
+        m_chooser.addOption("A Move Auto", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).AMoveAuto());
+        m_chooser.addOption("Triple Note CW1W2", new tripleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).CW1W2());
+        m_chooser.addOption("Double Note Auto 1 Return Sub (CW2)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto1ScoreSub());
+        m_chooser.addOption("Double Note Auto 2 Return Sub (BW1)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto2ScoreSub());
+        m_chooser.addOption("Double Note Auto 4 Return Sub (DW3)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto4ScoreSub());
+        m_chooser.addOption("D Score Move", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DMoveAuto());
+        m_chooser.addOption("D Score Collect (DC5)", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DC5Auto());
+        m_chooser.addOption("4 Note Auto (CW2W1W3)", new tripleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).CW1W2W3());
+        m_chooser.addOption("centerLine Auto", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).DC5C4PassC3());
+        m_chooser.addOption("driveForward", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).rollOutAuto());
+        m_chooser.addOption("3 Note Centerline Auto (DC3C2)", new tripleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).DC3C2());
         SmartDashboard.putData("chooser", m_chooser);
-
     }
 
 
     private void configureBindings() {
+
+
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
-        new JoystickButton(functionJoystick, 8).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(.1)));
-        new JoystickButton(buttonBox, 1).whileTrue(Commands.run(()->armSubsystem.wristPowerController(.1)));
-        new JoystickButton(functionJoystick, 7).whileTrue(Commands.run(()->armSubsystem.shoulderPowerController(-.1)));
-        new JoystickButton(buttonBox, 2).whileTrue(Commands.run(()->armSubsystem.wristPowerController(-.1)));
-        new JoystickButton(functionJoystick, 1).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(80), Rotation2d.fromDegrees(-38)), Set.of(armSubsystem))
-                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
-                        functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(2)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
-                        || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
+        // zero heading
+
+        shoulderUp.whileTrue(Commands.run(()->armSubsystem.shoulderVoltageController(1.5)));
+        wristUp.whileTrue(Commands.run(()->armSubsystem.wristVoltageController(1.5))); //in volts lol
+        shoulderDown.whileTrue(Commands.run(()->armSubsystem.shoulderVoltageController(-1.5)));
+        wristDown.whileTrue(Commands.run(()->armSubsystem.wristVoltageController(-1.5)));
+        //manual shoulder/wrist control
+
+        new JoystickButton(functionJoystick, 1).onTrue(Commands.defer(()->armSubsystem.goToPoint(Constants.collectorShoulder, Constants.collectorWrist), Set.of(armSubsystem))
+                .until(()->(shoulderUp.getAsBoolean() || functionJoystick.getRawButton(3) ||
+                        functionJoystick.getRawButton(8) || shoulderDown.getAsBoolean() ||
+                        functionJoystick.getRawButton(2)|| wristDown.getAsBoolean()|| wristUp.getAsBoolean()
+                        || functionJoystick.getRawButton(10) || buttonBox.getRawButton(3))));
         //collect
 
-        new JoystickButton(functionJoystick, 2).onTrue(Commands.defer(() -> armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-41.5)), Set.of(armSubsystem))
-                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
-                        functionJoystick.getRawButtonPressed(4) || functionJoystick.getRawButton(1) ||
-                        functionJoystick.getRawButton(8)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
-                        || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
-        //podium shot
+        new JoystickButton(functionJoystick, 8).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-44)), Set.of(armSubsystem))
+                .until(()->(shoulderUp.getAsBoolean() || functionJoystick.getRawButton(3) ||
+                        functionJoystick.getRawButton(2) || shoulderDown.getAsBoolean() ||
+                        functionJoystick.getRawButton(1)||wristDown.getAsBoolean()|| wristUp.getAsBoolean()
+                        || functionJoystick.getRawButton(10) || buttonBox.getRawButton(3))));
+        //all the shots smh until roshik chooses a new random button to be his favorite
 
-        new JoystickButton(functionJoystick, 4).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-41)), Set.of(armSubsystem))
-                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
-                        functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
-                        || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
-        //mid shot
-
-        new JoystickButton(functionJoystick, 9).onTrue(Commands.defer(() ->armSubsystem.goToPoint(Rotation2d.fromDegrees(112), Rotation2d.fromDegrees(-36)), Set.of(armSubsystem))
-                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
-                        functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
-                        || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(4))));
-        //wing shot
-
-        new JoystickButton(functionJoystick, 10).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(143), Rotation2d.fromDegrees(-71)), Set.of(armSubsystem))
-                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
-                        functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4) || buttonBox.getRawButton(1)
-                        || buttonBox.getRawButton(2) || functionJoystick.getRawButton(9))));
+        new JoystickButton(functionJoystick, 10).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(147), Rotation2d.fromDegrees(-78)), Set.of(armSubsystem))
+                .until(()->(shoulderUp.getAsBoolean() || functionJoystick.getRawButton(3) ||
+                        functionJoystick.getRawButton(2) || shoulderDown.getAsBoolean() ||
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(8) || wristDown.getAsBoolean()
+                        || wristUp.getAsBoolean() || buttonBox.getRawButton(3))));
         //amp shot
 
-        new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(109), Rotation2d.fromDegrees(-102.5)), Set.of(armSubsystem))
-                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(10) ||
-                        functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)
-                        || buttonBox.getRawButton(2) || functionJoystick.getRawButton(9))));
+        new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(113), Rotation2d.fromDegrees(-110)), Set.of(armSubsystem))
+                .until(()->(shoulderUp.getAsBoolean() || functionJoystick.getRawButton(10) ||
+                        functionJoystick.getRawButton(2) || shoulderDown.getAsBoolean() ||
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(8)|| wristDown.getAsBoolean()
+                        || wristUp.getAsBoolean() || buttonBox.getRawButton(3))));
         //safe pos
 
         new JoystickButton(buttonBox, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-135)), Set.of(armSubsystem))
-                .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
-                        functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4)||buttonBox.getRawButton(1)|| buttonBox.getRawButton(2)
-                        || functionJoystick.getRawButton(10) || functionJoystick.getRawButton(9))));
+                .until(()->(shoulderUp.getAsBoolean() || functionJoystick.getRawButton(3) ||
+                        functionJoystick.getRawButton(2) || shoulderDown.getAsBoolean() ||
+                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(8)|| wristDown.getAsBoolean()
+                        || wristUp.getAsBoolean() || functionJoystick.getRawButton(10))));
         //start position
 
-//        new JoystickButton(driverJoystick, 7).onTrue(turnToAmp.until(()->(Math.abs(driverJoystick.getRawAxis(2)) >= .2)));
-//        new JoystickButton(driverJoystick, 8).onTrue(turnToSource.until(()->(Math.abs(driverJoystick.getRawAxis(2)) >= .2)));
-//        new JoystickButton(functionJoystick, 3).onTrue(
-//                Commands.parallel(
-//                Commands.defer(()->armSubsystem.goToPoint(
-//                Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getX()),
-//                Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getY())), Set.of(armSubsystem))
-//                        .until(()->(functionJoystick.getRawButton(7) || functionJoystick.getRawButtonPressed(3) ||
-//                        functionJoystick.getRawButtonPressed(2) || functionJoystick.getRawButton(8) ||
-//                        functionJoystick.getRawButton(1) || functionJoystick.getRawButton(4))),
-//                        setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>.1))); //auto aim shot
-        //104,-41
-      //  new JoystickButton(driverJoystick, 7).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
 
+        new JoystickButton(functionJoystick, 2).onTrue(
+                Commands.parallel(
+                Commands.defer(()->armSubsystem.goToPoint(
+                Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getX()),
+                Rotation2d.fromDegrees(armSubsystem.autoAim(swerveSubsystem::getEstimatedPose).getY())), Set.of(armSubsystem)).andThen(
+                        Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState())
+                        ))
+                        .until(()->(shoulderUp.getAsBoolean() || functionJoystick.getRawButton(10) ||
+                                functionJoystick.getRawButton(3) || shoulderDown.getAsBoolean() ||
+                                functionJoystick.getRawButton(1) || functionJoystick.getRawButton(8)|| wristUp.getAsBoolean()
+                                || wristDown.getAsBoolean() || buttonBox.getRawButton(3))),
+                        Commands.run(()->swerveSubsystem.setDesiredYaw(swerveSubsystem.getAngleBetweenSpeaker(
+                                ()->swerveSubsystem.getEstimatedPose().getTranslation()).getDegrees())).until(
+                                ()->Math.abs(driverJoystick.getRawAxis(2)) >= .1
+                        )));
+        //auto aim shot
+
+        new JoystickButton(functionJoystick, 4).whileTrue(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(2300,2300))).
+                whileFalse(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(3200,3200)));
+        //half speed reduction
+
+        var driveToNote = new DriveToNoteCommand(
+                swerveSubsystem,
+                vision,
+                () -> Math.max(0, Math.hypot(driverJoystick.getRawAxis(0), driverJoystick.getRawAxis(1))-.05)*(maxMPS),
+                (rumblePercent) -> {
+                    SmartDashboard.putNumber("JoyRumble", rumblePercent);
+                    driverJoystick.setRumble(PS5Controller.RumbleType.kBothRumble, rumblePercent); //TODO: try different rumble types.
+                }
+        );
+        new JoystickButton(driverJoystick, 8).whileTrue(driveToNote);
+        // object detection note pickup button
 
     }
 

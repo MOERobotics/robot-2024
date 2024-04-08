@@ -12,7 +12,6 @@ import frc.robot.subsystems.ShooterSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class shootSpeakerCommand extends Command {
-    //    private final HeadSubsystem headSubsystem;
     private final ShooterSubsystem shooter;
     private  final CollectorSubsystem collector;
     private Timer timer;
@@ -40,6 +39,7 @@ public class shootSpeakerCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        shot = false;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -48,6 +48,7 @@ public class shootSpeakerCommand extends Command {
         shooter.setShooterTopSpeed(speedCalc());
         shooter.setShooterBottomSpeed(speedCalc());
         if(shooter.shooterAtSpeed() && !shot){
+            System.out.println("at speed, let's shoot");
             shot = true;
             collector.setCollectorSpeed(1);
             timer.restart();
@@ -58,13 +59,14 @@ public class shootSpeakerCommand extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        shooter.stopShooter();
+        //shooter.stopShooter();
         collector.stopCollector();
+        shot = false;
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return (shot && timer.get() >= .75);
+        return (shot && timer.get() >= .25);
     }
 }

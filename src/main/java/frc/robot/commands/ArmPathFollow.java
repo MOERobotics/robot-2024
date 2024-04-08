@@ -12,13 +12,15 @@ import frc.robot.helpers.LineHelpers;
 import frc.robot.subsystems.Arm;
 import edu.wpi.first.wpilibj2.command.Command;
 
+import static java.lang.Math.abs;
+
 /** An example command that uses an example subsystem. */
 public class ArmPathFollow extends Command {
     private final Arm armSubsystem;
     Translation2d desiredPoint;
     Translation2d startPoint, currPos;
     Timer timer;
-    double targetDist, speed, accel, s;
+    double targetDist, speed, accel, s, v_0;
 
 
     public ArmPathFollow(Arm subsystem, Rotation2d shoulderPos, Rotation2d wristPos, double speed, double accel) {
@@ -34,27 +36,39 @@ public class ArmPathFollow extends Command {
 
     @Override
     public void initialize() {
+        System.out.println("initialized");
         SmartDashboard.putNumber("made it to init", timer.get());
         startPoint = new Translation2d(armSubsystem.shoulderState().getDegrees(), armSubsystem.wristState().getDegrees());
         targetDist = startPoint.getDistance(desiredPoint);
+        v_0 = armSubsystem.getArmSpeed();
         timer.restart();
     }
 
     @Override
     public void execute() {
-        //SmartDashboard.putNumber("made it", timer.get());
-        //s = LineHelpers.getS(targetDist, speed, accel, timer.get());
-        //SmartDashboard.putNumber("ArmPathFollow s", s);
-        s = Math.min(timer.get()*speed, startPoint.getDistance(desiredPoint));
-        //var interPos = startPoint.getDistance(desiredPoint)
-        //var interPos = startPoint.interpolate(desiredPoint, s / startPoint.getDistance(desiredPoint));
-//        double shoulderPos = LineHelpers.getPositionX(startPoint, desiredPoint, s);
-//        double wristPos = LineHelpers.getPositionY(startPoint, desiredPoint, s);
-        var shoulderPos = (desiredPoint.getX()-startPoint.getX())/startPoint.getDistance(desiredPoint)*s+startPoint.getX();
-        var wristPos = (desiredPoint.getY()-startPoint.getY())/startPoint.getDistance(desiredPoint)*s+startPoint.getY();
+
+        s = LineHelpers.getS(desiredPoint.getDistance(startPoint), speed, accel, v_0, timer.get());
+        double v = LineHelpers.getVel(desiredPoint.getDistance(startPoint), speed, accel, v_0, timer.get());
+        var shoulderPos = (desiredPoint.getX()-startPoint.getX())/desiredPoint.getDistance(startPoint)*s+startPoint.getX();
+
+        double wristPos = (desiredPoint.getY()-startPoint.getY())/(desiredPoint.getX()-startPoint.getX())*(armSubsystem.shoulderState().getDegrees()
+                - startPoint.getX()) + startPoint.getY();
+
+        double wristVel = (desiredPoint.getY()-startPoint.getY())/(desiredPoint.getDistance(startPoint))*v;
+        double shoulderVel = (desiredPoint.getX()-startPoint.getX())/(desiredPoint.getDistance(startPoint))*v;
+
+        if (Math.abs(desiredPoint.getX() - startPoint.getX()) <= 5){
+            wristPos = (desiredPoint.getY()-startPoint.getY())/(desiredPoint.getDistance(startPoint))*s+startPoint.getY();
+        }
+        if (desiredPoint.getDistance(startPoint) <= 5){
+            s = desiredPoint.getDistance(startPoint);
+        }
         SmartDashboard.putNumber("ArmPathFollow writePos", wristPos);
-        SmartDashboard.putNumber("ArmPathFollow desiredWrite", desiredPoint.getY());
-        armSubsystem.pathFollow(Rotation2d.fromDegrees(shoulderPos), Rotation2d.fromDegrees(wristPos));
+        SmartDashboard.putNumber("ArmPathFollow shoulderPos", shoulderPos);
+        SmartDashboard.putNumber("ArmPathFollow desiredWrist", desiredPoint.getY());
+        SmartDashboard.putNumber("ArmPathFollow desiredShoulder", desiredPoint.getX());
+        armSubsystem.pathFollow(Rotation2d.fromDegrees(shoulderPos), Rotation2d.fromDegrees(wristPos), wristVel, shoulderVel);
+
         armSubsystem.setWristDestState(wristPos);
         armSubsystem.setShoulderDesState(shoulderPos);
         currPos = new Translation2d(armSubsystem.shoulderState().getDegrees(), armSubsystem.wristState().getDegrees());
@@ -62,12 +76,17 @@ public class ArmPathFollow extends Command {
 
     // Called once the command ends or is interrupted.
     @Override
-    public void end(boolean interrupted) {}
+    public void end(boolean interrupted) {
+        System.out.println("finished this command");
+        System.out.println(s);
+        armSubsystem.setWristDestState(desiredPoint.getY());
+        armSubsystem.setShoulderDesState(desiredPoint.getX());
+    }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return s >= startPoint.getDistance(desiredPoint);
+        return Math.abs(s - startPoint.getDistance(desiredPoint)) <= .1;
         //return currPos.getDistance(desiredPoint) <= 5;
     }
 }
