@@ -45,7 +45,7 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModule FRModule;
     SwerveModule BRModule;
     WPI_Pigeon2 pigeon;
-//    private final SwerveDriveOdometry odometer;
+    private final SwerveDriveOdometry odometer;
     private final double maxMetersPerSec, maxMPSAuto;
     private final double maxMetersPerSecSquared;
     public SwerveDriveKinematics kDriveKinematics;
@@ -90,7 +90,7 @@ public class SwerveDrive extends SubsystemBase {
         yController = new PIDController(xykP,xykI,xykD);
         kDriveKinematics = new SwerveDriveKinematics(FRModule.moduleTranslation(), FLModule.moduleTranslation(),
                 BRModule.moduleTranslation(), BLModule.moduleTranslation());
-//        odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0), getModulePositions());
+        odometer = new SwerveDriveOdometry(kDriveKinematics, new Rotation2d(0), getModulePositions());
         align = false;
         SmartDashboard.putData("odometry", field);
         swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(kDriveKinematics, new Rotation2d(0), getModulePositions(), new Pose2d());
@@ -103,7 +103,7 @@ public class SwerveDrive extends SubsystemBase {
 
     public Command setInitPosition(Pose2d initPose){
         return Commands.sequence(Commands.runOnce(()->setPigeon(AllianceFlip.apply(initPose).getRotation().getDegrees())),
-//		        Commands.runOnce(()->odometer.update(getRotation2d(),getModulePositions())),
+		        Commands.runOnce(()->odometer.update(getRotation2d(),getModulePositions())),
                 Commands.runOnce(() -> {}), //wait a cycle to reset the pigeon or everything breaks
                 Commands.runOnce(() -> {}),
                 Commands.runOnce(()->resetOdometry(AllianceFlip.apply(initPose))),
@@ -134,9 +134,10 @@ public class SwerveDrive extends SubsystemBase {
     public Pose2d getEstimatedPose(){
         return swerveDrivePoseEstimator.getEstimatedPosition();
     }
+    public Pose2d getOdomOnlyPose(){return odometer.getPoseMeters();}
 
     public void resetOdometry(Pose2d pose) {
-//        odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
+        odometer.resetPosition(getRotation2d(), getModulePositions(), pose);
         swerveDrivePoseEstimator.resetPosition(getRotation2d(), getModulePositions(), pose);
     }
 
@@ -158,8 +159,8 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboard.putNumber("yaw", getYaw());
 		SmartDashboard.putNumber("Yaw2d",getRotation2d().getDegrees());
         SmartDashboard.putNumber("desired yaw", getDesiredYaw());
-//        odometer.update(getRotation2d(), getModulePositions());
-//        field.getObject("odom").setPose(odometer.getPoseMeters());
+        odometer.update(getRotation2d(), getModulePositions());
+        field.getObject("odom").setPose(odometer.getPoseMeters());
 //        vision.setOdometryPosition(odometer.getPoseMeters());
         SmartDashboard.putNumber("Rotation",getEstimatedPose().getRotation().getDegrees());
         swerveDrivePoseEstimator.update(getRotation2d(), getModulePositions());
@@ -212,7 +213,8 @@ public class SwerveDrive extends SubsystemBase {
         SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                 trajectory,
 //                vision::getRobotPosition,
-		        this::getEstimatedPose,
+//		        this::getEstimatedPose,
+                this::getOdomOnlyPose,
                 kDriveKinematics,
                 xController,
                 yController,
@@ -240,7 +242,8 @@ public class SwerveDrive extends SubsystemBase {
         SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                 trajectory,
 //                vision::getRobotPosition,
-                this::getEstimatedPose,
+//                this::getEstimatedPose,
+                this::getOdomOnlyPose,
                 kDriveKinematics,
                 xController,
                 yController,

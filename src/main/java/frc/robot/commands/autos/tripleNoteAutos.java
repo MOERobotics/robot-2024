@@ -214,21 +214,21 @@ public class tripleNoteAutos {
                 Commands.defer(()->armSubsystem.goToPoint(Constants.collectorShoulder, Constants.collectorWrist), Set.of(armSubsystem)).andThen(Commands.waitSeconds(.15)),
                 Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(Commands.parallel(trajCommand.andThen(()->swerveDrive.stopModules()), collectNote),
-                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(4),
+                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(3),
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.race(trajCommand2.andThen(()->swerveDrive.stopModules()),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.race(shootAnotherNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(Commands.parallel(trajCommand3.andThen(()->swerveDrive.stopModules()), collectNote2),
-                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(4),
+                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(3),
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.race(Commands.parallel(trajCommand4.andThen(()->swerveDrive.stopModules())),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.race(shootLastNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(Commands.parallel(trajCommand5.andThen(()->swerveDrive.stopModules()), collectNote3),
-                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(4),
+                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(3),
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.race(trajCommand6.andThen(()->swerveDrive.stopModules()),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
@@ -242,9 +242,10 @@ public class tripleNoteAutos {
         //traj 1
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointD, UsefulPoints.Points.RotationOfStartingPointD);
         Rotation2d endRotation = new Rotation2d(0);
-        Translation2d endTranslation = new Translation2d(UsefulPoints.Points.CenterNote3.getX()-Units.inchesToMeters(12),
-                UsefulPoints.Points.CenterNote3.getY()+Units.inchesToMeters(10));
+        Translation2d endTranslation = new Translation2d(UsefulPoints.Points.CenterNote3.getX()-Units.inchesToMeters(6),
+                UsefulPoints.Points.CenterNote3.getY());
         Pose2d endPose = new Pose2d(endTranslation, endRotation); //goes from start D to C3
+
 
         Translation2d endTranslation2 = UsefulPoints.Points.StageEnterBottom;
 //        Rotation2d startRotation2 = new Rotation2d(swerveDrive.getYaw());
@@ -318,7 +319,7 @@ public class tripleNoteAutos {
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.defer(()->armSubsystem.goToPoint(
                         Rotation2d.fromDegrees(armSubsystem.autoAim(swerveDrive::getEstimatedPose).getX()),
-                        Rotation2d.fromDegrees(armSubsystem.autoAim(swerveDrive::getEstimatedPose).getY())), Set.of(armSubsystem))
+                        Rotation2d.fromDegrees(armSubsystem.autoAim(swerveDrive::getEstimatedPose).getY()-2)), Set.of(armSubsystem))
                         .andThen(Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState())).withTimeout(1)),
                 Commands.race(shootAnotherNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(2),
                 Commands.defer(()->armSubsystem.goToPoint(Constants.collectorShoulder, Constants.collectorWrist), Set.of(armSubsystem)).andThen(Commands.waitSeconds(1)),
@@ -330,7 +331,7 @@ public class tripleNoteAutos {
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.defer(()->armSubsystem.goToPoint(
                         Rotation2d.fromDegrees(armSubsystem.autoAim(swerveDrive::getEstimatedPose).getX()),
-                        Rotation2d.fromDegrees(armSubsystem.autoAim(swerveDrive::getEstimatedPose).getY())), Set.of(armSubsystem)).andThen
+                        Rotation2d.fromDegrees(armSubsystem.autoAim(swerveDrive::getEstimatedPose).getY()-2)), Set.of(armSubsystem)).andThen
                         (Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState())).withTimeout(1)),
                 Commands.parallel(shootLastNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState())))
         );

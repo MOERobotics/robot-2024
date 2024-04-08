@@ -70,7 +70,7 @@ public class FortissiMOEContainer{
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
     double maxMPS = 174/39.3701;
-    double maxMPSAuto = 3;
+    double maxMPSAuto = 4;
     double maxRPS =  1.5*2*Math.PI;
     double maxRPS2 = Math.PI;
 
@@ -129,12 +129,12 @@ public class FortissiMOEContainer{
 
     /////////////////////////////////////////////////////////////////////////////arm subsystem start
     private final Arm armSubsystem = new Arm(4, 15,14, 35, 37,
-            24.0e-2, 24.0e-3, 48.0e-4, .1724,3.0e-2, 2.0e-3,
+            24.0e-2, 24.0e-3, 48.0e-4, .1724,0/*3.0e-2*/, 2.0e-3,
             .0185, .14833, 1.42e-4, 1.36e-4,
             .95908/3, .54837/3, .033244/3, .00498/3,
             .6048, .3615, .18133,.14154,10.725,27.837,
             5.6705,5.899,0,0,
-            Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(-60), Rotation2d.fromDegrees(120), Rotation2d.fromDegrees(-60),
+            Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(-60), Rotation2d.fromDegrees(123), Rotation2d.fromDegrees(-60),
             100,300);
 
     /////////////////////////////////////////////////////////////////////////// arm subsystem end
@@ -224,7 +224,7 @@ public class FortissiMOEContainer{
         SmartDashboard.putNumber("Roll", pigeon.getRoll());
         SmartDashboard.putNumber("Pitch", pigeon.getPitch());
         pdh.setSwitchableChannel((collectorSubsystem.isCollected() && ((System.currentTimeMillis()/100)%2 == 0))
-                ||  (shooterSubsystem.shooterAtSpeed() && shooterSubsystem.getDesiredTopSpeed() != 0));
+                ||  (shooterSubsystem.shooterAtSpeed() && shooterSubsystem.getDesiredTopSpeed() != 0 && collectorSubsystem.isCollected()));
     });
     //weirdest command ever - climbing & pdh logic
 
@@ -321,7 +321,7 @@ public class FortissiMOEContainer{
                         || wristUp.getAsBoolean() || buttonBox.getRawButton(3))));
         //amp shot
 
-        new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(111), Rotation2d.fromDegrees(-110)), Set.of(armSubsystem))
+        new JoystickButton(functionJoystick, 3).onTrue(Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(113), Rotation2d.fromDegrees(-110)), Set.of(armSubsystem))
                 .until(()->(shoulderUp.getAsBoolean() || functionJoystick.getRawButton(10) ||
                         functionJoystick.getRawButton(2) || shoulderDown.getAsBoolean() ||
                         functionJoystick.getRawButton(1) || functionJoystick.getRawButton(8)|| wristDown.getAsBoolean()
