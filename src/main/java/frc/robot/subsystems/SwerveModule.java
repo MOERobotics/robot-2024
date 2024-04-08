@@ -8,6 +8,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.revrobotics.*;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -33,6 +34,7 @@ public class SwerveModule extends SubsystemBase {
     private final SparkPIDController driveController;
     private final Translation2d moduleTran;
 
+
     public SwerveModule(int driveMotorID, int pivotMotorID, int pivotEncoderID,
                         boolean driveInvert, boolean pivotInvert, double pivotOff, Translation2d moduleTran,
                         double encoderTicksPerMeter, double velocityConversionFactor,
@@ -44,6 +46,10 @@ public class SwerveModule extends SubsystemBase {
         driveMotor = new CANSparkMax(driveMotorID, kBrushless);
         pivotMotor = new CANSparkMax(pivotMotorID, kBrushless);
 
+        driveMotor.setSmartCurrentLimit(60);
+        pivotMotor.setSmartCurrentLimit(60);
+
+
         driveMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
         pivotMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
@@ -54,6 +60,7 @@ public class SwerveModule extends SubsystemBase {
         pivotMotor.setInverted(pivotInvert);
 
         pivotOffset = pivotOff;
+        driveMotor.setClosedLoopRampRate(.35);
 
         this.encoderTicksPerMeter = encoderTicksPerMeter;
         this.velocityConversionFactor = velocityConversionFactor;

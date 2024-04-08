@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.CollectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,6 +20,7 @@ public class CollectorControllerCommand extends Command {
     private final Supplier<Boolean> buttonIn;
     private final CollectorSubsystem subsystem;
     private final Supplier<Boolean> index;
+    private final Timer timer;
 
 
 
@@ -32,6 +34,7 @@ public class CollectorControllerCommand extends Command {
         this.buttonOut = buttonOut;
         this.buttonIn = buttonIn;
         this.subsystem = subsystem;
+        timer = new Timer();
 
         addRequirements(subsystem);
 
@@ -50,14 +53,17 @@ public class CollectorControllerCommand extends Command {
         double finalSpeed = 0;
 
         if (buttonOut.get() && !buttonIn.get()) { //collector out
-            finalSpeed = -speed;
+            finalSpeed = -1;//speed;
         }
         if (!buttonOut.get() && buttonIn.get() && !subsystem.isCollected()) { //collector in no note
             finalSpeed = speed;
+            timer.restart();
+        }
+        if (subsystem.isCollected() && timer.get() <= .1){
+            finalSpeed = -speed/3;
         }
         if(index.get()){
-            finalSpeed = speed;
-
+            finalSpeed = 1;
         }
 
         subsystem.updateCollectorSpeed(finalSpeed);

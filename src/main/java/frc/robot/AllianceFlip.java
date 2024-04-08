@@ -11,7 +11,12 @@ import java.util.List;
 public class AllianceFlip {
 	public static double fieldWidth = 16.541052;//field width in meters
 	public static boolean shouldFlip(){
-		return DriverStation.getAlliance().get()==DriverStation.Alliance.Red;
+		var alliance = DriverStation.getAlliance();
+		if (alliance.isEmpty()) {
+			DriverStation.reportError("No alliance color", false);
+			return false;
+		}
+		return alliance.get()==DriverStation.Alliance.Red;
 	}
 	public static Translation2d apply(Translation2d init){
 		if(shouldFlip()){
@@ -22,7 +27,7 @@ public class AllianceFlip {
 
 	public static Rotation2d apply(Rotation2d init){
 		if(shouldFlip()){
-			return new Rotation2d(-init.getCos(),init.getTan());
+			return new Rotation2d(-init.getCos(),init.getSin());
 		}
 		return init;
 	}
@@ -40,4 +45,7 @@ public class AllianceFlip {
 		return pts.stream().map(AllianceFlip::apply).toList();
 	}
 
+    public static List<Pose2d> apply(ArrayList<Pose2d> pts) {
+        return pts.stream().map(AllianceFlip::apply).toList();
+    }
 }

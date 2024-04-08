@@ -5,26 +5,32 @@
 package frc.robot;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.Autos;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.TestClimber;
+import frc.robot.commands.autos.doubleNoteAutos;
+import frc.robot.commands.autos.tripleNoteAutos;
 import frc.robot.commands.setHeading;
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.ClimberArm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
 
+import java.util.ArrayList;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -51,8 +57,13 @@ public class SwerveBotContainer extends RobotContainer {
     double driveFF = 1.76182e-4;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
-    double maxMPS = 174/39.3701;
+    double maxMPS = 176/39.3701;
+    double maxMPSSquared = 5;
     double maxRPS = Math.PI*2;
+    double maxRPSSquared = Math.PI*2;
+    private final SendableChooser<Command> m_chooser = new SendableChooser<>();
+
+
     private final SwerveModule backLeftModule = new SwerveModule(
             19,
             18,
@@ -98,7 +109,8 @@ public class SwerveBotContainer extends RobotContainer {
             driveP, driveI, driveD, driveFF
     );
     private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
-            ()->pigeon.getYaw(), maxMPS,0.04,0,0);
+            pigeon, maxMPS, maxMPS,maxMPSSquared, maxRPS, maxRPSSquared,1,0,0, 1.0, 0, 0,
+            .04,0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
@@ -111,10 +123,15 @@ public class SwerveBotContainer extends RobotContainer {
             () -> -driverJoystick.getRawAxis(0),
             () -> -driverJoystick.getRawAxis(2),
             () -> driverJoystick.getRawButton(6),
-            () -> driverJoystick.getRawButton(1), 6,6, maxMPS, maxRPS
+            () -> driverJoystick.getRawButton(1), 2,2, maxMPS, maxRPS
     );
 
+    Command setHeading = new setHeading(swerveSubsystem, () -> -driverJoystick.getRawAxis(1),
+            () -> -driverJoystick.getRawAxis(0), ()->(swerveSubsystem.getAngleBetweenSpeaker(
+            ()->swerveSubsystem.getEstimatedPose().getTranslation())));
     ////////////////////////////////////////////////////////////////////////////commands end
+
+
 
 
 
@@ -122,20 +139,28 @@ public class SwerveBotContainer extends RobotContainer {
     public SwerveBotContainer() {
 
         shooter = new DigitalOutput(4);
-
         pigeon.reset();
+
         swerveSubsystem.setDefaultCommand(drive);
+        m_chooser.setDefaultOption("Double Note Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto1());
+        m_chooser.addOption("Double Note Auto 2", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto2());
+        m_chooser.addOption("Double Note Auto 3", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto3());
+        m_chooser.addOption("Double Note Auto 4", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto4());
+        m_chooser.addOption("Center Line Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).CenterLineAuto1());
+        m_chooser.addOption("FCenter Auto", new doubleNoteAutos(swerveSubsystem,0,0).FCenterAuto());
+        SmartDashboard.putData(m_chooser);
+
         // Configure the trigger bindings
         configureBindings();
         var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
         button8.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),60*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?1:-1)));
+                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(-60))));
 
         var button7 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
         button7.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),90*((DriverStation.getAlliance().get()==DriverStation.Alliance.Red)?-1:1)));
+                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(90))));
     }
 
     @Override
@@ -144,6 +169,8 @@ public class SwerveBotContainer extends RobotContainer {
         var loop = CommandScheduler.getInstance().getDefaultButtonLoop();
             new Trigger(funcOpJoystick.axisGreaterThan(3, 0.8, loop))
                     .whileTrue(Commands.runOnce(() -> shooter.set(true))).whileFalse(Commands.runOnce(()->shooter.set(false)));
+
+        new JoystickButton(funcOpJoystick, 3).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
     }
 
     private void shooterOn(Solenoid shooter) {
@@ -151,9 +178,10 @@ public class SwerveBotContainer extends RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return null;
-        // return Autos.exampleAuto(m_drive);
+        return m_chooser.getSelected();
+       // return Autos.exampleAuto(m_drive);
     }
+
 }
 
 
