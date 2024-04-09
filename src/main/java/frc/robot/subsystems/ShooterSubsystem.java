@@ -62,8 +62,8 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterRPMTolerance=5;
         maxBotSpeed = 3500; maxTopSpeed = 3500;
         desiredBotSpeed = 0; desiredTopSpeed = 0;
-		shooterTop.setSmartCurrentLimit(40);
-	    shooterBottom.setSmartCurrentLimit(40);
+		shooterTop.setSmartCurrentLimit(40,60);
+	    shooterBottom.setSmartCurrentLimit(40,60);
 		ShooterTopFF=new SimpleMotorFeedforward(shooterTopkS,shooterTopkV,shooterTopkA);
 		ShooterBotFF=new SimpleMotorFeedforward(shooterBotkS,shooterBotkV,shooterBotkA);
 		//SYS ID for bottom shooter

@@ -20,21 +20,27 @@ public class DriveToNoteCommand extends Command {
 
     private final Vision vision;
     private final SwerveDrive subsystem;
-    private final DoubleSupplier speedSupplier;
+    private final Supplier<Double> xspdFunction,yspdFunction,turnspdFunction;
     private final DoubleConsumer rumbleCallback;
+	private final double maxMPS;
 
     private Translation2d target = null;
     private int idleLoopCount = 0;
     private final double Latency = 0.25;//Pose latency in seconds
 
-    public DriveToNoteCommand(SwerveDrive subsystem, Vision vision, DoubleSupplier speedSupplier) {
-        this(subsystem, vision, speedSupplier, null);
+    public DriveToNoteCommand(SwerveDrive subsystem, Vision vision, Supplier<Double> xspeed, Supplier<Double> yspeed,
+                              Supplier<Double> turnspeed, double maxMPS) {
+        this(subsystem, vision, xspeed,yspeed,turnspeed, null, maxMPS);
     }
-    public DriveToNoteCommand(SwerveDrive subsystem, Vision vision, DoubleSupplier speedSupplier, DoubleConsumer rumbleCallback){
-        this.speedSupplier = speedSupplier;
+    public DriveToNoteCommand(SwerveDrive subsystem, Vision vision, Supplier<Double> xspeed, Supplier<Double> yspeed,
+                              Supplier<Double> turnspeed, DoubleConsumer rumbleCallback, double maxMPS){
+		xspdFunction = xspeed;
+	    yspdFunction = yspeed;
+	    turnspdFunction = turnspeed;
         this.vision = vision;
         this.subsystem = subsystem;
         this.rumbleCallback = rumbleCallback;
+		this.maxMPS=maxMPS;
         addRequirements(subsystem);
     }
     // Called when the command is initially scheduled.
@@ -67,11 +73,12 @@ public class DriveToNoteCommand extends Command {
     public void execute() {
         updateTarget();
         if (target == null){
-            idleLoopCount += 1;
-
-            if (idleLoopCount >= 5 && rumbleCallback != null){
-                rumbleCallback.accept(1);
-            }
+//            idleLoopCount += 1;
+//
+//            if (idleLoopCount >= 5 && rumbleCallback != null){
+//                rumbleCallback.accept(1);
+//            }
+	        subsystem.driveAtSpeed(xspdFunction.get(), yspdFunction.get(), turnspdFunction.get(), true);
             return;
         }
         // Put the detection on NetworkTables, for debugging
@@ -84,11 +91,11 @@ public class DriveToNoteCommand extends Command {
 
         var robotAngle = unitDelta.getAngle();
         if (delta.getNorm() <= Units.inchesToMeters(24)) robotAngle = robotPose.getRotation().times(1);
-            SmartDashboard.putNumber("robot Object Detection angle", robotAngle.getDegrees());
+		SmartDashboard.putNumber("robot Object Detection angle", robotAngle.getDegrees());
        // var yawOffset = subsystem.getRotation2d().minus(robotPose.getRotation());
         subsystem.setDesiredYaw(robotAngle.getDegrees());//Set absolute heading
 
-        var speedVal = speedSupplier.getAsDouble();
+        var speedVal = Math.max(0, Math.hypot(xspdFunction.get(), yspdFunction.get())-.05)*(maxMPS);
         if (speedVal < .1) speedVal = 0;
 
         subsystem.driveAtSpeed(robotAngle.getCos()*speedVal,
@@ -98,7 +105,6 @@ public class DriveToNoteCommand extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-
     }
 
     // Returns true when the command should end.
