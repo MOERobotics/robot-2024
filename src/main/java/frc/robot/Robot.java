@@ -4,34 +4,61 @@
 
 package frc.robot;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import edu.wpi.first.wpilibj.RobotController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.SwerveDrive;
 
 public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
-//
-  private FortissiMOEContainer m_robotContainer; //= new FortissiMOEContainer();;
-//  private SwerveBotContainer m_robotContainer;
+  /**
+   * Set this to true before a competition weekend
+   */
+  public static final boolean IS_COMPETITION = false;
 
+  private Command m_autonomousCommand;
+  private RobotContainer m_robotContainer;
+  
+  private RobotContainer selectRobot() {
+    // Competition override
+    if (IS_COMPETITION)
+      return new FortissiMOEContainer();
+    // Try to read from USB
+    try {
+      Path robotFile = Paths.get("/u/robot.txt").toRealPath();
+      var robotName = Files.readString(robotFile);
+      var rc = RobotContainer.forName(robotName);
+      if (rc.isPresent())
+        return rc.get();
+    } catch (IOException | NullPointerException ex) {
+      // ignored
+    }
+    // Try to load from RoboRIO firmware
+    var rc = RobotContainer.forName(RobotController.getComments());
+    // By default, we select Fortissimoe
+    return rc.orElseGet(FortissiMOEContainer::new);
+  }
   private void initRobotContainer(boolean force) {
     if (m_robotContainer != null)
       return;
     if (force || DriverStation.getAlliance().isPresent())
-//      m_robotContainer = new SwerveBotContainer();
-      m_robotContainer = new FortissiMOEContainer();
+      m_robotContainer = selectRobot();
   }
 
   @Override
   public void robotInit() {
+    if (m_robotContainer == null)
+      m_robotContainer = selectRobot();
 //    m_robotContainer = new FortissiMOEContainer();
     initRobotContainer(false);
-
   }
 
 

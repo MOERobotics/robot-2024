@@ -36,8 +36,7 @@ import java.util.Set;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class FortissiMOEContainer{
-
+public class FortissiMOEContainer extends RobotContainer {
     public Climber climber = new Climber(
             7,
             12,
@@ -262,9 +261,6 @@ public class FortissiMOEContainer{
         collectorSubsystem.setDefaultCommand(collectorCommand);
 
         shooterSubsystem.setDefaultCommand(shooterControl);
-	    // Configure the trigger bindings
-	    configureBindings();
-
 
         SmartDashboard.putData("Scheduler", CommandScheduler.getInstance());
 
@@ -287,10 +283,8 @@ public class FortissiMOEContainer{
         SmartDashboard.putData("chooser", m_chooser);
     }
 
-
-    private void configureBindings() {
-
-
+    @Override
+    protected void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
         // zero heading
 
@@ -371,9 +365,9 @@ public class FortissiMOEContainer{
 
     }
 
+    @Override
     public Command getAutonomousCommand() {
         return m_chooser.getSelected();
-        // return Autos.exampleAuto(m_drive);
     }
     public Command resetArmPos(){
         return Commands.runOnce(()->armSubsystem.setState(armSubsystem.shoulderState().getDegrees(), armSubsystem.wristState().getDegrees()));

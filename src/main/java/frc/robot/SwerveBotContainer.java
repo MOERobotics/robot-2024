@@ -38,10 +38,8 @@ import java.util.ArrayList;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class SwerveBotContainer {
-
+public class SwerveBotContainer extends RobotContainer {
     // public Solenoid shooter;
-
 
     public DigitalOutput shooter;
 
@@ -165,8 +163,8 @@ public class SwerveBotContainer {
                 () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(90))));
     }
 
-
-    private void configureBindings() {
+    @Override
+    protected void configureBindings() {
         new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
         var loop = CommandScheduler.getInstance().getDefaultButtonLoop();
             new Trigger(funcOpJoystick.axisGreaterThan(3, 0.8, loop))
