@@ -23,9 +23,8 @@ public class DriveToNoteCommand extends Command {
     private final Supplier<Double> xspdFunction,yspdFunction,turnspdFunction;
     private final DoubleConsumer rumbleCallback;
 	private final double maxMPS;
-
-    private Translation2d target = null;
-    private int idleLoopCount = 0;
+	private Timer timer;
+	private Translation2d targetRel = null;
     private final double Latency = 0.25;//Pose latency in seconds
 
     public DriveToNoteCommand(SwerveDrive subsystem, Vision vision, Supplier<Double> xspeed, Supplier<Double> yspeed,
@@ -46,23 +45,30 @@ public class DriveToNoteCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        this.target = null;
-        idleLoopCount = 0;
+        this.targetRel = null;
+		timer.reset();
     }
 
     private void updateTarget() {
         var robotPose = subsystem.getBufferedPose(Timer.getFPGATimestamp()-Latency);
         var detectionMaxThreshold = Double.POSITIVE_INFINITY;
-        if (target != null) {
-            detectionMaxThreshold = robotPose.getTranslation().getDistance(target) + Units.feetToMeters(2);
+        if (targetRel != null) {
+            detectionMaxThreshold = targetRel.getNorm() + Units.feetToMeters(2);
         }
 
         var detections = vision.detections();
+		if(detections.isEmpty()){
+			if(timer.get()>1) {
+				detectionMaxThreshold = Double.POSITIVE_INFINITY;
+				targetRel = null;
+			}
+		}else{
+			timer.reset();
+		}
         for (var detection : detections){
             var distance = detection.getNorm();
             if (distance < detectionMaxThreshold){
-                var detectionFieldCoord = robotPose.transformBy(new Transform2d(detection, new Rotation2d())).getTranslation();
-                target = detectionFieldCoord;
+				targetRel=detection;
                 detectionMaxThreshold = distance;
             }
         }
@@ -72,7 +78,8 @@ public class DriveToNoteCommand extends Command {
     @Override
     public void execute() {
         updateTarget();
-        if (target == null){
+        if (targetRel == null){
+			subsystem.setDesiredYaw(subsystem.getEstimatedPose().getRotation().getDegrees());
 //            idleLoopCount += 1;
 //
 //            if (idleLoopCount >= 5 && rumbleCallback != null){
@@ -82,15 +89,11 @@ public class DriveToNoteCommand extends Command {
             return;
         }
         // Put the detection on NetworkTables, for debugging
-        subsystem.field.getObject("NoteTarget").setPose(new Pose2d(target, new Rotation2d()));
+        subsystem.field.getObject("NoteTarget").setPose(new Pose2d(subsystem.getBufferedPose(Timer.getFPGATimestamp()).getTranslation().plus(targetRel), new Rotation2d()));
         // Drive towards target
         var robotPose = subsystem.getEstimatedPose();
-        var delta = target.minus(robotPose.getTranslation());
-
-        var unitDelta = delta.div(delta.getNorm());//.times(speedSupplier.getAsDouble());
-
-        var robotAngle = unitDelta.getAngle();
-        if (delta.getNorm() <= Units.inchesToMeters(24)) robotAngle = robotPose.getRotation().times(1);
+		var robotAngle = targetRel.getAngle().plus(robotPose.getRotation());
+        if (targetRel.getNorm() <= Units.inchesToMeters(24)) robotAngle = robotPose.getRotation().times(1);
 		SmartDashboard.putNumber("robot Object Detection angle", robotAngle.getDegrees());
        // var yawOffset = subsystem.getRotation2d().minus(robotPose.getRotation());
         subsystem.setDesiredYaw(robotAngle.getDegrees());//Set absolute heading
