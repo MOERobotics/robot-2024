@@ -116,7 +116,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public double getYawCorrection(){
-        return driveThetaController.calculate(getYaw()-desiredYaw);
+        return driveThetaController.calculate(getOdomOnlyPose().getRotation().getDegrees()-desiredYaw);
     }
 
     public double getYaw(){
@@ -161,7 +161,7 @@ public class SwerveDrive extends SubsystemBase {
         SmartDashboard.putNumber("desired yaw", getDesiredYaw());
         odometer.update(getRotation2d(), getModulePositions());
         field.getObject("odom").setPose(odometer.getPoseMeters());
-//        vision.setOdometryPosition(odometer.getPoseMeters());
+        vision.setOdometryPosition(odometer.getPoseMeters());
         SmartDashboard.putNumber("Rotation",getEstimatedPose().getRotation().getDegrees());
         swerveDrivePoseEstimator.update(getRotation2d(), getModulePositions());
         var aprilTagVal = vision.getAprilTagPose();
@@ -242,8 +242,8 @@ public class SwerveDrive extends SubsystemBase {
         SwerveControllerCommand trajCommand = new SwerveControllerCommand(
                 trajectory,
 //                vision::getRobotPosition,
-//                this::getEstimatedPose,
-                this::getOdomOnlyPose,
+                this::getEstimatedPose,
+//                this::getOdomOnlyPose,
                 kDriveKinematics,
                 xController,
                 yController,

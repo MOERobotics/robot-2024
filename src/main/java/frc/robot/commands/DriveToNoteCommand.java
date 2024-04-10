@@ -23,9 +23,9 @@ public class DriveToNoteCommand extends Command {
     private final Supplier<Double> xspdFunction,yspdFunction,turnspdFunction;
     private final DoubleConsumer rumbleCallback;
 	private final double maxMPS;
+	private Timer timer;
 
     private Translation2d target = null;
-    private int idleLoopCount = 0;
     private final double Latency = 0.25;//Pose latency in seconds
 
     public DriveToNoteCommand(SwerveDrive subsystem, Vision vision, Supplier<Double> xspeed, Supplier<Double> yspeed,
@@ -41,13 +41,14 @@ public class DriveToNoteCommand extends Command {
         this.subsystem = subsystem;
         this.rumbleCallback = rumbleCallback;
 		this.maxMPS=maxMPS;
+		timer = new Timer();
         addRequirements(subsystem);
     }
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
         this.target = null;
-        idleLoopCount = 0;
+		timer.reset();
     }
 
     private void updateTarget() {
@@ -58,6 +59,14 @@ public class DriveToNoteCommand extends Command {
         }
 
         var detections = vision.detections();
+		if(detections.isEmpty()){
+			if(timer.get()>1) {//TODO: Update this value
+				detectionMaxThreshold = Double.POSITIVE_INFINITY;
+				target = null;
+			}
+		}else{
+			timer.reset();
+		}
         for (var detection : detections){
             var distance = detection.getNorm();
             if (distance < detectionMaxThreshold){
@@ -73,6 +82,7 @@ public class DriveToNoteCommand extends Command {
     public void execute() {
         updateTarget();
         if (target == null){
+			subsystem.setDesiredYaw(subsystem.getEstimatedPose().getRotation().getDegrees());
 //            idleLoopCount += 1;
 //
 //            if (idleLoopCount >= 5 && rumbleCallback != null){
@@ -86,7 +96,6 @@ public class DriveToNoteCommand extends Command {
         // Drive towards target
         var robotPose = subsystem.getEstimatedPose();
         var delta = target.minus(robotPose.getTranslation());
-
         var unitDelta = delta.div(delta.getNorm());//.times(speedSupplier.getAsDouble());
 
         var robotAngle = unitDelta.getAngle();
