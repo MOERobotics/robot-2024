@@ -74,7 +74,7 @@ public class FortissiMOEContainer{
     double maxRPS =  1.5*2*Math.PI;
     double maxRPS2 = Math.PI;
 
-    double maxMPSSquared = 2;
+    double maxMPSSquared = 3;
 
     Vision vision = new Vision();
     private final SendableChooser<Command> m_chooser = new SendableChooser<>();

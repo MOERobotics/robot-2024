@@ -22,9 +22,11 @@ public class Robot extends TimedRobot {
   private void initRobotContainer(boolean force) {
     if (m_robotContainer != null)
       return;
-    if (force || DriverStation.getAlliance().isPresent())
+    if (force || DriverStation.getAlliance().isPresent()) {
 //      m_robotContainer = new SwerveBotContainer();
-      m_robotContainer = new FortissiMOEContainer();
+        m_robotContainer = new FortissiMOEContainer();
+        m_robotContainer.climber.clearStickyFaults();
+    }
   }
 
   @Override
