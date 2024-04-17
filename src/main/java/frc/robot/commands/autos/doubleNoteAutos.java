@@ -321,22 +321,25 @@ public class doubleNoteAutos {
 
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
-                Commands.defer(()->armSubsystem.goToPoint(Rotation2d.fromDegrees(135), Rotation2d.fromDegrees(-35)), Set.of(armSubsystem)),
-                Commands.defer(()->armSubsystem.goToPoint(Constants.collectorShoulder, Constants.collectorWrist), Set.of(armSubsystem)),
+                Commands.defer(()->armSubsystem.goToPoint(Constants.collectorShoulder, Constants.collectorWrist), Set.of(armSubsystem)).andThen(Commands.waitSeconds(.15)),
                 Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
-                Commands.race(Commands.parallel(trajCommand.andThen(()->swerveDrive.stopModules()),collectNote.withTimeout(5)), Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
-                //goes to point C5
+                Commands.race(Commands.parallel(trajCommand.andThen(()->swerveDrive.stopModules()), collectNote),
+                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(4),
+                Commands.runOnce(()->swerveDrive.stopModules()),//goes to point C5
                 Commands.race(headingCorrect.andThen(()-> swerveDrive.stopModules()),Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(passNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))), //heading correct and spit back
                 Commands.race(headingCorrectCollect.andThen(()-> swerveDrive.stopModules()),Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))), //swap back to 90
-                Commands.race(Commands.parallel(trajCommand2.andThen(()->swerveDrive.stopModules()),collectAnotherNote.withTimeout(2)), Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
-                 //goes to point C4
-                Commands.race(Commands.parallel(trajCommand3.andThen(()->swerveDrive.stopModules())), Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
-                Commands.race(headingCorrect2.andThen(()-> swerveDrive.stopModules()),Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(Commands.parallel(trajCommand2.andThen(()->swerveDrive.stopModules()), collectAnotherNote),
+                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(2),
+                Commands.runOnce(()->swerveDrive.stopModules()), //goes to point C4
+                Commands.race(Commands.parallel(trajCommand3.andThen(()->swerveDrive.stopModules())),
+                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(2),
+                Commands.runOnce(()->swerveDrive.stopModules()),Commands.race(headingCorrect2.andThen(()-> swerveDrive.stopModules()),Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(passAnotherNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))), //spit out and then reorient to collect
                 Commands.race(headingCorrectCollect2.andThen(()-> swerveDrive.stopModules()),Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
-                Commands.race(Commands.parallel(trajCommand4.andThen(()->swerveDrive.stopModules()),collectLastNote), Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState())))
-                );
+                Commands.race(Commands.parallel(trajCommand4.andThen(()->swerveDrive.stopModules()), collectLastNote),
+                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(2),
+                Commands.runOnce(()->swerveDrive.stopModules()));
     }
     public Command DoubleNoteAuto3(){//TODO: Fix coordinates, create actual shoot and collect commands
 
