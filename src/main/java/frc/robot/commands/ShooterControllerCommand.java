@@ -26,8 +26,8 @@ public class ShooterControllerCommand extends Command {
      */
     public ShooterControllerCommand(ShooterSubsystem subsystem, Supplier <Double> desShoulder, Supplier<Boolean> on) {
         this.subsystem = subsystem;
-        this.shooterSpeedTop = 5000;
-        this.shooterSpeedBottom = 5000;
+        this.shooterSpeedTop = 3500;
+        this.shooterSpeedBottom = 3500;
         this.desShoulder = desShoulder;
         onoff = on;
         onState = 0;

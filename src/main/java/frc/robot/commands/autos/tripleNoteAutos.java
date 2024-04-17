@@ -339,8 +339,8 @@ public class tripleNoteAutos {
         Rotation2d endRotation1 = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote3));
         Pose2d endPose1 = new Pose2d(UsefulPoints.Points.WingedNote3, endRotation1);
 
-        Rotation2d startRotation2 = new Rotation2d(swerveDrive.getYaw());
-        Pose2d startPose2 = new Pose2d(UsefulPoints.Points.WingedNote3, startRotation2);
+//        Rotation2d startRotation2 = new Rotation2d(swerveDrive.getYaw());
+        Pose2d startPose2 = new Pose2d(UsefulPoints.Points.WingedNote3, endRotation1);
 
         Rotation2d endRotation2 = (swerveDrive.getAngleBetweenSpeaker(UsefulPoints.Points.WingedNote2));
         Pose2d endPose2 = new Pose2d(UsefulPoints.Points.WingedNote2, endRotation2);

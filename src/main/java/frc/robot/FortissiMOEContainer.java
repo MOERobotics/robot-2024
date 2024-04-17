@@ -360,11 +360,15 @@ public class FortissiMOEContainer{
         var driveToNote = new DriveToNoteCommand(
                 swerveSubsystem,
                 vision,
-                () -> Math.max(0, Math.hypot(driverJoystick.getRawAxis(0), driverJoystick.getRawAxis(1))-.05)*(maxMPS),
+//                () -> Math.max(0, Math.hypot(driverJoystick.getRawAxis(0), driverJoystick.getRawAxis(1))-.05)*(maxMPS),
+		        () -> -driverJoystick.getRawAxis(1),
+		        () -> -driverJoystick.getRawAxis(0),
+		        () -> -driverJoystick.getRawAxis(2),
                 (rumblePercent) -> {
                     SmartDashboard.putNumber("JoyRumble", rumblePercent);
                     driverJoystick.setRumble(PS5Controller.RumbleType.kBothRumble, rumblePercent); //TODO: try different rumble types.
-                }
+                },
+		        maxMPS
         );
         new JoystickButton(driverJoystick, 8).whileTrue(driveToNote);
         // object detection note pickup button
