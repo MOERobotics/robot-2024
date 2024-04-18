@@ -20,6 +20,9 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.IntegerSubscriber;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -61,6 +64,7 @@ public class SwerveDrive extends SubsystemBase {
     public final Field2d field = new Field2d();
     SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 	private TimeInterpolatableBuffer<Pose2d> BufferedPose;
+    private final IntegerSubscriber pingSubscriber = NetworkTableInstance.getDefault().getTable("moenet").getIntegerTopic("client_ping").subscribe(0, PubSubOption.keepDuplicates(true));
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
                        WPI_Pigeon2 pigeon, double maxMPSAuto, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
                        double kP, double kI, double kD,
@@ -170,6 +174,13 @@ public class SwerveDrive extends SubsystemBase {
             var dist = getEstimatedPose().getTranslation().getDistance(aprilTagVal.get().pose.getTranslation());
             swerveDrivePoseEstimator.addVisionMeasurement(aprilTagVal.get().pose, aprilTagVal.get().timestamp-0.1,
                     VecBuilder.fill(5e-2,5e-2,10));
+        }
+
+        var ping = pingSubscriber.getAtomic();
+        if (ping.timestamp == 0 || (Timer.getFPGATimestamp() - (ping.timestamp / 1e6)) > 1) {
+            SmartDashboard.putBoolean("Object camera", false);
+        } else {
+            SmartDashboard.putBoolean("Object camera", true);
         }
 
         field.setRobotPose(swerveDrivePoseEstimator.getEstimatedPosition());
