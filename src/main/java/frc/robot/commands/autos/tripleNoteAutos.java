@@ -15,10 +15,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.AllianceFlip;
 import frc.robot.Constants;
 import frc.robot.UsefulPoints;
-import frc.robot.commands.Collect;
-import frc.robot.commands.DriveToNoteCommand;
-import frc.robot.commands.setHeading;
-import frc.robot.commands.shootSpeakerCommand;
+import frc.robot.commands.*;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.CollectorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -221,12 +218,17 @@ public class tripleNoteAutos {
                 Commands.race(
                         Commands.parallel(
                                 trajCommand.andThen(()->swerveDrive.stopModules()),
-                                collectNote
+                                new Intake(collector, 0.35)
                         ),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))
                 ).withTimeout(2),
                 Commands.runOnce(()->swerveDrive.stopModules()),
-                Commands.race(trajCommand2.andThen(()->swerveDrive.stopModules()),
+                Commands.deadline(
+                        trajCommand2.andThen(()->swerveDrive.stopModules()),
+                        Commands.sequence(
+                                new Intake(collector, 0.35),
+
+                        ),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.race(shootAnotherNote, Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
