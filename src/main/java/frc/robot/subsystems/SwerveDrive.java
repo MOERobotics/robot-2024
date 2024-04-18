@@ -168,7 +168,7 @@ public class SwerveDrive extends SubsystemBase {
         if (aprilTagVal.isPresent()) {
             SmartDashboard.putNumber("timeStamp", aprilTagVal.get().timestamp);
             var dist = getEstimatedPose().getTranslation().getDistance(aprilTagVal.get().pose.getTranslation());
-            swerveDrivePoseEstimator.addVisionMeasurement(aprilTagVal.get().pose, aprilTagVal.get().timestamp,
+            swerveDrivePoseEstimator.addVisionMeasurement(aprilTagVal.get().pose, aprilTagVal.get().timestamp-0.1,
                     VecBuilder.fill(5e-2,5e-2,10));
         }
 

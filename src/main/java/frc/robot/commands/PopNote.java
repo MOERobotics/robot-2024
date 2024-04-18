@@ -7,6 +7,8 @@ import frc.robot.subsystems.CollectorSubsystem;
 
 public class PopNote extends Command {
     private final double speed;
+    private Timer timer;
+
     private CollectorSubsystem collector;
     public PopNote(CollectorSubsystem collector, double speed){
         this.collector=collector;
@@ -18,19 +20,14 @@ public class PopNote extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        timer.restart();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double finalSpeed = 0;
-        if(speed<0){
-            finalSpeed=speed;
-        }
-        if (collector.isCollected() && timer.get() <= .1 && speed > 0){
-            shouldStop = true;
-            finalSpeed = -speed;
-        }
+        double finalSpeed = -speed;
+        collector.updateCollectorSpeed(finalSpeed);
         SmartDashboard.putBoolean("started collector", collector.getCollectorState());
         SmartDashboard.putNumber("collector speed", finalSpeed);
     }
@@ -44,9 +41,10 @@ public class PopNote extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if(collector.isCollected()){
+        if(timer.get() >= .1 || !collector.isCollected()){
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 }
