@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.pathfinding.LocalADStar;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,7 +34,8 @@ public class Robot extends TimedRobot {
   public void robotInit() {
 //    m_robotContainer = new FortissiMOEContainer();
     initRobotContainer(false);
-
+      DataLogManager.start();
+      DriverStation.startDataLog(DataLogManager.getLog());
   }
 
 

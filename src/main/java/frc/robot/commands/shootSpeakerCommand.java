@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.CollectorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -35,7 +36,7 @@ public class shootSpeakerCommand extends Command {
         shot = false;
     }
 	public shootSpeakerCommand(ShooterSubsystem shooterSubsystem,CollectorSubsystem collectorSubsystem) {
-		this(shooterSubsystem,collectorSubsystem,3000);
+		this(shooterSubsystem,collectorSubsystem, Constants.subShotSpeed);
 	}
     //TODO: Calculate shooter speeds based on odometry.
 

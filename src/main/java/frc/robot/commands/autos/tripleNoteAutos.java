@@ -29,6 +29,7 @@ import javax.xml.crypto.dsig.TransformService;
 import java.util.ArrayList;
 import java.util.Set;
 
+@SuppressWarnings("UnnecessaryLocalVariable")
 public class tripleNoteAutos {
 
     private SwerveDrive swerveDrive;
@@ -138,7 +139,7 @@ public class tripleNoteAutos {
         );
     }
 
-    public Command CW1W2W3(){//TODO: Fix coordinates, create actual shoot and collect commands
+    public Command CW1W2W3(){
         //go to W1 collect; go to B; shoot; W2 collect; go to D; shoot
         //traj 1
         Rotation2d startRotation = new Rotation2d(0);
@@ -214,10 +215,16 @@ public class tripleNoteAutos {
 
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
+                Commands.runOnce(()->shooter.setShooterSpeeds(Constants.subShotSpeed,Constants.subShotSpeed)),
                 Commands.defer(()->armSubsystem.goToPoint(Constants.collectorShoulder, Constants.collectorWrist), Set.of(armSubsystem)).andThen(Commands.waitSeconds(.15)),
-                Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
-                Commands.race(Commands.parallel(trajCommand.andThen(()->swerveDrive.stopModules()), collectNote),
-                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(2),
+                Commands.race(Commands.waitSeconds(.2).andThen(shootNote),Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(
+                        Commands.parallel(
+                                trajCommand.andThen(()->swerveDrive.stopModules()),
+                                collectNote
+                        ),
+                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))
+                ).withTimeout(2),
                 Commands.runOnce(()->swerveDrive.stopModules()),
                 Commands.race(trajCommand2.andThen(()->swerveDrive.stopModules()),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
@@ -302,7 +309,7 @@ public class tripleNoteAutos {
         Command trajCommand3 = swerveDrive.generateTrajectory(startPose3,endPose3,internalPoints3,0,0);
         Command trajCommand4 = swerveDrive.generateTrajectory(startPose4,endPose4,internalPoints4,0,0);
         Command shootNote = new shootSpeakerCommand(shooter,collector);
-        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector, 3000);
         Command shootLastNote = new shootSpeakerCommand(shooter, collector);
 
         Command collectNote = new Collect(collector,0.4,false);
@@ -312,8 +319,9 @@ public class tripleNoteAutos {
         Command headingCorrect4 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation4));
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
+                Commands.runOnce(()->shooter.setShooterSpeeds(Constants.subShotSpeed,Constants.subShotSpeed)),
                 Commands.defer(()->armSubsystem.goToPoint(Constants.collectorShoulder, Constants.collectorWrist), Set.of(armSubsystem)).andThen(Commands.waitSeconds(.15)),
-                Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(Commands.waitSeconds(.2).andThen(shootNote),Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(Commands.parallel(trajCommand.andThen(()->swerveDrive.stopModules()), collectNote),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(6),
                 Commands.runOnce(()->swerveDrive.stopModules()),
@@ -366,7 +374,7 @@ public class tripleNoteAutos {
         Command trajCommand = swerveDrive.generateTrajectoryQuintic(trajOnePoses,0,0);
         Command trajCommand2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints2,0,0);
         Command shootNote = new shootSpeakerCommand(shooter,collector);
-        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
+        Command shootAnotherNote = new shootSpeakerCommand(shooter,collector, 3000);
 
         Command collectNote = new Collect(collector,0.4,false);
 
@@ -386,8 +394,9 @@ public class tripleNoteAutos {
 
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
+                Commands.runOnce(()->shooter.setShooterSpeeds(Constants.subShotSpeed,Constants.subShotSpeed)),
                 Commands.defer(()->armSubsystem.goToPoint(Constants.collectorShoulder, Constants.collectorWrist), Set.of(armSubsystem)).andThen(Commands.waitSeconds(.15)),
-                Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(Commands.waitSeconds(.2).andThen(shootNote),Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
                 Commands.race(Commands.parallel(trajCommand.andThen(driveToNote.withTimeout(2))
                         .andThen(()->swerveDrive.stopModules()), collectNote),
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(6),

@@ -39,10 +39,11 @@ public class Collect extends Command {
         if(speed<0){
             finalSpeed=speed;
         }
-        if (!shouldStop && speed>0 && ((index&&collector.isCollected())||!collector.isCollected())) { //collector in no note
+        if (!shouldStop && speed>0 && ((index&&collector.isCollected())||!collector.isCollected())) { //collecting in, we have no note
             finalSpeed = speed;
             timer.restart();
         }
+        // Run backwards for a bit
         if (collector.isCollected() && timer.get() <= .1 && speed > 0){
             shouldStop = true;
             finalSpeed = -speed;

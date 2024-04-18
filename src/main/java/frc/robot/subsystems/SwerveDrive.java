@@ -223,7 +223,6 @@ public class SwerveDrive extends SubsystemBase {
                 this
         );
         return Commands.parallel(
-
                 Commands.runOnce(() -> field.getObject("traj").setTrajectory(trajectory)),
                 trajCommand
         );
