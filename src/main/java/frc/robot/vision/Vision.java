@@ -65,7 +65,7 @@ public class Vision {
     }
 
     public List<Translation2d> detections(){
-        ArrayList<Translation2d> dets = new ArrayList<>();
+        List<Translation2d> dets = new ArrayList<>();
         var entry = subNotes.getAtomic();
         if (entry.timestamp > oldDetTime && entry.value.length %3 == 0){
             oldDetTime = entry.timestamp;

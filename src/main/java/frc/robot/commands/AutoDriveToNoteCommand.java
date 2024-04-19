@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -55,7 +56,10 @@ public class AutoDriveToNoteCommand extends Command {
         updateTarget();
         if (target == null){
             idleLoopCount += 1;
+            return;
         }
+        // Put the detection on NetworkTables, for debugging
+        subsystem.field.getObject("NoteTarget").setPose(new Pose2d(target, new Rotation2d()));
         // Drive towards target
         var robotPose = subsystem.getEstimatedPose();
         var delta = target.minus(robotPose.getTranslation());

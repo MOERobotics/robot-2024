@@ -341,6 +341,103 @@ public class doubleNoteAutos {
                         Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(2),
                 Commands.runOnce(()->swerveDrive.stopModules()));
     }
+    public Command DC5C4PassC3ObjDet(){
+        Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointD, UsefulPoints.Points.RotationOfStartingPointD);
+        Pose2d endPose = new Pose2d(UsefulPoints.Points.CenterNote5,Rotation2d.fromDegrees(0));
+        Pose2d startPose2 = new Pose2d(endPose.getTranslation(),Rotation2d.fromDegrees(90));
+        Pose2d endPose2 = new Pose2d(UsefulPoints.Points.CenterNote4,Rotation2d.fromDegrees(90));
+        Pose2d startPose3 = new Pose2d(endPose2.getTranslation(),Rotation2d.fromDegrees(90));
+        Pose2d endPose3 = new Pose2d(UsefulPoints.Points.CenterNote5,Rotation2d.fromDegrees(-25));
+        Pose2d startPose4 = new Pose2d(endPose3.getTranslation(),Rotation2d.fromDegrees(90));
+        Pose2d endPose4 = new Pose2d(UsefulPoints.Points.CenterNote3,Rotation2d.fromDegrees(90));
+        Pose2d startPose5 = new Pose2d(endPose4.getTranslation(),Rotation2d.fromDegrees(90));
+        Pose2d endPose5 = new Pose2d(UsefulPoints.Points.CenterNote5,Rotation2d.fromDegrees(-25));
+
+        ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
+        Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints,0,0);
+        Command trajCommand2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints,0,0);
+        Command trajCommand3 = swerveDrive.generateTrajectory(startPose3,endPose3,internalPoints,0,0);
+        Command trajCommand4 = swerveDrive.generateTrajectory(startPose4,endPose4,internalPoints,0,0);
+
+        Command shootNote = new shootSpeakerCommand(shooter,collector);
+        Command passNote = new NoteFeed(shooter,collector,()->1800);
+        Command passAnotherNote = new NoteFeed(shooter,collector,()->1800);
+        Command collectNote = new Collect(collector,.4,false);
+        Command collectAnotherNote = new Collect(collector,.4,false);
+        Command collectLastNote = new Collect(collector,.4,false);
+        Command headingCorrect = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()->AllianceFlip.apply(Rotation2d.fromDegrees(-25)));
+        Command headingCorrectCollect = new setHeading(swerveDrive,()->0.0,()->0.0,()->AllianceFlip.apply(Rotation2d.fromDegrees(90)));
+        Command headingCorrect2 = new setHeading(swerveDrive,()->0.0,()->0.0,()->AllianceFlip.apply(Rotation2d.fromDegrees(-25)));
+        Command headingCorrectCollect2 = new setHeading(swerveDrive,()->0.0,()->0.0,()->AllianceFlip.apply(Rotation2d.fromDegrees(90)));
+        Command headingCorrect3 = new setHeading(swerveDrive,()->0.0,()->0.0,()->AllianceFlip.apply(Rotation2d.fromDegrees(180)));
+
+        var driveToNote = new DriveToNoteCommand(
+                swerveDrive,
+                vision,
+//                () -> Math.max(0, Math.hypot(driverJoystick.getRawAxis(0), driverJoystick.getRawAxis(1))-.05)*(maxMPS),
+                () -> 1.0,
+                () -> 0.0,
+                () -> 0.0,
+                (rumblePercent) -> {
+                    SmartDashboard.putNumber("JoyRumble", rumblePercent);
+                    //driverJoystick.setRumble(PS5Controller.RumbleType.kBothRumble, rumblePercent); //TODO: try different rumble types.
+                },
+                .56
+        );
+        var driveToNoteAgain = new DriveToNoteCommand(
+                swerveDrive,
+                vision,
+//                () -> Math.max(0, Math.hypot(driverJoystick.getRawAxis(0), driverJoystick.getRawAxis(1))-.05)*(maxMPS),
+                () -> 1.0,
+                () -> 0.0,
+                () -> 0.0,
+                (rumblePercent) -> {
+                    SmartDashboard.putNumber("JoyRumble", rumblePercent);
+                    //driverJoystick.setRumble(PS5Controller.RumbleType.kBothRumble, rumblePercent); //TODO: try different rumble types.
+                },
+                .56
+        );
+
+        var driveToLastNote = new DriveToNoteCommand(
+                swerveDrive,
+                vision,
+//                () -> Math.max(0, Math.hypot(driverJoystick.getRawAxis(0), driverJoystick.getRawAxis(1))-.05)*(maxMPS),
+                () -> 1.0,
+                () -> 0.0,
+                () -> 0.0,
+                (rumblePercent) -> {
+                    SmartDashboard.putNumber("JoyRumble", rumblePercent);
+                    //driverJoystick.setRumble(PS5Controller.RumbleType.kBothRumble, rumblePercent); //TODO: try different rumble types.
+                },
+                .56
+        );
+
+
+        return Commands.sequence(
+                swerveDrive.setInitPosition(startPose),
+                Commands.defer(()->armSubsystem.goToPoint(Constants.collectorShoulder, Constants.collectorWrist), Set.of(armSubsystem)).andThen(Commands.waitSeconds(.15)),
+                Commands.race(shootNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(Commands.parallel(trajCommand.andThen(driveToNote.withTimeout(2))
+                                .andThen(()->swerveDrive.stopModules()), collectNote),
+                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(6),
+                Commands.runOnce(()->swerveDrive.stopModules()),//goes to point C5
+                Commands.race(headingCorrect.andThen(()-> swerveDrive.stopModules()),Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(passNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))), //heading correct and spit back
+                Commands.race(headingCorrectCollect.andThen(()-> swerveDrive.stopModules()),Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))), //swap back to 90
+                Commands.race(Commands.parallel(trajCommand2.andThen(driveToNoteAgain.withTimeout(2))
+                                .andThen(()->swerveDrive.stopModules()), collectNote),
+                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(6),
+                Commands.runOnce(()->swerveDrive.stopModules()), //goes to point C4
+                Commands.race(Commands.parallel(trajCommand3.andThen(()->swerveDrive.stopModules())),
+                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(2),
+                Commands.runOnce(()->swerveDrive.stopModules()),Commands.race(headingCorrect2.andThen(()-> swerveDrive.stopModules()),Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(passAnotherNote,Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))), //spit out and then reorient to collect
+                Commands.race(headingCorrectCollect2.andThen(()-> swerveDrive.stopModules()),Commands.run(()-> armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))),
+                Commands.race(Commands.parallel(trajCommand4.andThen(driveToLastNote.withTimeout(2))
+                                .andThen(()->swerveDrive.stopModules()), collectNote),
+                        Commands.run(()->armSubsystem.holdPos(armSubsystem.getShoulderDesState(), armSubsystem.getWristDesState()))).withTimeout(6),
+                Commands.runOnce(()->swerveDrive.stopModules()));
+    }
     public Command DoubleNoteAuto3(){//TODO: Fix coordinates, create actual shoot and collect commands
 
         Rotation2d startRotation = new Rotation2d(0);
