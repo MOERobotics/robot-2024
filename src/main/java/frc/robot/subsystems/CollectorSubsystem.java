@@ -46,6 +46,9 @@ public class CollectorSubsystem extends SubsystemBase {
         }
     }
 
+    public double getCollectorAmps(){
+        return collector.getOutputCurrent();
+    }
 
     public Command runCollectorForAuto(final double speed) {
         Command cmd = Commands.run(() -> updateCollectorSpeed(speed));
