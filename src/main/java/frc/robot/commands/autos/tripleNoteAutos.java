@@ -87,24 +87,16 @@ public class tripleNoteAutos {
         Rotation2d endRotation4= endRotation2;
         Pose2d endPose4 = new Pose2d(endTranslation4, endRotation4); //W1 to start C
 
-        Translation2d endTranslation5 = new Translation2d(UsefulPoints.Points.WingedNote3.getX()-Units.inchesToMeters(19),UsefulPoints.Points.WingedNote3.getY()-Units.inchesToMeters(3));
-        Rotation2d endRotation5 = (swerveDrive.getAngleBetweenSpeaker(endTranslation));
-        Rotation2d startRotation5 = endRotation4;
-        Pose2d startPose5 = new Pose2d(endPose4.getTranslation(), startRotation5);
-        Pose2d endPose5 = new Pose2d(endTranslation5, endRotation5);// start C to W3
-
         ArrayList<Translation2d> internalPoints = new ArrayList<Translation2d>();
         ArrayList<Translation2d> internalPoints2 = new ArrayList<>();
         ArrayList<Translation2d> internalPoints3 = new ArrayList<>();
         ArrayList<Translation2d> internalPoints4 = new ArrayList<>();
-        ArrayList<Translation2d> internalPoints5 = new ArrayList<>();
 
 
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints,0,0);
         Command trajCommand2 = swerveDrive.generateTrajectory(startPose2,endPose2,internalPoints2,0,0);
         Command trajCommand3 = swerveDrive.generateTrajectory(startPose3,endPose3,internalPoints3,0,0);
         Command trajCommand4 = swerveDrive.generateTrajectory(startPose4,endPose4,internalPoints4,0,0);
-        Command trajCommand5 = swerveDrive.generateTrajectory(startPose5,endPose5,internalPoints5,0,0);
         Command shootNote = new shootSpeakerCommand(shooter,collector);
         Command shootAnotherNote = new shootSpeakerCommand(shooter,collector);
         Command shootLastNote = new shootSpeakerCommand(shooter, collector);
@@ -112,8 +104,6 @@ public class tripleNoteAutos {
         Command collectNote = new Collect(collector,0.4,false);
         Command collectNote2 = new Collect(collector,0.4,false);
 
-        Command headingCorrect = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation));
-        Command headingCorrect2 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation3));
         Command headingCorrect4 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation4));
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
@@ -204,11 +194,6 @@ public class tripleNoteAutos {
         Command collectNote = new Collect(collector,0.35,false);
         Command collectNote2 = new Collect(collector,0.35,false);
         Command collectNote3 = new Collect(collector,0.35,false);
-
-        Command headingCorrect = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation));
-        Command headingCorrect2 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation3));
-        Command headingCorrect4 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation4));
-        Command headingCorrect6 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation4));
 
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
@@ -306,7 +291,6 @@ public class tripleNoteAutos {
         Command collectNote = new Collect(collector,0.4,false);
         Command collectNote2 = new Collect(collector,0.4,false);
 
-        Command headingCorrect2 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation2));
         Command headingCorrect4 = new setHeading(swerveDrive, ()-> 0.0, ()-> 0.0, ()-> AllianceFlip.apply(endRotation4));
         return Commands.sequence(
                 swerveDrive.setInitPosition(startPose),
@@ -341,7 +325,6 @@ public class tripleNoteAutos {
     public Command DC3ObjDetect(){//TODO: Fix coordinates, create actual shoot and collect commands
         Pose2d startPose = new Pose2d(UsefulPoints.Points.StartingPointD, UsefulPoints.Points.RotationOfStartingPointD);
         Rotation2d endRotation = new Rotation2d(0);
-        Translation2d finTranslation = UsefulPoints.Points.CenterNote3;
         Translation2d endTranslation = new Translation2d(UsefulPoints.Points.CenterNote3.getX()-Units.inchesToMeters(36),
                 UsefulPoints.Points.CenterNote3.getY());
         Pose2d endPose = new Pose2d(endTranslation, endRotation); //goes from start D to C3
@@ -461,7 +444,6 @@ public class tripleNoteAutos {
         Command shootNote2 = new shootSpeakerCommand(shooter,collector);
         Command shootNote3 = new shootSpeakerCommand(shooter,collector);
 
-        Command shootLastNote = new shootSpeakerCommand(shooter, collector);
         Command collectNote = new Collect(collector,.6,false);
         Command collectNote2 = new Collect(collector,.6,false);
 
@@ -504,7 +486,6 @@ public class tripleNoteAutos {
         Command shootNote2 = new shootSpeakerCommand(shooter,collector);
         Command shootNote3 = new shootSpeakerCommand(shooter,collector);
 
-        Command shootLastNote = new shootSpeakerCommand(shooter, collector);
         Command collectNote = new Collect(collector,1,false);
         Command collectNote2 = new Collect(collector,1,false);
 
