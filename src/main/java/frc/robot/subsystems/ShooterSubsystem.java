@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 public class ShooterSubsystem extends SubsystemBase {
 

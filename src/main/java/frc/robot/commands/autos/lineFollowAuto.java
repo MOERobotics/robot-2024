@@ -2,7 +2,6 @@ package frc.robot.commands.autos;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.helpers.LineHelpers;
-import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.SwerveDrive;
 
 public class lineFollowAuto {

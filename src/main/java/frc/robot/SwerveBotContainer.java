@@ -9,10 +9,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -21,16 +19,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.TestClimber;
 import frc.robot.commands.autos.doubleNoteAutos;
-import frc.robot.commands.autos.tripleNoteAutos;
 import frc.robot.commands.setHeading;
-import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.ClimberArm;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.SwerveModule;
-
-import java.util.ArrayList;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

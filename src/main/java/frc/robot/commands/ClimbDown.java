@@ -8,10 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 
 import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-
-import java.util.function.Supplier;
 
 /** An example command that uses an example subsystem. */
 public class ClimbDown extends Command {

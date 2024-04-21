@@ -12,8 +12,6 @@ import frc.robot.helpers.LineHelpers;
 import frc.robot.subsystems.Arm;
 import edu.wpi.first.wpilibj2.command.Command;
 
-import static java.lang.Math.abs;
-
 /** An example command that uses an example subsystem. */
 public class ArmPathFollow extends Command {
     private final Arm armSubsystem;

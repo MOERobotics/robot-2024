@@ -1,13 +1,9 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.internal.DriverStationModeThread;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.SwerveDrive;
 
 import java.util.function.Supplier;
@@ -18,8 +14,6 @@ public class setHeading extends Command {
 
     private SwerveDrive swerveDrive;
     private final Supplier<Double> xspdFunction, yspdFunction;
-
-    private PIDController PID;
 
     public setHeading(SwerveDrive swerveDrive, Supplier<Double> xspeed, Supplier<Double> yspeed, Supplier<Rotation2d> desiredYaw){
 

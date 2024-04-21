@@ -10,8 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import java.util.function.Supplier;
-
 public class CollectorSubsystem extends SubsystemBase {
     private final CANSparkMax collector;
     private final SparkPIDController collectorController;
