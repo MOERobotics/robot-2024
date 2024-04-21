@@ -25,17 +25,17 @@ public final class UsefulPoints {
 
         public static Translation2d StartingPointA = new Translation2d(Units.inchesToMeters(18.6), Units.inchesToMeters(273.1));
         public static Translation2d StartingPointB = new Translation2d(Units.inchesToMeters(25.6), Units.inchesToMeters(265.6)); //60 degrees
-        public static Rotation2d RotationOfStartingPointB = new Rotation2d().fromDegrees(60);
+        public static Rotation2d RotationOfStartingPointB = Rotation2d.fromDegrees(60);
         public static Translation2d StartingPointC = new Translation2d(Units.inchesToMeters(53.1 + 3.125), Units.inchesToMeters(219.6));
         public static Translation2d StartingPointD = new Translation2d(Units.inchesToMeters(25.6), Units.inchesToMeters(170.6));
-        public static Rotation2d RotationOfStartingPointD = new Rotation2d().fromDegrees(-60);
+        public static Rotation2d RotationOfStartingPointD = Rotation2d.fromDegrees(-60);
         public static Translation2d StartingPointE = new Translation2d(Units.inchesToMeters(18.6), Units.inchesToMeters(138.6));
         public static Translation2d StartingPointF = new Translation2d(Units.inchesToMeters(18.6), Units.inchesToMeters(92.6));
 
         public static Translation2d StageEnterTop = new Translation2d(Units.inchesToMeters(158.6),Units.inchesToMeters(216));
-        public static Rotation2d RotationOfStageEnterTop = new Rotation2d().fromDegrees(-120);
+        public static Rotation2d RotationOfStageEnterTop = Rotation2d.fromDegrees(-120);
         public static Translation2d StageEnterBottom = new Translation2d(Units.inchesToMeters(158.6),Units.inchesToMeters(106.6));
-        public static Rotation2d RotationOfStageBottomTop = new Rotation2d().fromDegrees(60);
+        public static Rotation2d RotationOfStageBottomTop = Rotation2d.fromDegrees(60);
 
         public static Translation2d CenterStage = new Translation2d(Units.inchesToMeters(193.6),Units.inchesToMeters(161.6));
         public static Translation2d OutOfStage = new Translation2d(Units.inchesToMeters(258.6),Units.inchesToMeters(161.6));
