@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,7 +12,6 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.vision.Vision;
 
 import java.util.function.DoubleConsumer;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class DriveToNoteCommand extends Command {
@@ -67,14 +65,17 @@ public class DriveToNoteCommand extends Command {
 		}else{
 			timer.reset();
 		}
+        Translation2d localTarget = null;
         for (var detection : detections){
             var distance = detection.getNorm();
             if (distance < detectionMaxThreshold){
                 var detectionFieldCoord = robotPose.transformBy(new Transform2d(detection, new Rotation2d())).getTranslation();
-                target = detectionFieldCoord;
+                if (target == null) localTarget = detectionFieldCoord;
+                else localTarget = target.interpolate(detectionFieldCoord, .5); //TODO: lol what does this mean???
                 detectionMaxThreshold = distance;
             }
         }
+        if (localTarget != null) target = localTarget;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
