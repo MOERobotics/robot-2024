@@ -74,7 +74,7 @@ public class FortissiMOEContainer{
     double maxRPS =  1.5*2*Math.PI;
     double maxRPS2 = Math.PI;
 
-    double maxMPSSquared = 2;
+    double maxMPSSquared = 3;
 
     Vision vision = new Vision();
     private final SendableChooser<Command> m_chooser = new SendableChooser<>();
@@ -223,8 +223,8 @@ public class FortissiMOEContainer{
 
         SmartDashboard.putNumber("Roll", pigeon.getRoll());
         SmartDashboard.putNumber("Pitch", pigeon.getPitch());
-        pdh.setSwitchableChannel((collectorSubsystem.isCollected() && ((System.currentTimeMillis()/100)%2 == 0))
-                ||  (shooterSubsystem.shooterAtSpeed() && shooterSubsystem.getDesiredTopSpeed() != 0 && collectorSubsystem.isCollected()));
+        pdh.setSwitchableChannel(((collectorSubsystem.isCollected() || collectorSubsystem.getCollectorAmps() > 20) && ((System.currentTimeMillis()/100)%2 == 0))
+                ||  (shooterSubsystem.shooterAtSpeed() && shooterSubsystem.getDesiredTopSpeed() != 0 && (collectorSubsystem.isCollected() || collectorSubsystem.getCollectorAmps() > 20)));
     });
     //weirdest command ever - climbing & pdh logic
 
@@ -281,9 +281,10 @@ public class FortissiMOEContainer{
         m_chooser.addOption("D Score Move", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DMoveAuto());
         m_chooser.addOption("D Score Collect (DC5)", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).DC5Auto());
         m_chooser.addOption("4 Note Auto (CW2W1W3)", new tripleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem,collectorSubsystem,0,0).CW1W2W3());
-        m_chooser.addOption("centerLine Auto", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).DC5C4PassC3());
+        m_chooser.addOption("CenterLine Pass Auto (DC5C4PassC3)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).DC5C4PassC3());
         m_chooser.addOption("driveForward", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).rollOutAuto());
         m_chooser.addOption("3 Note Centerline Auto (DC3C2)", new tripleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).DC3C2());
+        m_chooser.addOption("2 Note Centerline Auto Obj Detect", new tripleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DC3ObjDetect());
         SmartDashboard.putData("chooser", m_chooser);
     }
 
@@ -360,11 +361,15 @@ public class FortissiMOEContainer{
         var driveToNote = new DriveToNoteCommand(
                 swerveSubsystem,
                 vision,
-                () -> Math.max(0, Math.hypot(driverJoystick.getRawAxis(0), driverJoystick.getRawAxis(1))-.05)*(maxMPS),
+//                () -> Math.max(0, Math.hypot(driverJoystick.getRawAxis(0), driverJoystick.getRawAxis(1))-.05)*(maxMPS),
+		        () -> -driverJoystick.getRawAxis(1),
+		        () -> -driverJoystick.getRawAxis(0),
+		        () -> -driverJoystick.getRawAxis(2),
                 (rumblePercent) -> {
                     SmartDashboard.putNumber("JoyRumble", rumblePercent);
                     driverJoystick.setRumble(PS5Controller.RumbleType.kBothRumble, rumblePercent); //TODO: try different rumble types.
-                }
+                },
+		        maxMPS
         );
         new JoystickButton(driverJoystick, 8).whileTrue(driveToNote);
         // object detection note pickup button

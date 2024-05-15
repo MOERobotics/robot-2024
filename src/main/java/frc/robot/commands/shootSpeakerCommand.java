@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.CollectorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -14,27 +15,30 @@ import frc.robot.subsystems.ShooterSubsystem;
 public class shootSpeakerCommand extends Command {
     private final ShooterSubsystem shooter;
     private  final CollectorSubsystem collector;
+	private final double speed;
     private Timer timer;
     private boolean shot = false;
     /**
-     * Creates a new ExampleCommand.
+     * Creates a new shootSpeakerCommand.
      *
      * @param shooterSubsystem The shooter subsystem used by this command.
-     * @param collectorSubsystem The collector subsystem used by this command
+     * @param collectorSubsystem The collector subsystem used by this command.
+     * @param speed  The speed in RPM to set the shooter motors to.
      */
-    public shootSpeakerCommand(ShooterSubsystem shooterSubsystem,CollectorSubsystem collectorSubsystem) {
+    public shootSpeakerCommand(ShooterSubsystem shooterSubsystem,CollectorSubsystem collectorSubsystem, double speed) {
         this.shooter = shooterSubsystem;
         this.collector = collectorSubsystem;
+		this.speed=speed;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(shooterSubsystem,collectorSubsystem);
 
         timer = new Timer();
         shot = false;
     }
+	public shootSpeakerCommand(ShooterSubsystem shooterSubsystem,CollectorSubsystem collectorSubsystem) {
+		this(shooterSubsystem,collectorSubsystem, Constants.subShotSpeed);
+	}
     //TODO: Calculate shooter speeds based on odometry.
-    public double speedCalc(){
-        return 3000;
-    }//placeholder value
 
     // Called when the command is initially scheduled.
     @Override
@@ -45,8 +49,8 @@ public class shootSpeakerCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        shooter.setShooterTopSpeed(speedCalc());
-        shooter.setShooterBottomSpeed(speedCalc());
+        shooter.setShooterTopSpeed(speed);
+        shooter.setShooterBottomSpeed(speed);
         if(shooter.shooterAtSpeed() && !shot){
             System.out.println("at speed, let's shoot");
             shot = true;

@@ -39,6 +39,11 @@ public class Climber extends SubsystemBase {
         climberArmLeft.drive(speed);
     }
 
+    public void clearStickyFaults(){
+        climberArmLeft.clearStickyFault();
+        climberArmRight.clearStickyFault();
+    }
+
     public void stopArms(){
         climberArmRight.stop();
         climberArmLeft.stop();

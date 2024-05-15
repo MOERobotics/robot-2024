@@ -111,6 +111,10 @@ public class ClimberArm extends SubsystemBase {
         this.speed=  speed;
     }
 
+    public void clearStickyFault(){
+        climberMotor.clearFaults();
+    }
+
     @Override
     public void periodic() {
         // This method will be called once per scheduler
