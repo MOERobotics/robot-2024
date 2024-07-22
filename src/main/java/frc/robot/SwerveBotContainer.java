@@ -110,14 +110,14 @@ public class SwerveBotContainer {
             pigeon, maxMPS, maxMPS,maxMPSSquared, maxRPS, maxRPSSquared,1,0,0, 1.0, 0, 0,
             .04,0,0);
 
-    private final KrakenDrive krakenDrive = new KrakenDrive(53,driveP,driveI,driveD,driveFF);
+    private final KrakenDrive krakenDrive = new KrakenDrive(52,driveP,driveI,driveD,driveFF);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports
     private final Joystick funcOpJoystick = new Joystick(0);
 
     ////////////////////////////////////////////////////////////////////////////commands
-    private final Command kraken = new KrakenControllerCommand(krakenDrive,()-> driverJoystick.getRawAxis(1));
+    private final Command kraken = new KrakenControllerCommand(krakenDrive,()-> -driverJoystick.getRawAxis(1));
     private final Command drive  = new SwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
@@ -142,14 +142,14 @@ public class SwerveBotContainer {
         pigeon.reset();
 
         krakenDrive.setDefaultCommand(kraken);
-        swerveSubsystem.setDefaultCommand(drive);
-        m_chooser.setDefaultOption("Double Note Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto1());
-        m_chooser.addOption("Double Note Auto 2", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto2());
-        m_chooser.addOption("Double Note Auto 3", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto3());
-        m_chooser.addOption("Double Note Auto 4", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto4());
-        m_chooser.addOption("Center Line Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).CenterLineAuto1());
-        m_chooser.addOption("FCenter Auto", new doubleNoteAutos(swerveSubsystem,0,0).FCenterAuto());
-        SmartDashboard.putData(m_chooser);
+//        swerveSubsystem.setDefaultCommand(drive);
+//        m_chooser.setDefaultOption("Double Note Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto1());
+//        m_chooser.addOption("Double Note Auto 2", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto2());
+//        m_chooser.addOption("Double Note Auto 3", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto3());
+//        m_chooser.addOption("Double Note Auto 4", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto4());
+//        m_chooser.addOption("Center Line Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).CenterLineAuto1());
+//        m_chooser.addOption("FCenter Auto", new doubleNoteAutos(swerveSubsystem,0,0).FCenterAuto());
+//        SmartDashboard.putData(m_chooser);
 
         // Configure the trigger bindings
         configureBindings();

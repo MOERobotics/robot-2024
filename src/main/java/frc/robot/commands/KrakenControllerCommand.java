@@ -28,6 +28,8 @@ public class KrakenControllerCommand extends Command {
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
 	public void execute() {
+		System.out.printf("Speed Supply: %f\n", speedSupply.get());
+		System.out.flush();
 		if(Math.abs(speedSupply.get())>0.1) {
 			krakenDrive.setDriveState(speedSupply.get());
 		}else{

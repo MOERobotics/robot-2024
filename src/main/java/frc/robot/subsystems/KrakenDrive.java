@@ -6,6 +6,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class KrakenDrive extends SubsystemBase {
@@ -36,15 +37,16 @@ public class KrakenDrive extends SubsystemBase {
 		return driveMotor.getVelocity().getValue();
 	}
 
-	public void setDriveState(double Vel){
-		driveMotor.set(Vel);
+	public void setDriveState(double power){
+		driveMotor.set(power);
+		SmartDashboard.putNumber("Kraken Motor Speed",getDriveVelocity());
 	}
 
 	/**Set drive motor velocity in rotations per second
-	 * @param Vel Velocity in rotations per second
+	 * @param vel Velocity in rotations per second
 	 */
-	public void setDriveVelocity(double Vel){
-		driveMotor.setControl(driveVelocityVoltage.withVelocity(Vel).withFeedForward(driveFF));
+	public void setDriveVelocity(double vel){
+		driveMotor.setControl(driveVelocityVoltage.withVelocity(vel).withFeedForward(driveFF));
 	}
 
 	public void stopMotor(){
