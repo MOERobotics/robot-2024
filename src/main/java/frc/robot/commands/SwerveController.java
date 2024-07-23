@@ -61,7 +61,7 @@ public class SwerveController extends Command{
             xspd = 0;
         }
         else{
-            xspd = (xspd-Math.signum(yspd)*D)/(1-D);
+            xspd = (xspd-Math.signum(xspd)*D)/(1-D);
             xspd = (G*Math.pow(xspd, 3) + (1-G)*xspd)*maxMPS;
         }
         if (Math.abs(yspd) <= D){
@@ -77,7 +77,7 @@ public class SwerveController extends Command{
             turnspd = 0;
         }
         else{
-            turnspd = (turnspd-Math.signum(yspd)*D)/(1-D);
+            turnspd = (turnspd-Math.signum(turnspd)*D)/(1-D);
             turnspd = (G*Math.pow(turnspd, 3) + (1-G)*turnspd)*maxMPS;
         }
 
