@@ -81,9 +81,6 @@ public class KrakenMotor extends SubsystemBase implements GenericMotor{
 		return motor.get();
 	}
 
-	/**Set drive motor velocity in rotations per second
-	 * @param vel Velocity in rotations per minute
-	 */
 	@Override
 	public void setMotorVelocity(double vel){
 		motor.setControl(driveVelocityVoltage.withVelocity(vel*60).withFeedForward(motorFF));
@@ -97,6 +94,18 @@ public class KrakenMotor extends SubsystemBase implements GenericMotor{
 	@Override
 	public int getDeviceID(){
 		return motor.getDeviceID();
+	}
+
+	@Override
+	public KrakenMotor withPID(double motorP, double motorI, double motorD, double motorFF) {
+		this.setPID(motorP,motorI,motorD,motorFF);
+		return this;
+	}
+
+	@Override
+	public KrakenMotor withInvert(boolean invert) {
+		this.setInvert(invert);
+		return this;
 	}
 
 }

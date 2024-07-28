@@ -82,4 +82,16 @@ public class NeoMotor extends SubsystemBase implements GenericMotor{
 	public int getDeviceID(){
 		return motor.getDeviceId();
 	}
+
+	@Override
+	public NeoMotor withPID(double motorP, double motorI, double motorD, double motorFF){
+		this.setPID(motorP,motorI,motorD,motorFF);
+		return this;
+	}
+
+	@Override
+	public NeoMotor withInvert(boolean invert){
+		this.setInvert(invert);
+		return this;
+	}
 }

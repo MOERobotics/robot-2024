@@ -103,7 +103,19 @@ public class SwerveBotContainer {
             pigeon, maxMPS, maxMPS,maxMPSSquared, maxRPS, maxRPSSquared,1,0,0, 1.0, 0, 0,
             .04,0,0);
 
-    private final KrakenMotor krakenMotor = new KrakenMotor(52,false,driveP,driveI,driveD,driveFF);
+    private final KrakenMotor krakenMotor = new KrakenMotor(52).withInvert(false).withPID(driveP,driveI,driveD,driveFF);
+//    private final NeoMotor neoMotor = new NeoMotor(98);
+//    private final GenericSwerveModule testSwerve = new GenericSwerveModule(
+//            krakenMotor,
+//            neoMotor,
+//            99,
+//            false,
+//            true,
+//            45,
+//            new Translation2d(width,length),
+//            encoderTicksPerMeter, velocityConversionFactor,
+//            pivotP, pivotI, pivotD,
+//            driveP, driveI, driveD, driveFF);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
     private final Joystick driverJoystick = new Joystick(1); ///joystick imports

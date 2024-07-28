@@ -55,4 +55,21 @@ public interface GenericMotor {
 	 * @return The device ID of the motor
 	 */
 	int getDeviceID();
+
+	/**
+	 * Modifies the PID constants of the motor and returns itself
+	 * @param motorP P constant
+	 * @param motorI I constant
+	 * @param motorD D constant
+	 * @param motorFF Feed Forward constant
+	 * @return A GenericMotor with the specified PID constants
+	 */
+	GenericMotor withPID(double motorP, double motorI, double motorD, double motorFF);
+
+	/**
+	 * Modifies the default rotation direction of the motor and returns itself
+	 * @param invert The direction of the motor, true or false
+	 * @return A GenericMotor with the specified default rotation direction
+	 */
+	GenericMotor withInvert(boolean invert);
 }
