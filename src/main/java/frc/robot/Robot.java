@@ -17,22 +17,22 @@ import frc.robot.subsystems.SwerveDrive;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 //
-//  private FortissiMOEContainer m_robotContainer; //= new FortissiMOEContainer();;
-  private SwerveBotContainer m_robotContainer;
+  private FortissiMOEContainer m_robotContainer; //= new FortissiMOEContainer();;
+//  private SwerveBotContainer m_robotContainer;
 
   private void initRobotContainer(boolean force) {
     if (m_robotContainer != null)
       return;
     if (force || DriverStation.getAlliance().isPresent()) {
-      m_robotContainer = new SwerveBotContainer();
-//        m_robotContainer = new FortissiMOEContainer();
-//        m_robotContainer.climber.clearStickyFaults();
+//      m_robotContainer = new SwerveBotContainer();
+        m_robotContainer = new FortissiMOEContainer();
+        m_robotContainer.climber.clearStickyFaults();
     }
   }
 
   @Override
   public void robotInit() {
-//    m_robotContainer = new FortissiMOEContainer();
+    m_robotContainer = new FortissiMOEContainer();
     initRobotContainer(false);
       DataLogManager.start();
       DriverStation.startDataLog(DataLogManager.getLog());
@@ -49,10 +49,10 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {}
 
-//  @Override
-//  public void disabledPeriodic() {
-//    if (m_robotContainer!= null) m_robotContainer.resetArmPos();
-//  }
+  @Override
+  public void disabledPeriodic() {
+    if (m_robotContainer!= null) m_robotContainer.resetArmPos();
+  }
 
   @Override
   public void autonomousInit() {
@@ -76,8 +76,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-//    m_robotContainer.resetArmPos().schedule();
-//    m_robotContainer.buttonsCommand.schedule();
+    m_robotContainer.resetArmPos().schedule();
+    m_robotContainer.buttonsCommand.schedule();
   }
 
   @Override

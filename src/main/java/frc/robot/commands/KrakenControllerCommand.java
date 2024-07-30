@@ -16,6 +16,7 @@ public class KrakenControllerCommand extends Command {
 	public KrakenControllerCommand(KrakenMotor krakenMotor, Supplier <Double> speed) {
 		this.krakenMotor = krakenMotor;
 		speedSupply = speed;
+		addRequirements(krakenMotor);
 	}
 
 	// Called when the command is initially scheduled.

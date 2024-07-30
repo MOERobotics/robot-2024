@@ -63,13 +63,13 @@ public class FortissiMOEContainer{
     double pivotP = 8.0e-3*60;
     double pivotI = 0.0;
     double pivotD = 0.0;
-    double driveP = 5.0e-5;
+    double driveP = 5.0e-2;//5.0e-4@TODO: Redetermine PID constants for kraken
     double driveI = 0.0;
-    double driveD = 2.0e-4;
-    double driveFF = 1.76182e-4;
+    double driveD = 2.0e-2;//2.0e-4
+    double driveFF = 1.76182e-3;//1.76182e-4
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
-    double maxMPS = 174/39.3701;
+    double maxMPS = 600/39.3701;//174@TODO: Redetermine max speed
     double maxMPSAuto = 4;
     double maxRPS =  1.5*2*Math.PI;
     double maxRPS2 = Math.PI;
@@ -79,9 +79,9 @@ public class FortissiMOEContainer{
     Vision vision = new Vision();
     private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 
-    private final SwerveModule backLeftModule = new SwerveModule(
-            19,
-            18,
+    private final GenericSwerveModule backLeftModule = new GenericSwerveModule(
+            new KrakenMotor (51),
+            new NeoMotor(18),
             31,
             false,
             true,
@@ -90,9 +90,9 @@ public class FortissiMOEContainer{
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule backRightModule = new SwerveModule(
-            1,
-            20,
+    private final GenericSwerveModule backRightModule = new GenericSwerveModule(
+            new KrakenMotor(52),
+            new NeoMotor(20),
             32,
             false,
             true,
@@ -101,9 +101,9 @@ public class FortissiMOEContainer{
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule frontLeftModule = new SwerveModule(
-            17,
-            16,
+    private final GenericSwerveModule frontLeftModule = new GenericSwerveModule(
+            new KrakenMotor(54),
+            new NeoMotor(16),
             34,
             false,
             true,
@@ -112,9 +112,9 @@ public class FortissiMOEContainer{
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule frontRightModule = new SwerveModule(
-            3,
-            2,
+    private final GenericSwerveModule frontRightModule = new GenericSwerveModule(
+            new KrakenMotor(53),
+            new NeoMotor(2),
             33,
             false,
             true,
@@ -123,7 +123,7 @@ public class FortissiMOEContainer{
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
+    private final GenericSwerveDrive swerveSubsystem = new GenericSwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
             pigeon, maxMPSAuto, maxMPS, maxMPSSquared, maxRPS, maxRPS2,1.0, 0, 0, 1.0, 0, 0, 4e-2, 0,0);
     /////////////////////////////////////////////////////////////////////////////drive subsystems end
 
@@ -155,9 +155,10 @@ public class FortissiMOEContainer{
 
     ////////////////////////////////////////////////////////////////////////////commands
 
+//    private final KrakenControllerCommand krakenDrive = new KrakenControllerCommand(krakenMotor,()-> -driverJoystick.getRawAxis(1));
 
 
-    private final Command drive  = new SwerveController(swerveSubsystem,
+    private final Command drive  = new GenericSwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
             () -> -driverJoystick.getRawAxis(2),
@@ -267,7 +268,7 @@ public class FortissiMOEContainer{
 
 
         SmartDashboard.putData("Scheduler", CommandScheduler.getInstance());
-
+        /*
         m_chooser.setDefaultOption("Double Note Auto 1 (CW2)", new doubleNoteAutos(swerveSubsystem,armSubsystem,shooterSubsystem, collectorSubsystem,0,0).DoubleNoteAuto1());
         m_chooser.addOption("Double Note Auto 2 (BW1)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto2());
        // m_chooser.addOption("Double Note Auto 3 (CW1)", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DoubleNoteAuto3());
@@ -285,7 +286,7 @@ public class FortissiMOEContainer{
         m_chooser.addOption("driveForward", new doubleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).rollOutAuto());
         m_chooser.addOption("3 Note Centerline Auto (DC3C2)", new tripleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0, 0).DC3C2());
         m_chooser.addOption("2 Note Centerline Auto Obj Detect", new tripleNoteAutos(swerveSubsystem, armSubsystem, shooterSubsystem, collectorSubsystem, 0,0).DC3ObjDetect());
-        SmartDashboard.putData("chooser", m_chooser);
+        SmartDashboard.putData("chooser", m_chooser);*/
     }
 
 
@@ -358,6 +359,7 @@ public class FortissiMOEContainer{
                 whileFalse(Commands.runOnce(()->shooterSubsystem.setMaxShooterSpeeds(3200,3200)));
         //half speed reduction
 
+        /*
         var driveToNote = new DriveToNoteCommand(
                 swerveSubsystem,
                 vision,
@@ -371,7 +373,7 @@ public class FortissiMOEContainer{
                 },
 		        maxMPS
         );
-        new JoystickButton(driverJoystick, 8).whileTrue(driveToNote);
+        new JoystickButton(driverJoystick, 8).whileTrue(driveToNote);*/
         // object detection note pickup button
 
     }

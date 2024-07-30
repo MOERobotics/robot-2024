@@ -68,7 +68,7 @@ public class KrakenMotor extends SubsystemBase implements GenericMotor{
 
 	@Override
 	public double getMotorVelocity(){
-		return motor.getVelocity().getValue()/60;
+		return motor.getVelocity().getValue()*60;
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public class KrakenMotor extends SubsystemBase implements GenericMotor{
 
 	@Override
 	public void setMotorVelocity(double vel){
-		motor.setControl(driveVelocityVoltage.withVelocity(vel*60).withFeedForward(motorFF));
+		motor.setControl(driveVelocityVoltage.withVelocity(vel/60).withFeedForward(motorFF));
 	}
 
 	@Override

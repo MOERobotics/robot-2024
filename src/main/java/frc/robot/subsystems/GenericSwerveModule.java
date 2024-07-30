@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,7 +19,7 @@ public class GenericSwerveModule extends SubsystemBase {
     private final GenericMotor driveMotor;
     private final GenericMotor pivotMotor;
 
-    private final CANcoder pivotEncoder;
+    private final WPI_CANCoder pivotEncoder;
 
     private final double pivotOffset;
     private final double encoderTicksPerMeter;
@@ -40,7 +41,7 @@ public class GenericSwerveModule extends SubsystemBase {
         this.pivotMotor = pivotMotor;
         this.driveMotor.setInvert(driveInvert);
         this.pivotMotor.setInvert(pivotInvert);
-        pivotEncoder = new CANcoder(pivotEncoderID);
+        pivotEncoder = new WPI_CANCoder(pivotEncoderID);
 
         pivotOffset = pivotOff;
 
@@ -62,7 +63,7 @@ public class GenericSwerveModule extends SubsystemBase {
     }
 
     public double getPivotPosition(){
-        double reading = pivotEncoder.getAbsolutePosition().getValue()*360+pivotOffset;
+        double reading = pivotEncoder.getAbsolutePosition()+pivotOffset;
         SmartDashboard.putNumber("Power pivot Motor"+pivotMotor.getDeviceID(), pivotMotor.get());
         SmartDashboard.putNumber("pivot Motor"+pivotMotor.getDeviceID(), reading);
         if (reading < 0){
