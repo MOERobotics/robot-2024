@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.GenericSwerveController;
 import frc.robot.commands.KrakenControllerCommand;
 import frc.robot.commands.SwerveController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -42,10 +43,10 @@ public class SwerveBotContainer {
     double pivotP = 8.0e-3*60;
     double pivotI = 0.0;
     double pivotD = 0.0;
-    double driveP = 7.0e-5;
+    double driveP = 0.2;
     double driveI = 0.0;
-    double driveD = 1.0e-4;
-    double driveFF = 1.76182e-4;
+    double driveD = 0.0;
+    double driveFF = 1.14e-1;
     double width = Units.inchesToMeters(14);
     double length = Units.inchesToMeters(14);
     double maxMPS = 176/39.3701;
@@ -55,9 +56,9 @@ public class SwerveBotContainer {
     private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 
 
-    private final SwerveModule backLeftModule = new SwerveModule(
-            19,
-            18,
+    private final GenericSwerveModule backLeftModule = new GenericSwerveModule(
+            new KrakenMotor(51),
+            new NeoMotor(18),
             34,
             false,
             true,
@@ -66,9 +67,9 @@ public class SwerveBotContainer {
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule backRightModule = new SwerveModule(
-            1,
-            20,
+    private final GenericSwerveModule backRightModule = new GenericSwerveModule(
+            new KrakenMotor(52),
+            new NeoMotor(20),
             33,
             false,
             true,
@@ -77,9 +78,9 @@ public class SwerveBotContainer {
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule frontLeftModule = new SwerveModule(
-            11,
-            10,
+    private final GenericSwerveModule frontLeftModule = new GenericSwerveModule(
+            new KrakenMotor(54),
+            new NeoMotor(10),
             31,
             false,
             true,
@@ -88,9 +89,9 @@ public class SwerveBotContainer {
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveModule frontRightModule = new SwerveModule(
-            9,
-            8,
+    private final GenericSwerveModule frontRightModule = new GenericSwerveModule(
+            new KrakenMotor(53),
+            new NeoMotor(8),
             32,
             false,
             true,
@@ -99,11 +100,11 @@ public class SwerveBotContainer {
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
     );
-    private final SwerveDrive swerveSubsystem = new SwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
+    private final GenericSwerveDrive swerveSubsystem = new GenericSwerveDrive(frontLeftModule, backLeftModule, frontRightModule, backRightModule,
             pigeon, maxMPS, maxMPS,maxMPSSquared, maxRPS, maxRPSSquared,1,0,0, 1.0, 0, 0,
             .04,0,0);
 
-    private final KrakenMotor krakenMotor = new KrakenMotor(52).withInvert(false).withPID(driveP,driveI,driveD,driveFF);
+//    private final KrakenMotor krakenMotor = new KrakenMotor(52).withInvert(false).withPID(driveP,driveI,driveD,driveFF);
 //    private final NeoMotor neoMotor = new NeoMotor(98);
 //    private final GenericSwerveModule testSwerve = new GenericSwerveModule(
 //            krakenMotor,
@@ -122,8 +123,8 @@ public class SwerveBotContainer {
     private final Joystick funcOpJoystick = new Joystick(0);
 
     ////////////////////////////////////////////////////////////////////////////commands
-    private final Command kraken = new KrakenControllerCommand(krakenMotor,()-> -driverJoystick.getRawAxis(1));
-    private final Command drive  = new SwerveController(swerveSubsystem,
+//    private final Command kraken = new KrakenControllerCommand(krakenMotor,()-> -driverJoystick.getRawAxis(1));
+    private final Command drive  = new GenericSwerveController(swerveSubsystem,
             () -> -driverJoystick.getRawAxis(1),
             () -> -driverJoystick.getRawAxis(0),
             () -> -driverJoystick.getRawAxis(2),
@@ -131,9 +132,9 @@ public class SwerveBotContainer {
             () -> driverJoystick.getRawButton(1), 2,2, maxMPS, maxRPS
     );
 
-    Command setHeading = new setHeading(swerveSubsystem, () -> -driverJoystick.getRawAxis(1),
-            () -> -driverJoystick.getRawAxis(0), ()->(swerveSubsystem.getAngleBetweenSpeaker(
-            ()->swerveSubsystem.getEstimatedPose().getTranslation())));
+//    Command setHeading = new setHeading(swerveSubsystem, () -> -driverJoystick.getRawAxis(1),
+//            () -> -driverJoystick.getRawAxis(0), ()->(swerveSubsystem.getAngleBetweenSpeaker(
+//            ()->swerveSubsystem.getEstimatedPose().getTranslation())));
     ////////////////////////////////////////////////////////////////////////////commands end
 
 
@@ -145,8 +146,8 @@ public class SwerveBotContainer {
         shooter = new DigitalOutput(4);
         pigeon.reset();
 
-        krakenMotor.setDefaultCommand(kraken);
-//        swerveSubsystem.setDefaultCommand(drive);
+//        krakenMotor.setDefaultCommand(kraken);
+        swerveSubsystem.setDefaultCommand(drive);
 //        m_chooser.setDefaultOption("Double Note Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto1());
 //        m_chooser.addOption("Double Note Auto 2", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto2());
 //        m_chooser.addOption("Double Note Auto 3", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto3());
@@ -156,7 +157,7 @@ public class SwerveBotContainer {
 //        SmartDashboard.putData(m_chooser);
 
         // Configure the trigger bindings
-        configureBindings();
+        configureBindings();/*
         var button8 = new Trigger(()->driverJoystick.getRawButton(8)); //turn to source
         button8.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
@@ -165,7 +166,7 @@ public class SwerveBotContainer {
         var button7 = new Trigger(()->driverJoystick.getRawButton(7)); //turn to amp
         button7.whileTrue(new setHeading(swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(1),
-                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(90))));
+                () -> -driverJoystick.getRawAxis(0),()->AllianceFlip.apply(Rotation2d.fromDegrees(90))));*/
     }
 
 
@@ -175,7 +176,7 @@ public class SwerveBotContainer {
             new Trigger(funcOpJoystick.axisGreaterThan(3, 0.8, loop))
                     .whileTrue(Commands.runOnce(() -> shooter.set(true))).whileFalse(Commands.runOnce(()->shooter.set(false)));
 
-        new JoystickButton(funcOpJoystick, 3).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
+//        new JoystickButton(funcOpJoystick, 3).whileTrue(setHeading.until(()->Math.abs(driverJoystick.getRawAxis(2))>= .1));
     }
 
     private void shooterOn(Solenoid shooter) {
