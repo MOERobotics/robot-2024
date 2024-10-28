@@ -292,7 +292,7 @@ public class FortissiMOEContainer{
     private void configureBindings() {
 
 
-        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(0); swerveSubsystem.setDesiredYaw(0);}));
+        new JoystickButton(driverJoystick, 1).onTrue(Commands.runOnce(() -> {pigeon.setYaw(AllianceFlip.apply(Rotation2d.fromDegrees(0)).getDegrees()); swerveSubsystem.setDesiredYaw(AllianceFlip.apply(Rotation2d.fromDegrees(0)).getDegrees());}));
         // zero heading
 
         shoulderUp.whileTrue(Commands.run(()->armSubsystem.shoulderVoltageController(1.5)));
