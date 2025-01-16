@@ -1,36 +1,40 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.*;
+import com.revrobotics.spark.*;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.*;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
-import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 
 public class ShooterSubsystem extends SubsystemBase {
 
-    private final CANSparkMax shooterTop;
-    private final CANSparkMax shooterBottom;
+    private final SparkMax shooterTop;
+    private final SparkMaxConfig shooterTopConfig;
+    private final SparkMax shooterBottom;
+    private final SparkMaxConfig shooterBottomConfig;
 
-    private final SparkPIDController shooterTopController;
-    private final SparkPIDController shooterBottomController;
+    private final SparkClosedLoopController shooterTopController;
+    private final SparkClosedLoopController shooterBottomController;
 
     private final RelativeEncoder shooterTopEncoder;
     private final RelativeEncoder shooterBottomEncoder;
     private double shooterRPMTolerance;
     private double maxTopSpeed, maxBotSpeed;
     private double desiredTopSpeed, desiredBotSpeed;
-	private final Measure<Velocity<Voltage>> rampRate= Volts.of(0.5).per(Seconds.of(1));
-	private final Measure<Voltage> stepVoltage = Volts.of(7);
-	private final Measure<Time>timeout = Seconds.of(10);
-	private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
-	private final MutableMeasure<Angle> m_angle = mutable(Rotations.of(0));
-	private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(RotationsPerSecond.of(0));
+    private final Velocity<VoltageUnit> rampRate= Volts.per(Seconds).of(0.5);
+    private final Voltage stepVoltage = Volts.of(7);
+    private final Time timeout = Seconds.of(10);
+    private final MutVoltage m_appliedVoltage = Volts.mutable(0);
+    private final MutAngle m_angle = Degrees.mutable(0);
+    private final MutAngularVelocity m_velocity = DegreesPerSecond.mutable(0);
 	private final SysIdRoutine ShooterSysIdRoutine;
 	private SimpleMotorFeedforward ShooterTopFF,ShooterBotFF;
 
@@ -38,39 +42,36 @@ public class ShooterSubsystem extends SubsystemBase {
                             double shooterI, double shooterD,
                             double shooterTopkS, double shooterTopkV, double shooterTopkA,
                             double shooterBotkS, double shooterBotkV, double shooterBotkA) {
-        shooterTop = new CANSparkMax(shooterTopID, CANSparkLowLevel.MotorType.kBrushless);
-        shooterBottom = new CANSparkMax(shooterBottomID, CANSparkLowLevel.MotorType.kBrushless);
+        shooterTop = new SparkMax(shooterTopID, SparkLowLevel.MotorType.kBrushless);
+        shooterBottom = new SparkMax(shooterBottomID, SparkLowLevel.MotorType.kBrushless);
         shooterTop.setInverted(true);
         shooterBottom.setInverted(true);
-        shooterTop.setIdleMode(CANSparkBase.IdleMode.kCoast);
-        shooterBottom.setIdleMode(CANSparkBase.IdleMode.kCoast);
+        shooterTopConfig = new SparkMaxConfig();
+        shooterBottomConfig = new SparkMaxConfig();
 
+        shooterTopConfig.idleMode(SparkBaseConfig.IdleMode.kCoast).smartCurrentLimit(40,60);
+        shooterBottomConfig.idleMode(SparkBaseConfig.IdleMode.kCoast).smartCurrentLimit(40,60);
+
+        shooterTopConfig.closedLoop.pid(shooterP,shooterI,shooterD).velocityFF(0).outputRange(0,1);
+        shooterBottomConfig.closedLoop.pid(shooterP,shooterI,shooterD).velocityFF(0).outputRange(0,1);
 //        shooterBottom.setSmartCurrentLimit(40);
 //        shooterTop.setSmartCurrentLimit(40);
 
         shooterTopEncoder = shooterTop.getEncoder();
-        shooterTopController = shooterTop.getPIDController();
-        shooterTopController.setP(shooterP ); shooterTopController.setI(shooterI);
-        shooterTopController.setD(shooterD); shooterTopController.setFF(0);
-        shooterTopController.setOutputRange(0, 1);
+        shooterTopController = shooterTop.getClosedLoopController();
 
         shooterBottomEncoder = shooterBottom.getEncoder();
-        shooterBottomController = shooterBottom.getPIDController();
-        shooterBottomController.setP(shooterP); shooterBottomController.setI(shooterI);
-        shooterBottomController.setD(shooterD); shooterBottomController.setFF(0);
-        shooterTopController.setOutputRange(0, 1);
+        shooterBottomController = shooterBottom.getClosedLoopController();
         shooterRPMTolerance=5;
         maxBotSpeed = 3500; maxTopSpeed = 3500;
         desiredBotSpeed = 0; desiredTopSpeed = 0;
-		shooterTop.setSmartCurrentLimit(40,60);
-	    shooterBottom.setSmartCurrentLimit(40,60);
 		ShooterTopFF=new SimpleMotorFeedforward(shooterTopkS,shooterTopkV,shooterTopkA);
 		ShooterBotFF=new SimpleMotorFeedforward(shooterBotkS,shooterBotkV,shooterBotkA);
 		//SYS ID for bottom shooter
 	    ShooterSysIdRoutine = new SysIdRoutine(
 			    new SysIdRoutine.Config(rampRate,stepVoltage,timeout),
 			    new SysIdRoutine.Mechanism(
-					    (Measure<Voltage> volts)->{
+					    ( volts)->{
 						    shooterBottom.setVoltage(volts.in(Volts));
 					    },
 					    log -> {
@@ -97,13 +98,13 @@ public class ShooterSubsystem extends SubsystemBase {
     public void setShooterTopSpeed(double speed){
         setDesiredTopSpeed(speed);
         SmartDashboard.putNumber("shooterTopDesired", speed);
-        shooterTopController.setReference(speed, CANSparkBase.ControlType.kVelocity,1,ShooterTopFF.calculate(speed));
+        shooterTopController.setReference(speed, SparkBase.ControlType.kVelocity,ClosedLoopSlot.kSlot0,ShooterTopFF.calculate(speed));
         //shooterTop.set(speed);
     }
     public void setShooterBottomSpeed(double speed){
         setDesiredBotSpeed(speed);
         SmartDashboard.putNumber("shooterBottomDesired", speed);
-        shooterBottomController.setReference(speed, CANSparkBase.ControlType.kVelocity,1,ShooterBotFF.calculate(speed));
+        shooterBottomController.setReference(speed, SparkBase.ControlType.kVelocity, ClosedLoopSlot.kSlot0,ShooterBotFF.calculate(speed));
         //shooterBottom.set(speed);
     }
     public void setShooterSpeeds(double topSpeed, double bottomSpeed){

@@ -7,6 +7,11 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.revrobotics.*;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,11 +22,13 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
+import static com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless;
 
 public class SwerveModule extends SubsystemBase {
-    private final CANSparkMax driveMotor;
-    private final CANSparkMax pivotMotor;
+    private final SparkMax driveMotor;
+    private final SparkMaxConfig driveMotorConfig;
+    private final SparkMax pivotMotor;
+    private final SparkMaxConfig pivotMotorConfig;
 
     private final RelativeEncoder driveEncoder;
     private final CANCoder pivotEncoder;
@@ -31,7 +38,7 @@ public class SwerveModule extends SubsystemBase {
     private final double velocityConversionFactor;
 
     private final PIDController turningController;
-    private final SparkPIDController driveController;
+    private final SparkClosedLoopController driveController;
     private final Translation2d moduleTran;
 
 
@@ -43,15 +50,13 @@ public class SwerveModule extends SubsystemBase {
 
         this.moduleTran = moduleTran;
 
-        driveMotor = new CANSparkMax(driveMotorID, kBrushless);
-        pivotMotor = new CANSparkMax(pivotMotorID, kBrushless);
+        driveMotor = new SparkMax(driveMotorID, kBrushless);
+        driveMotorConfig = new SparkMaxConfig();
+        pivotMotor = new SparkMax(pivotMotorID, kBrushless);
+        pivotMotorConfig = new SparkMaxConfig();
 
-        driveMotor.setSmartCurrentLimit(60);
-        pivotMotor.setSmartCurrentLimit(60);
-
-
-        driveMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
-        pivotMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        driveMotorConfig.smartCurrentLimit(60).idleMode(SparkBaseConfig.IdleMode.kBrake);
+        pivotMotorConfig.smartCurrentLimit(60).idleMode(SparkBaseConfig.IdleMode.kBrake);
 
         driveEncoder = driveMotor.getEncoder();
         pivotEncoder = new WPI_CANCoder(pivotEncoderID);
@@ -60,7 +65,7 @@ public class SwerveModule extends SubsystemBase {
         pivotMotor.setInverted(pivotInvert);
 
         pivotOffset = pivotOff;
-        driveMotor.setClosedLoopRampRate(.35);
+        driveMotorConfig.closedLoopRampRate(.35);
 
         this.encoderTicksPerMeter = encoderTicksPerMeter;
         this.velocityConversionFactor = velocityConversionFactor;
@@ -68,13 +73,11 @@ public class SwerveModule extends SubsystemBase {
         turningController = new PIDController(pivotP, pivotI, pivotD);
         turningController.enableContinuousInput(-Math.PI, Math.PI);
 
-        driveController = driveMotor.getPIDController();
-        driveController.setP(driveP);
-        driveController.setI(driveI);
-        driveController.setIZone(0);
-        driveController.setD(driveD);
-        driveController.setFF(driveFF);
-        driveController.setOutputRange(-1, 1);
+        driveController = driveMotor.getClosedLoopController();
+        driveMotorConfig.closedLoop.pid(driveP,driveI,driveD).iZone(0).velocityFF(driveFF).outputRange(-1,1);
+
+        driveMotor.configure(driveMotorConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+        pivotMotor.configure(pivotMotorConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
     }
 
 
@@ -118,7 +121,7 @@ public class SwerveModule extends SubsystemBase {
         var driveVelocity = state.speedMetersPerSecond * velocityConversionFactor;
         SmartDashboard.putNumber("Velocity " + this.driveMotor.getDeviceId(), driveVelocity);
         SmartDashboard.putNumber("True Velocity" + this.driveMotor.getDeviceId(), getDriveVelocity());
-        driveController.setReference(driveVelocity, CANSparkMax.ControlType.kVelocity);
+        driveController.setReference(driveVelocity, SparkMax.ControlType.kVelocity);
         pivotMotor.set(turningController.calculate(getPivotRad(), state.angle.getRadians()));
     }
 

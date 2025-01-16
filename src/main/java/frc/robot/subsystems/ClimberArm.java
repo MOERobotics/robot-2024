@@ -1,8 +1,12 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.*;
+import com.revrobotics.spark.SparkAnalogSensor;
+import com.revrobotics.spark.SparkLimitSwitch;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.LimitSwitchConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.SPI;
@@ -10,12 +14,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
+import static com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless;
 
 public class ClimberArm extends SubsystemBase {
 
 //right voltage upper limit 2.8; upper left .49; lower left 2.214; lower rigyht 2.81
-    private final CANSparkMax climberMotor;
+    private final SparkMax climberMotor;
+    private final SparkMaxConfig climberMotorConfig;
     private double speed;
 
     // need to change max height
@@ -42,11 +47,13 @@ public class ClimberArm extends SubsystemBase {
        this.min_Inches = min_Inches;
        this.max_Inches= max_Inches;
        this.start_Inches=start_Inches;
-        climberMotor = new CANSparkMax(climberID, kBrushless);
-        climberMotor.setInverted(isInverted);
-        stringPot = climberMotor.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
-        upperLimit = climberMotor.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
-        lowerLimit = climberMotor.getReverseLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
+        climberMotor = new SparkMax(climberID, kBrushless);
+        climberMotorConfig = new SparkMaxConfig();
+        climberMotorConfig.inverted(isInverted);
+        climberMotorConfig.limitSwitch.forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed).reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyClosed);
+        stringPot = climberMotor.getAnalog();
+        upperLimit = climberMotor.getForwardLimitSwitch();
+        lowerLimit = climberMotor.getReverseLimitSwitch();
 
         climberEncoder = climberMotor.getEncoder();
     }

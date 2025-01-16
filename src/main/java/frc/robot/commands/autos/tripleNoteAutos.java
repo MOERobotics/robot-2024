@@ -166,13 +166,13 @@ public class tripleNoteAutos {
         Rotation2d endRotation4= endRotation2;
         Pose2d endPose4 = new Pose2d(endTranslation4, endRotation4); //W3 to start C
 
-        Translation2d endTranslation5 = new Translation2d(UsefulPoints.Points.WingedNote1.getX(),UsefulPoints.Points.WingedNote1.getY() + Units.inchesToMeters(6));
+        Translation2d endTranslation5 = new Translation2d(UsefulPoints.Points.WingedNote1.getX(),UsefulPoints.Points.WingedNote1.getY() + Units.inchesToMeters(/*6*/10));
         Rotation2d endRotation5 = (swerveDrive.getAngleBetweenSpeaker(endTranslation));
         Rotation2d startRotation5 = endRotation4;
         Pose2d startPose5 = new Pose2d(endPose4.getTranslation(), startRotation5);
         Pose2d endPose5 = new Pose2d(endTranslation5, endRotation5);// start C to W1
 
-        Translation2d endTranslation6 = endTranslation4;
+        Translation2d endTranslation6 = endTranslation4/*.plus(new Translation2d(Units.inchesToMeters(2),Units.inchesToMeters(-5)))*/;
         Rotation2d endRotation6 = (swerveDrive.getAngleBetweenSpeaker(endTranslation6));
         Rotation2d startRotation6 = endRotation5;
         Pose2d startPose6 = new Pose2d(endPose5.getTranslation(), startRotation6);
@@ -184,9 +184,9 @@ public class tripleNoteAutos {
         internalPoints3.add(endTranslation3.plus(new Translation2d(Units.inchesToMeters(-24),Units.inchesToMeters(5))));
         ArrayList<Translation2d> internalPoints4 = new ArrayList<>();
         ArrayList<Translation2d> internalPoints5 = new ArrayList<>();
-        internalPoints5.add(endTranslation5.plus(new Translation2d(Units.inchesToMeters(-24), Units.inchesToMeters(-5))));
+        internalPoints5.add(endTranslation5.plus(new Translation2d(Units.inchesToMeters(-24), Units.inchesToMeters(/*-5*/-2))));
         ArrayList<Translation2d> internalPoints6 = new ArrayList<>();
-        internalPoints6.add(endTranslation6.plus(new Translation2d(Units.inchesToMeters(20),Units.inchesToMeters(5))));
+        internalPoints6.add(endTranslation6.plus(new Translation2d(Units.inchesToMeters(20),Units.inchesToMeters(/*5*/2))));
 
 
         Command trajCommand = swerveDrive.generateTrajectory(startPose,endPose,internalPoints,0,0);

@@ -6,6 +6,10 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.*;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.*;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -24,15 +29,17 @@ import frc.robot.commands.ArmPathFollow;
 
 import java.util.function.Supplier;
 
-import static com.revrobotics.CANSparkLowLevel.MotorType.kBrushless;
-import static edu.wpi.first.units.MutableMeasure.mutable;
+import static com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless;
 import static edu.wpi.first.units.Units.*;
 
 public class Arm extends SubsystemBase {
-    private final CANSparkMax shoulderMotorLeft, shoulderMotorRight;
-    private final CANSparkMax wristMotor;
+    private final SparkMax shoulderMotorLeft, shoulderMotorRight;
+    private final SparkMax wristMotor;
+    private final SparkMaxConfig shoulderMotorLeftConfig,shoulderMotorRightConfig;
+    private final SparkMaxConfig wristMotorConfig;
 
     private final CANCoder shoulderEncoder;
+
     private final CANCoder wristEncoder;
 
     private final RelativeEncoder shoulderRelEncoder;
@@ -48,12 +55,12 @@ public class Arm extends SubsystemBase {
     shoulderCOMOffset, wristCOMOffset, shoulderMass, wristMass, shoulderGearing, wristGearing;
     private double wristOffset = 0;
     private double shoulderOffset = 90;
-	private final Measure<Velocity<Voltage>>rampRate= Volts.of(0.25).per(Seconds.of(1));
-	private final Measure<Voltage> stepVoltage = Volts.of(2);
-	private final Measure<Time>timeout = Seconds.of(5);
-	private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
-	private final MutableMeasure<Angle> m_angle = mutable(Degrees.of(0));
-	private final MutableMeasure<Velocity<Angle>> m_velocity = mutable(DegreesPerSecond.of(0));
+	private final Velocity<VoltageUnit> rampRate= Volts.per(Seconds).of(0.25);
+	private final Voltage stepVoltage = Volts.of(2);
+	private final Time timeout = Seconds.of(5);
+	private final MutVoltage m_appliedVoltage = Volts.mutable(0);
+	private final MutAngle m_angle = Degrees.mutable(0);
+	private final MutAngularVelocity m_velocity = DegreesPerSecond.mutable(0);
 	private final SysIdRoutine shoulderSysIdRoutine;
     private final ArmFeedforward wristFF, shoulderFF;
 
@@ -69,23 +76,16 @@ public class Arm extends SubsystemBase {
                Rotation2d highTransitionShoulderAngle, Rotation2d highTransitionWristAngle,
                double maxSpeed, double maxAccel) {
 
-        shoulderMotorLeft = new CANSparkMax(leftShoulderMotorID, kBrushless);
-        shoulderMotorRight = new CANSparkMax(rightShoulderMotorID, kBrushless);
-        wristMotor = new CANSparkMax(wristMotorID, kBrushless);
+        shoulderMotorLeft = new SparkMax(leftShoulderMotorID, kBrushless);
+        shoulderMotorLeftConfig = new SparkMaxConfig();
+        shoulderMotorRight = new SparkMax(rightShoulderMotorID, kBrushless);
+        shoulderMotorRightConfig = new SparkMaxConfig();
+        wristMotor = new SparkMax(wristMotorID, kBrushless);
+        wristMotorConfig = new SparkMaxConfig();
 
-        shoulderMotorRight.setIdleMode(CANSparkBase.IdleMode.kBrake);
-        shoulderMotorLeft.setIdleMode(CANSparkBase.IdleMode.kBrake);
-        wristMotor.setIdleMode(CANSparkBase.IdleMode.kBrake);
-
-        shoulderMotorLeft.setInverted(true);
-        shoulderMotorRight.setInverted(false);
-        wristMotor.setInverted(true);
-
-        wristMotor.setSmartCurrentLimit(20);
-        shoulderMotorRight.setSmartCurrentLimit(20);
-        shoulderMotorLeft.setSmartCurrentLimit(20);
-
-        shoulderMotorRight.follow(shoulderMotorLeft, true);
+        shoulderMotorLeftConfig.idleMode(SparkBaseConfig.IdleMode.kBrake).inverted(true).smartCurrentLimit(20);
+        shoulderMotorRightConfig.idleMode(SparkBaseConfig.IdleMode.kBrake).inverted(false).smartCurrentLimit(20).follow(shoulderMotorLeft,true);
+        wristMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake).inverted(true).smartCurrentLimit(20);
 
         shoulderEncoder = new CANCoder(shoulderEncoderID);
         wristEncoder = new CANCoder(wristEncoderID);
@@ -112,10 +112,14 @@ public class Arm extends SubsystemBase {
 		setWristDestState(wristState().getDegrees());
         shoulderController.reset();
         wristController.reset();
+
+        shoulderMotorLeft.configure(shoulderMotorLeftConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+        shoulderMotorRight.configure(shoulderMotorLeftConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+        wristMotor.configure(shoulderMotorLeftConfig, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
 	    shoulderSysIdRoutine = new SysIdRoutine(
 			new SysIdRoutine.Config(rampRate, stepVoltage,timeout),
 			new SysIdRoutine.Mechanism(
-					(Measure<Voltage> volts)->{
+					(volts)->{
 						shoulderMotorLeft.setVoltage(volts.in(Volts));
 						},
 					log -> {

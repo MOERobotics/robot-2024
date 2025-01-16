@@ -38,6 +38,11 @@ public class ObjectDetection {
         }
 
         @Override
+        public String getTypeName() {
+            return "ObjectDetection";
+        }
+
+        @Override
         public String getTypeString() {
             return "struct:ObjectDetection";
         }

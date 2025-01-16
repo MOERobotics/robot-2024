@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -45,7 +45,7 @@ public class SwerveBotContainer {
 
     public DigitalOutput shooter;
 
-    WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
+    PigeonIMU pigeon = new PigeonIMU(0);
 
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;
@@ -141,7 +141,7 @@ public class SwerveBotContainer {
     public SwerveBotContainer() {
 
         shooter = new DigitalOutput(4);
-        pigeon.reset();
+        pigeon.setYaw(0);
 
         swerveSubsystem.setDefaultCommand(drive);
         m_chooser.setDefaultOption("Double Note Auto 1", new doubleNoteAutos(swerveSubsystem,0,0).DoubleNoteAuto1());

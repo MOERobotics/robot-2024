@@ -4,8 +4,8 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
-import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix.sensors.PigeonIMU;
+import com.studica.frc.AHRS;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -52,9 +52,9 @@ public class FortissiMOEContainer{
             0.52 * ClimberArm.CONVERSION_FACTOR_INCHES,
             0.83 * ClimberArm.CONVERSION_FACTOR_INCHES
     );
-    public AHRS navx = new AHRS(I2C.Port.kMXP, (byte)50);
+    public AHRS navx = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
-    WPI_Pigeon2 pigeon = new WPI_Pigeon2(0);
+    PigeonIMU pigeon = new PigeonIMU(0);
     PowerDistribution pdh = new PowerDistribution(21, PowerDistribution.ModuleType.kRev);
 
     /////////////////////////////////////////////////////////////////////////////drive subsystems

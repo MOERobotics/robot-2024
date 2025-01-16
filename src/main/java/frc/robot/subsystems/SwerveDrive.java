@@ -3,10 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -44,7 +43,7 @@ public class SwerveDrive extends SubsystemBase {
     SwerveModule BLModule;
     SwerveModule FRModule;
     SwerveModule BRModule;
-    WPI_Pigeon2 pigeon;
+    PigeonIMU pigeon;
     private final SwerveDriveOdometry odometer;
     private final double maxMetersPerSec, maxMPSAuto;
     private final double maxMetersPerSecSquared;
@@ -62,7 +61,7 @@ public class SwerveDrive extends SubsystemBase {
     SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 	private TimeInterpolatableBuffer<Pose2d> BufferedPose;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
-                       WPI_Pigeon2 pigeon, double maxMPSAuto, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
+                       PigeonIMU pigeon, double maxMPSAuto, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
                        double kP, double kI, double kD,
                        double xykP, double xykI, double xykD,
                        double thetaP, double thetaI, double thetaD) {

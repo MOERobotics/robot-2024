@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkLowLevel;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkPIDController;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkLowLevel;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,24 +15,20 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.Supplier;
 
 public class CollectorSubsystem extends SubsystemBase {
-    private final CANSparkMax collector;
-    private final SparkPIDController collectorController;
+    private final SparkMax collector;
+    private final SparkMaxConfig collectorConfig;
+    private final SparkClosedLoopController collectorController;
     private final DigitalInput collectorBeam;
     private boolean collectorState;
 
     public CollectorSubsystem(int collectorID,double collectorP, double collectorI, double collectorD, double collectorFF,  int collectorBeamID){
         this.collectorBeam = new DigitalInput(collectorBeamID);
-        this.collector=new CANSparkMax(collectorID, CANSparkLowLevel.MotorType.kBrushless);
-        collector.setIdleMode(CANSparkBase.IdleMode.kBrake);
+        this.collector=new SparkMax(collectorID, SparkLowLevel.MotorType.kBrushless);
+        collectorConfig = new SparkMaxConfig();
+        collectorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake).inverted(true).smartCurrentLimit(40);
+        collectorConfig.closedLoop.pid(collectorP,collectorI,collectorD).velocityFF(collectorFF).iZone(0).outputRange(-1,1);
         collector.setInverted(true);
-        this.collectorController = collector.getPIDController();
-        collectorController.setP(collectorP);
-        collectorController.setI(collectorI);
-        collectorController.setIZone(0);
-        collectorController.setD(collectorD);
-        collectorController.setFF(collectorFF);
-        collectorController.setOutputRange(-1, 1);
-        collector.setSmartCurrentLimit(40);
+        this.collectorController = collector.getClosedLoopController();
     }
     public boolean isCollected(){
         SmartDashboard.putBoolean("Beambreak", collectorBeam.get());
