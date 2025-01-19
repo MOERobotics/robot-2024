@@ -55,14 +55,12 @@ public class SwerveModule extends SubsystemBase {
         pivotMotor = new SparkMax(pivotMotorID, kBrushless);
         pivotMotorConfig = new SparkMaxConfig();
 
-        driveMotorConfig.smartCurrentLimit(60).idleMode(SparkBaseConfig.IdleMode.kBrake);
-        pivotMotorConfig.smartCurrentLimit(60).idleMode(SparkBaseConfig.IdleMode.kBrake);
+        driveMotorConfig.inverted(driveInvert).smartCurrentLimit(60).idleMode(SparkBaseConfig.IdleMode.kBrake);
+        pivotMotorConfig.inverted(pivotInvert).smartCurrentLimit(60).idleMode(SparkBaseConfig.IdleMode.kBrake);
 
         driveEncoder = driveMotor.getEncoder();
         pivotEncoder = new WPI_CANCoder(pivotEncoderID);
 
-        driveMotor.setInverted(driveInvert);
-        pivotMotor.setInverted(pivotInvert);
 
         pivotOffset = pivotOff;
         driveMotorConfig.closedLoopRampRate(.35);
