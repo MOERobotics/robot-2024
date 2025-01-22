@@ -4,8 +4,7 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.WPI_CANCoder;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.*;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -23,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless;
+import static edu.wpi.first.units.Units.*;
 
 public class SwerveModule extends SubsystemBase {
     private final SparkMax driveMotor;
@@ -31,7 +31,7 @@ public class SwerveModule extends SubsystemBase {
     private final SparkMaxConfig pivotMotorConfig;
 
     private final RelativeEncoder driveEncoder;
-    private final CANCoder pivotEncoder;
+    private final CANcoder pivotEncoder;
 
     private final double pivotOffset;
     private final double encoderTicksPerMeter;
@@ -59,7 +59,7 @@ public class SwerveModule extends SubsystemBase {
         pivotMotorConfig.inverted(pivotInvert).smartCurrentLimit(60).idleMode(SparkBaseConfig.IdleMode.kBrake);
 
         driveEncoder = driveMotor.getEncoder();
-        pivotEncoder = new WPI_CANCoder(pivotEncoderID);
+        pivotEncoder = new CANcoder(pivotEncoderID);
 
 
         pivotOffset = pivotOff;
@@ -89,7 +89,7 @@ public class SwerveModule extends SubsystemBase {
     }
 
     public double getPivotPosition(){
-        double reading = pivotEncoder.getAbsolutePosition()+pivotOffset;
+        double reading = pivotEncoder.getAbsolutePosition().getValue().in(Degrees)+pivotOffset;
         SmartDashboard.putNumber("Power pivot Motor"+pivotMotor.getDeviceId(), pivotMotor.get());
         SmartDashboard.putNumber("pivot Motor"+pivotMotor.getDeviceId(), reading);
         if (reading < 0){

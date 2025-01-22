@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.*;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
@@ -38,9 +38,9 @@ public class Arm extends SubsystemBase {
     private final SparkMaxConfig shoulderMotorLeftConfig,shoulderMotorRightConfig;
     private final SparkMaxConfig wristMotorConfig;
 
-    private final CANCoder shoulderEncoder;
+    private final CANcoder shoulderEncoder;
 
-    private final CANCoder wristEncoder;
+    private final CANcoder wristEncoder;
 
     private final RelativeEncoder shoulderRelEncoder;
     private final RelativeEncoder wristRelEncoder;
@@ -87,8 +87,8 @@ public class Arm extends SubsystemBase {
         shoulderMotorRightConfig.idleMode(SparkBaseConfig.IdleMode.kBrake).inverted(false).smartCurrentLimit(20).follow(shoulderMotorLeft,true);
         wristMotorConfig.idleMode(SparkBaseConfig.IdleMode.kBrake).inverted(true).smartCurrentLimit(20);
 
-        shoulderEncoder = new CANCoder(shoulderEncoderID);
-        wristEncoder = new CANCoder(wristEncoderID);
+        shoulderEncoder = new CANcoder(shoulderEncoderID);
+        wristEncoder = new CANcoder(wristEncoderID);
 
         shoulderRelEncoder = shoulderMotorLeft.getEncoder();
         wristRelEncoder = wristMotor.getEncoder();
@@ -264,7 +264,7 @@ public class Arm extends SubsystemBase {
 
 
     public Rotation2d shoulderState() {
-        double deg = shoulderEncoder.getAbsolutePosition()+shoulderOffset;
+        double deg = shoulderEncoder.getAbsolutePosition().getValue().in(Degrees)+shoulderOffset;
         if (deg < -180) deg = deg + 360;
         if (deg > 180) deg = deg - 360;
         return Rotation2d.fromDegrees(deg);
@@ -272,7 +272,7 @@ public class Arm extends SubsystemBase {
 
     public Rotation2d wristState(){
         //return Rotation2d.fromDegrees(wristPosRel());
-        double deg = wristEncoder.getAbsolutePosition() + wristOffset;
+        double deg = wristEncoder.getAbsolutePosition().getValue().in(Degrees) + wristOffset;
         if (deg < -180) deg = deg + 360;
         if (deg > 180) deg = deg - 360;
         return Rotation2d.fromDegrees(-deg);
@@ -338,7 +338,7 @@ public class Arm extends SubsystemBase {
         return wristRelEncoder.getVelocity()*(-126.3+2)/(-0.548-15.8)*22/48;
     }
     public double getShoulderVelocity(){
-        return shoulderEncoder.getVelocity();
+        return shoulderEncoder.getVelocity().getValue().in(DegreesPerSecond);
     }
 
     public void holdPos(double shoulder, double wrist){
