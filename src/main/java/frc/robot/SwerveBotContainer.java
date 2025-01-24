@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -45,7 +45,7 @@ public class SwerveBotContainer {
 
     public DigitalOutput shooter;
 
-    PigeonIMU pigeon = new PigeonIMU(0);
+    Pigeon2 pigeon = new Pigeon2(0);
 
     /////////////////////////////////////////////////////////////////////////////drive subsystems
     double encoderTicksPerMeter = 6.75/12.375*1.03/1.022*39.3701;

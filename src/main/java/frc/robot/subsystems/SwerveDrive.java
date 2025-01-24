@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
-import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -37,13 +37,15 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.DoubleStream;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 public class SwerveDrive extends SubsystemBase {
     /** Creates a new ExampleSubsystem. */
     SwerveModule FLModule;
     SwerveModule BLModule;
     SwerveModule FRModule;
     SwerveModule BRModule;
-    PigeonIMU pigeon;
+    Pigeon2 pigeon;
     private final SwerveDriveOdometry odometer;
     private final double maxMetersPerSec, maxMPSAuto;
     private final double maxMetersPerSecSquared;
@@ -61,7 +63,7 @@ public class SwerveDrive extends SubsystemBase {
     SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 	private TimeInterpolatableBuffer<Pose2d> BufferedPose;
     public SwerveDrive(SwerveModule FLModule, SwerveModule BLModule, SwerveModule FRModule, SwerveModule BRModule,
-                       PigeonIMU pigeon, double maxMPSAuto, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
+                       Pigeon2 pigeon, double maxMPSAuto, double maxMetersPerSec, double maxMetersPerSecSquared, double maxRPS, double maxRPS2,
                        double kP, double kI, double kD,
                        double xykP, double xykI, double xykD,
                        double thetaP, double thetaI, double thetaD) {
@@ -119,7 +121,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public double getYaw(){
-        return pigeon.getYaw();
+        return pigeon.getYaw().getValue().in(Degrees);
     }
 
 	public void setPigeon(double Yaw){

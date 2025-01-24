@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.studica.frc.AHRS;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -28,6 +28,8 @@ import frc.robot.subsystems.*;
 import frc.robot.vision.Vision;
 
 import java.util.Set;
+
+import static edu.wpi.first.units.Units.Degrees;
 
 
 /**
@@ -54,7 +56,7 @@ public class FortissiMOEContainer{
     );
     public AHRS navx = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
-    PigeonIMU pigeon = new PigeonIMU(0);
+    Pigeon2 pigeon = new Pigeon2(0);
     PowerDistribution pdh = new PowerDistribution(21, PowerDistribution.ModuleType.kRev);
 
     /////////////////////////////////////////////////////////////////////////////drive subsystems
@@ -85,7 +87,7 @@ public class FortissiMOEContainer{
             31,
             false,
             true,
-            135,
+            45,
             new Translation2d(-width, length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
@@ -96,7 +98,7 @@ public class FortissiMOEContainer{
             32,
             false,
             true,
-            -135,
+            135,
             new Translation2d(-width, -length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
@@ -107,7 +109,7 @@ public class FortissiMOEContainer{
             34,
             false,
             true,
-            45,
+            -45,
             new Translation2d(width, length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
@@ -118,7 +120,7 @@ public class FortissiMOEContainer{
             33,
             false,
             true,
-            -45,
+            -135,
             new Translation2d(width, -length),
             encoderTicksPerMeter,velocityConversionFactor, pivotP, pivotI, pivotD,
             driveP, driveI, driveD, driveFF
@@ -189,7 +191,7 @@ public class FortissiMOEContainer{
     private final Command climbUp= new ClimbUp(
             climber,
             1,
-            ()-> -pigeon.getPitch()
+            ()-> -pigeon.getPitch().getValue().in(Degrees)
     );
 
 
@@ -221,8 +223,8 @@ public class FortissiMOEContainer{
         SmartDashboard.putBoolean("ClimbingDown", climbingDown);
         SmartDashboard.putBoolean("ClimbingUp", climbingUp);
 
-        SmartDashboard.putNumber("Roll", pigeon.getRoll());
-        SmartDashboard.putNumber("Pitch", pigeon.getPitch());
+        SmartDashboard.putNumber("Roll", pigeon.getRoll().getValue().in(Degrees));
+        SmartDashboard.putNumber("Pitch", pigeon.getPitch().getValue().in(Degrees));
         pdh.setSwitchableChannel(((collectorSubsystem.isCollected() || collectorSubsystem.getCollectorAmps() > 20) && ((System.currentTimeMillis()/100)%2 == 0))
                 ||  (shooterSubsystem.shooterAtSpeed() && shooterSubsystem.getDesiredTopSpeed() != 0 && (collectorSubsystem.isCollected() || collectorSubsystem.getCollectorAmps() > 20)));
     });
